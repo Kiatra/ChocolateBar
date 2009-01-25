@@ -1,0 +1,19 @@
+## Interface: 30000
+## Title: ChocolateBar
+## Notes: A display for LibDataBroker-1.1
+## Author: yess
+## Version: 0.1 Beta
+## X-Email:
+## OptionalDeps: Ace3, LibDataBroker-1.1
+## X-Embeds: Ace3, LibDataBroker-1.1
+
+## SavedVariables: ChocolateBarDB
+
+embeds.xml
+
+Chocolate.lua
+DragAndDrop.lua
+ChocolateOptions.lua
+ChocolatePiece.lua
+ChocolateBar.lua
+
