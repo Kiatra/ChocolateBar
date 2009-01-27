@@ -493,6 +493,7 @@ function Jostle:Refresh(...)
 	end
 end
 
+--[[
 local function compat()
 	local Jostle20 = {}
 	function Jostle20:RegisterTop(...)
@@ -562,3 +563,4 @@ elseif Rock then
 		end
 	end
 end
+]]
