@@ -12,7 +12,7 @@ function Bar:New(name, settings)
 		frame[k] = v
 	end
 	
-	frame:SetHeight(settings.height)
+	frame:SetHeight(21)
 	frame:SetPoint("TOPLEFT",-1,1);
 	--frame:SetPoint("TOPLEFT", settings.xoff, settings.yoff);
 	frame:SetPoint("RIGHT", "UIParent" ,"RIGHT",0, 0);
@@ -123,17 +123,35 @@ end
 function Bar:GetChocolateAtCursor()
 	local s = self:GetEffectiveScale()
 	local x, y = GetCursorPosition()
+	local align
+	if x < 50 then
+		align = "left"
+	end
+	if x > 850 then
+		align =  "right"
+	end
+	
 	x = x/s
 	for k, v in pairs(self.chocolist) do
 		if x > v:GetLeft() and x < v:GetRight() then
-			return v
+			return v, align
 		end
 	end
-	return nil
+	return nil, align
 end
 
 function Bar:UpdateDragChocolate()
-	local choco = self:GetChocolateAtCursor()
+	local choco, align = self:GetChocolateAtCursor()
+	if self.dummy.settings.align ~= align then
+		if align == "left"  then
+			self.dummy.settings.index = -1
+			self.dummy.settings.align = "left"
+		end
+		if align == "right" then
+			self.dummy.settings.index = -1
+			self.dummy.settings.align = "right"
+		end
+	end
 	if not choco then 
 		Debug("Bar:UpdateDragChocolate(pos) cursour above: nil")
 		self.dummy.settings.index = 500
