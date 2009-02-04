@@ -1,4 +1,4 @@
-local LibStub = LibStub
+﻿local LibStub = LibStub
 local LSM = LibStub("LibSharedMedia-3.0")
 local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("ChocolateBar")
 local Debug = ChocolateBar.Debug
@@ -53,6 +53,18 @@ local aceoptions = {
 					end,
 					set = function(info, value)
 							db.hideonleave = value
+					end,
+				},
+				locked = {
+					type = 'toggle',
+					order = 2,
+					name = "Lock Chocolates",
+					desc = "Disable drag and drop",
+					get = function(info, value)
+							return db.locked
+					end,
+					set = function(info, value)
+							db.locked = value
 					end,
 				},
 				backbround = {
@@ -165,6 +177,20 @@ local function GetEnabled(info, value)
 	return db.objSettings[name].enabled
 end
 
+local function GetIcon(info, value)
+	local cleanName = info[#info-1]
+	local name = chocolateOptions[cleanName].desc
+	return db.objSettings[name].showIcon
+end
+
+local function SetIcon(info, value)
+	local cleanName = info[#info-1]
+	local name = chocolateOptions[cleanName].desc
+	db.objSettings[name].showIcon = value
+	ChocolateBar:AttributeChanged(nil, name, "updateSettings", value)
+end
+
+
 local function GetText(info, value)
 	local cleanName = info[#info-1]
 	local name = chocolateOptions[cleanName].desc
@@ -258,6 +284,7 @@ function ChocolateBar:RegisterOptions()
 					align = "left",
 					enabled = true,
 					showText = true,
+					showIcon = true,
 					space = 7,
 				},
 			},
@@ -271,6 +298,7 @@ function ChocolateBar:RegisterOptions()
 	LSM:Register("statusbar", "Solid", "Interface\\Buttons\\WHITE8X8")
 	LSM:Register("statusbar", "Blizzard Parchment","Interface\\AchievementFrame\\UI-Achievement-Parchment-Horizontal")
 	LSM:Register("statusbar", "Chocolate","Interface\\AddOns\\ChocolateBar\\ChocolateBar")
+	LSM:Register("statusbar", "Titan","Interface\\AddOns\\ChocolateBar\\Titan")
 	
 	createDropPoint("ChocolateTextDrop", dropText, -100,"Toggle Text","Interface/ICONS/Achievement_BG_winbyten")
 	createDropPoint("ChocolateDisableDrop", dropDisable, 100,"Eat Chocolate", "Interface/ICONS/Achievement_Halloween_Smiley_01")
@@ -298,7 +326,7 @@ function ChocolateBar:AddObjectOptions(name)
 			enabled = {
 				type = 'toggle',
 				--width = "half",
-				order = 9,
+				order = 0,
 				name = "Enabled",
 				desc = "Enabled",
 				get = GetEnabled,
@@ -307,11 +335,20 @@ function ChocolateBar:AddObjectOptions(name)
 			text = {
 				type = 'toggle',
 				--width = "half",
-				order = 9,
+				order = 1,
 				name = "Show Text",
 				desc = "Show Text",
 				get = GetText,
 				set = SetText,
+			},
+			icon = {
+				type = 'toggle',
+				--width = "half",
+				order = 2,
+				name = "Show Icon",
+				desc = "Show Icon",
+				get = GetIcon,
+				set = SetIcon,
 			},
 		},
 	}

@@ -6,7 +6,7 @@ local Debug = ChocolateBar.Debug
 local function resizeFrame(self)
 	local settings = self.settings
 	local width = settings.space
-	if self.icon then
+	if self.icon and settings.showIcon then
 		width = width + self.icon:GetWidth()
 	end
 	if settings.showText then
@@ -22,14 +22,23 @@ local function TextUpdater(frame, value, name)
 	resizeFrame(frame)
 end
 
-local function SettingsUpdater(frame, value, name)
-	if not value then
-		frame.text:Hide()
-		Debug("Update hide:", value)
+local function SettingsUpdater(self, value, name)
+	local settings = self.settings
+	if not settings.showText then
+		self.text:Hide()
 	else
-		frame.text:Show()
+		self.text:Show()
 	end
-	resizeFrame(frame)
+	if self.icon then 
+		if not settings.showIcon then
+			self.icon:Hide()
+			self.text:SetPoint("LEFT", self, "LEFT", 0, 0)
+		else
+			self.icon:Show()
+			self.text:SetPoint("LEFT", self.icon, "RIGHT", 0, 0)
+		end
+	end
+	resizeFrame(self)
 end
 
 -- updaters code taken with permission from fortress 
@@ -39,7 +48,9 @@ local uniqueUpdaters = {
 	icon = function(frame, value, name)
 		--if value and self.db.icon then
 		if value then
-			frame.icon:SetTexture(value)
+			if frame.icon then
+				frame.icon:SetTexture(value)
+			end
 			--frame:ShowIcon()
 		else
 			--frame:HideIcon()
@@ -165,20 +176,24 @@ local function Update(self, f,key, value)
 end
 
 local function OnDragStart(frame)
-	GameTooltip:Hide();
-	local barName = frame.settings.barName			
-	local bar = frame.bar			
-	Drag:Start(bar, frame.name)
-	this:StartMoving()
-	this.isMoving = true
+	if not ChocolateBar.db.profile.locked then 
+		GameTooltip:Hide();
+		local barName = frame.settings.barName			
+		local bar = frame.bar			
+		Drag:Start(bar, frame.name)
+		this:StartMoving()
+		this.isMoving = true
+	end
 end
 
 local function OnDragStop(frame)
-	this:StopMovingOrSizing()
-	this.isMoving = false
-	Drag:Stop(frame)
-	this:StopMovingOrSizing()
-	this.isMoving = false
+	if not ChocolateBar.db.profile.locked then 
+		this:StopMovingOrSizing()
+		this.isMoving = false
+		Drag:Stop(frame)
+		this:StopMovingOrSizing()
+		this.isMoving = false
+	end
 end
 
 function ChocolatePiece:New(name, obj, settings)

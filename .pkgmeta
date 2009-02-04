@@ -1,3 +1,5 @@
+package-as: ChocolateBar
+
 externals:
     libs/LibStub:
         url: svn://svn.wowace.com/wow/libstub/mainline/trunk
