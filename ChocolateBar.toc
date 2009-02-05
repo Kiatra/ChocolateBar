@@ -2,7 +2,7 @@
 ## Title: ChocolateBar
 ## Notes: A display for LibDataBroker-1.1
 ## Author: yess
-## Version: 0.1 Beta
+## Version: 0.2
 ## X-Email:
 ## OptionalDeps: Ace3, LibDataBroker-1.1
 ## X-Embeds: Ace3, LibDataBroker-1.1
