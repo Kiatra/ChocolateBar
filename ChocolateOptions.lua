@@ -155,15 +155,8 @@ local chocolateOptions = aceoptions.args.chocolates.args
 local function GetName(info)
 	local cleanName = info[#info]
 	local name = chocolateOptions[cleanName].desc
-	local choco = ChocolateBar:GetChocolate(name)
-	local icon
-	if choco and choco.obj.icon then
-		icon = choco.obj.icon
-	else
-		icon = "Interface\\AddOns\\ChocolateBar\\ChocolatePiece"
-	end
+	local icon = chocolateOptions[cleanName].icon
 	if(not db.objSettings[name].enabled)then
-		--cleanName = "|cFFFF0000"..cleanName.."|r"
 		cleanName = "|TZZ"..cleanName.."|t|T"..icon..":18|t |cFFFF0000"..cleanName.."|r"
 	else
 		cleanName = "|H"..cleanName.."|h|T"..icon..":18|t "..cleanName
@@ -334,6 +327,7 @@ function ChocolateBar:AddObjectOptions(name, icon)
 	chocolateOptions[cleanName] = {
 		name = GetName,
 		desc = name,
+		icon = icon,
 		type = "group",
 		args={
 			header = {
