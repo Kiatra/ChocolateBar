@@ -104,7 +104,7 @@ function ChocolateBar:LibDataBroker_DataObjectCreated(event, name, obj, noupdate
 	if db.objSettings[name].enabled then
 		self:EnableDataObject(name, noupdate)
 	end
-	self:AddObjectOptions(name)
+	self:AddObjectOptions(name, obj.icon)
 end
 
 function ChocolateBar:EnableDataObject(name, noupdate)
@@ -171,6 +171,10 @@ function ChocolateBar:UpdateBarOptions(val)
 	bars.ChocolateBar1:UpdateTexture()
 	bars.ChocolateBar1:UpdateColors()
 	bars.ChocolateBar1:UpdateScale()
+end
+
+function ChocolateBar:GetChocolate(name)
+	return chocolateObjects[name]
 end
 
 function ChocolateBar:OnProfileChanged(event, database, newProfileKey)
