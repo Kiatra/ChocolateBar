@@ -155,8 +155,18 @@ local chocolateOptions = aceoptions.args.chocolates.args
 local function GetName(info)
 	local cleanName = info[#info]
 	local name = chocolateOptions[cleanName].desc
+	local choco = ChocolateBar:GetChocolate(name)
+	local icon
+	if choco and choco.obj.icon then
+		icon = choco.obj.icon
+	else
+		icon = "Interface\\AddOns\\ChocolateBar\\ChocolatePiece"
+	end
 	if(not db.objSettings[name].enabled)then
-		 cleanName = "|cFFFF0000"..cleanName
+		--cleanName = "|cFFFF0000"..cleanName.."|r"
+		cleanName = "|TZZ"..cleanName.."|t|T"..icon..":18|t |cFFFF0000"..cleanName.."|r"
+	else
+		cleanName = "|H"..cleanName.."|h|T"..icon..":18|t "..cleanName
 	end
 	return cleanName
 end
@@ -312,7 +322,10 @@ function ChocolateBar:ChatCommand(input)
     end
 end
 
-function ChocolateBar:AddObjectOptions(name)
+function ChocolateBar:AddObjectOptions(name, icon)
+	if not icon then
+		icon = "Interface\\AddOns\\ChocolateBar\\ChocolatePiece"
+	end
 	local cleanName = string.gsub(name, "\|c........", "")
 	cleanName = string.gsub(cleanName, "\|r", "")
 	cleanName = string.gsub(cleanName, "[%c \127]", "")
@@ -323,10 +336,23 @@ function ChocolateBar:AddObjectOptions(name)
 		desc = name,
 		type = "group",
 		args={
+			header = {
+				order = 1,
+				type = "header",
+				name = "|T"..icon..":25|t "..name,
+			},
+			--[[
+			label = {
+				order = 0,
+				type = "description",
+				name = "",
+				image = icon,
+			},
+			--]]
 			enabled = {
 				type = 'toggle',
-				--width = "half",
-				order = 0,
+				--width "half",
+				order = 2,
 				name = "Enabled",
 				desc = "Enabled",
 				get = GetEnabled,
@@ -335,7 +361,7 @@ function ChocolateBar:AddObjectOptions(name)
 			text = {
 				type = 'toggle',
 				--width = "half",
-				order = 1,
+				order = 3,
 				name = "Show Text",
 				desc = "Show Text",
 				get = GetText,
@@ -344,7 +370,7 @@ function ChocolateBar:AddObjectOptions(name)
 			icon = {
 				type = 'toggle',
 				--width = "half",
-				order = 2,
+				order = 4,
 				name = "Show Icon",
 				desc = "Show Icon",
 				get = GetIcon,
