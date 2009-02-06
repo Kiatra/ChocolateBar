@@ -11,7 +11,7 @@ local version = GetAddOnMetadata("ChocolateBar","Version")
 local db
 local index = 0
 
-local aceoptions = { 
+aceoptions = { 
     name = "ChocolateBar".." "..version,
     handler = ChocolateBar,
 	--childGroups = "tab",
@@ -316,7 +316,7 @@ function ChocolateBar:ChatCommand(input)
 end
 
 function ChocolateBar:AddObjectOptions(name, icon)
-	if not icon then
+	if not icon or icon == "Interface\\AddOns\\" then
 		icon = "Interface\\AddOns\\ChocolateBar\\ChocolatePiece"
 	end
 	local cleanName = string.gsub(name, "\|c........", "")
