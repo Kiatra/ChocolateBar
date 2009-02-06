@@ -11,7 +11,7 @@
 
 embeds.xml
 
-Chocolate.lua
+Core.lua
 DragAndDrop.lua
 ChocolateOptions.lua
 ChocolatePiece.lua
