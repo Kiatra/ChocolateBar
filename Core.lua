@@ -19,7 +19,7 @@ local dataObjects = {}
 --------
 local function Debug(...)
 	if ChocolateBar.db.char.debug then
-	 	local s = "Debug:"
+	 	local s = "ChocolateBar Debug:"
 		for i=1,select("#", ...) do
 			local x = select(i, ...)
 			if(type(x)== "string" or type(x)== "number")then
@@ -185,7 +185,9 @@ function ChocolateBar:OnProfileChanged(event, database, newProfileKey)
 	for name, obj in pairs(dataObjects) do
 		if db.objSettings[name].enabled then
 			local choco = chocolateObjects[name]
-			choco.settings = db.objSettings[name]
+			if choco then
+				choco.settings = db.objSettings[name]
+			end
 			self:DisableDataObject(name)
 			self:EnableDataObject(name, true) --no bar update
 		else

@@ -248,7 +248,7 @@ function ChocolateBar:UpdateDB(data)
 end
 
 function ChocolateBar:RegisterOptions()
-	self.db = LibStub("AceDB-3.0"):New("ChocolateBarDB", defaults, "Default")
+	self.db = LibStub("AceDB-3.0"):New("ChocolateBarDB", defaults)
 
 	LibStub("AceConfig-3.0"):RegisterOptionsTable("ChocolateBar", aceoptions)
 	aceoptions.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
@@ -300,8 +300,8 @@ function ChocolateBar:RegisterOptions()
 	LSM:Register("statusbar", "Tooltip", "Interface\\Tooltips\\UI-Tooltip-Background")
 	LSM:Register("statusbar", "Solid", "Interface\\Buttons\\WHITE8X8")
 	LSM:Register("statusbar", "Blizzard Parchment","Interface\\AchievementFrame\\UI-Achievement-Parchment-Horizontal")
-	LSM:Register("statusbar", "Chocolate","Interface\\AddOns\\ChocolateBar\\ChocolateBar")
-	LSM:Register("statusbar", "Titan","Interface\\AddOns\\ChocolateBar\\Titan")
+	LSM:Register("statusbar", "Chocolate","Interface\\AddOns\\ChocolateBar\\pics\\ChocolateBar")
+	LSM:Register("statusbar", "Titan","Interface\\AddOns\\ChocolateBar\\pics\\Titan")
 	
 	createDropPoint("ChocolateTextDrop", dropText, -100,"Toggle Text","Interface/ICONS/Achievement_BG_winbyten")
 	createDropPoint("ChocolateDisableDrop", dropDisable, 100,"Eat Chocolate", "Interface/ICONS/Achievement_Halloween_Smiley_01")
@@ -317,7 +317,7 @@ end
 
 function ChocolateBar:AddObjectOptions(name, icon)
 	if not icon or icon == "Interface\\AddOns\\" then
-		icon = "Interface\\AddOns\\ChocolateBar\\ChocolatePiece"
+		icon = "Interface\\AddOns\\ChocolateBar\\pics\\ChocolatePiece"
 	end
 	local cleanName = string.gsub(name, "\|c........", "")
 	cleanName = string.gsub(cleanName, "\|r", "")
