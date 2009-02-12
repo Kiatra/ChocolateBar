@@ -231,7 +231,7 @@ function ChocolatePiece:New(name, obj, settings)
 		OnLeave(chocolate)
 	end)
 	
-	chocolate:RegisterForClicks("LeftButtonUp","RightButtonUp")
+	chocolate:RegisterForClicks("AnyUp")
 	chocolate:SetScript("OnClick", obj.OnClick)
 	
 	chocolate:Show()

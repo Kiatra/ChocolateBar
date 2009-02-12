@@ -87,7 +87,7 @@ function Bar:AddChocolatePiece(choco, name,noupdate)
 	choco.bar = self
 
 	if not noupdate then
-		self:UpdateBar(self)
+		self:UpdateBar()
 	end
 	--self:UpdateChocolte(name, key, value)
 end
@@ -100,7 +100,7 @@ function Bar:EatChocolatePiece(name)
 	if choco then
 		choco:Hide()
 		self.chocolist[name] = nil
-		self:UpdateBar(self)
+		self:UpdateBar()
 	end
 end
 
@@ -247,7 +247,7 @@ function Bar:UpdateBar(updateindex)
 		relative = chocolates[k]
 	end
 	
-	local relative = nil
+	relative = nil
 	for i, v in ipairs(tempright) do
 		k = v[1]
 		chocolates[k]:ClearAllPoints()
