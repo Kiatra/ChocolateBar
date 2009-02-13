@@ -6,6 +6,10 @@
 ## X-Email: yessica@fantasymail.de
 ## OptionalDeps: Ace3, LibDataBroker-1.1
 ## X-Embeds: Ace3, LibDataBroker-1.1
+## X-Curse-Packaged-Version: r12
+## X-Curse-Project-Name: ChocolateBar (Broker Display)
+## X-Curse-Project-ID: chocolatebar
+## X-Curse-Repository-ID: wow/chocolatebar/mainline
 
 ## SavedVariables: ChocolateBarDB
 

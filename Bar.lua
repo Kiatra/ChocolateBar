@@ -85,7 +85,9 @@ function Bar:AddChocolatePiece(choco, name,noupdate)
 	
 	choco:SetParent(self)
 	choco.bar = self
-
+	if not choco.settings.index then
+		choco.settings.index = 1
+	end
 	if not noupdate then
 		self:UpdateBar()
 	end
