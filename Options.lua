@@ -7,12 +7,12 @@ local AceCfgDlg = LibStub("AceConfigDialog-3.0")
 local Drag = ChocolateBar.Drag
 
 local version = GetAddOnMetadata("ChocolateBar","Version")
-
+local revision = GetAddOnMetadata("ChocolateBar","X-Curse-Packaged-Version")
 local db
 local index = 0
 
 aceoptions = { 
-    name = "ChocolateBar".." "..version,
+    name = "ChocolateBar".." "..version.." "..revision.."",
     handler = ChocolateBar,
 	--childGroups = "tab",
 	type='group',
@@ -289,6 +289,7 @@ function ChocolateBar:RegisterOptions()
 					showText = true,
 					showIcon = true,
 					space = 7,
+					index = 1,
 				},
 			},
 		},
