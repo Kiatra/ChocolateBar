@@ -99,6 +99,13 @@ local function GetAnchors(frame)
 	end
 end
 
+--code taken with permission from fortress 
+local function GT_OnLeave(self)
+	self:SetScript("OnLeave", self.fortressOnLeave)
+	self:Hide()
+	GameTooltip:EnableMouse(false)
+end
+
 -- PrepareTooltip code taken with permission from fortress 
 local function PrepareTooltip(frame, anchorFrame)
 	if frame == GameTooltip then

@@ -6,13 +6,13 @@ local AceCfgReg = LibStub("AceConfigRegistry-3.0")
 local AceCfgDlg = LibStub("AceConfigDialog-3.0")
 local Drag = ChocolateBar.Drag
 
-local version = GetAddOnMetadata("ChocolateBar","Version")
-local revision = GetAddOnMetadata("ChocolateBar","X-Curse-Packaged-Version")
+--local version = GetAddOnMetadata("ChocolateBar","Version") or ""
+local version = GetAddOnMetadata("ChocolateBar","X-Curse-Packaged-Version") or ""
 local db
 local index = 0
 
 aceoptions = { 
-    name = "ChocolateBar".." "..version.." "..revision.."",
+    name = "ChocolateBar".." "..version,
     handler = ChocolateBar,
 	--childGroups = "tab",
 	type='group',
