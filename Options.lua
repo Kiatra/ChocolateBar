@@ -53,6 +53,7 @@ aceoptions = {
 					end,
 					set = function(info, value)
 							db.hideonleave = value
+							ChocolateBar:UpdateBarOptions()
 					end,
 				},
 				locked = {
@@ -215,6 +216,14 @@ local function dropText(frame, choco)
 		frame:SetBackdropBorderColor(1,1,1,1) 
 end
 
+local function dropCenter(frame, choco)
+		local name = choco.name
+		db.objSettings[name].align = "center"
+		--ChocolateBar:AttributeChanged(nil, name, "updateSettings", db.objSettings[name].center)
+		choco.bar:AddChocolatePiece(choco, name,noupdate)
+		frame:SetBackdropBorderColor(1,1,1,1) 
+end
+
 local function dropDisable(frame, choco)
 		choco:Hide()
 		ChocolateBar:DisableDataObject(choco.name)
@@ -305,7 +314,8 @@ function ChocolateBar:RegisterOptions()
 	LSM:Register("statusbar", "Titan","Interface\\AddOns\\ChocolateBar\\pics\\Titan")
 	
 	createDropPoint("ChocolateTextDrop", dropText, -100,"Toggle Text","Interface/ICONS/Achievement_BG_winbyten")
-	createDropPoint("ChocolateDisableDrop", dropDisable, 100,"Eat Chocolate", "Interface/ICONS/Achievement_Halloween_Smiley_01")
+	createDropPoint("ChocolateCenterDrop", dropCenter, 50,"Align Center","Interface/Icons/Spell_Holy_GreaterBlessingofSalvation") 
+	createDropPoint("ChocolateDisableDrop", dropDisable, 200,"Eat Chocolate", "Interface/ICONS/Achievement_Halloween_Smiley_01")
 end
 
 function ChocolateBar:ChatCommand(input)

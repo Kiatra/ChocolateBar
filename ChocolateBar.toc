@@ -2,14 +2,30 @@
 ## Title: ChocolateBar
 ## Notes: A display for LibDataBroker-1.1
 ## Author: yess
-## Version: 0.3
+## Version: 0.4
 ## X-Email: yessica@fantasymail.de
 ## OptionalDeps: Ace3, LibDataBroker-1.1
 ## X-Embeds: Ace3, LibDataBroker-1.1
 
 ## SavedVariables: ChocolateBarDB
 
-embeds.xml
+#@no-lib-strip@
+libs\LibStub\LibStub.lua"
+libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
+libs\AceAddon-3.0\AceAddon-3.0.xml
+libs\AceConsole-3.0\AceConsole-3.0.xml
+libs\AceDB-3.0\AceDB-3.0.xml
+libs\AceGUI-3.0\AceGUI-3.0.xml
+libs\AceConfig-3.0\AceConfig-3.0.xml
+libs\AceEvent-3.0\AceEvent-3.0.xml
+libs\AceLocale-3.0\AceLocale-3.0.xml
+libs\AceDBOptions-3.0\AceDBOptions-3.0.xml
+libs\LibSharedMedia-3.0\lib.xml
+libs\AceGUI-3.0-SharedMediaWidgets\widget.xml
+#@end-no-lib-strip@
+
+libs\LibJostle-3.0\LibJostle-3.0-mod.lua
+libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
 
 Core.lua
 DragAndDrop.lua

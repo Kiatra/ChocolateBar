@@ -3,6 +3,7 @@ local LSM = LibStub("LibSharedMedia-3.0")
 local Bar = ChocolateBar.Bar
 local chocolate = ChocolateBar.ChocolatePiece
 local Debug = ChocolateBar.Debug
+local jostle = LibStub("LibJostle-3.0-mod")
 
 function Bar:New(name, settings)
 	local frame = CreateFrame("Frame",name,UIParent)
@@ -38,9 +39,20 @@ function Bar:New(name, settings)
 	frame:UpdateTexture()
 	frame:UpdateColors()
 	frame:UpdateScale()
+	frame:UpdateAutoHide()
 	
 	frame.chocolist = {} --create list of chocolate chocolist in the bar
 	return frame
+end
+
+function Bar:UpdateAutoHide()
+	if ChocolateBar.db.profile.hideonleave then
+		ChocolateBar1:SetAlpha(0)
+		jostle:Unregister(self)
+	else
+		ChocolateBar1:SetAlpha(1)
+		jostle:RegisterTop(self)
+	end
 end
 
 function Bar:UpdateScale()
@@ -153,6 +165,10 @@ function Bar:UpdateDragChocolate()
 			self.dummy.settings.index = -1
 			self.dummy.settings.align = "right"
 		end
+		if align == "center" then
+			self.dummy.settings.index = -1
+			self.dummy.settings.align = "center"
+		end
 	end
 	if not choco then 
 		Debug("Bar:UpdateDragChocolate(pos) cursour above: nil")
@@ -208,30 +224,38 @@ function Bar:Drag(name)
 	self:UpdateBar()
 end
 
+local templeft = {}
+local tempright = {}
+local tempcenter = {}
 local function SortTab(tab)
-	local left = {}
-	local right = {}
+	templeft = {}
+	tempright = {}
+	tempcenter = {}
+	
 	for k,v in pairs(tab) do
 		local index = v["settings"]["index"]
 		if not index then
 			index = 500
 		end
 		if v.settings.align == "left" then
-			table.insert(left,{k,index})
+			table.insert(templeft,{k,index})
+		elseif v.settings.align == "center" then
+			table.insert(tempcenter,{k,index})
 		else
-			table.insert(right,{k,index})
+			table.insert(tempright,{k,index})
 		end
 	end
-	table.sort(left, function(a,b)return a[2] < b[2] end)
-	table.sort(right, function(a,b)return a[2] < b[2] end)
-	return left, right
+	table.sort(templeft, function(a,b)return a[2] < b[2] end)
+	table.sort(tempcenter, function(a,b)return a[2] < b[2] end)
+	table.sort(tempright, function(a,b)return a[2] < b[2] end)
+	return templeft, tempcenter, tempright
 end
 
 -- rearange all chocolate chocolist in a given bar
 -- called when chocolates are added, removed, moved
 function Bar:UpdateBar(updateindex)
 	local chocolates =  self.chocolist
-	local templeft, tempright = SortTab(chocolates)
+	templeft, tempcenter ,tempright = SortTab(chocolates)
 	
 	local yoff = 0
 	local relative = nil
@@ -242,6 +266,21 @@ function Bar:UpdateBar(updateindex)
 			chocolates[k]:SetPoint("TOPLEFT",relative,"TOPRIGHT", 0,0)
 		else
 			chocolates[k]:SetPoint("TOPLEFT",self, 6,yoff)
+		end
+		if updateindex then
+			chocolates[k].settings.index = i
+		end
+		relative = chocolates[k]
+	end
+	
+	local relative = nil
+	for i, v in ipairs(tempcenter) do
+		k = v[1]
+		chocolates[k]:ClearAllPoints()
+		if(relative)then
+			chocolates[k]:SetPoint("TOPRIGHT",relative,"TOPLEFT", 0,0)
+		else
+			chocolates[k]:SetPoint("CENTER",self, 6,yoff)
 		end
 		if updateindex then
 			chocolates[k].settings.index = i

@@ -65,8 +65,6 @@ function ChocolateBar:OnInitialize()
 	Drag:RegisterFrame(bars.ChocolateBar1)
 	--Drag:RegisterFrame(bars.ChocolateBar2)
 	
-	local jostle = LibStub("LibJostle-3.0-mod")
-	jostle:RegisterTop(bars.ChocolateBar1)
 end
 
 
@@ -168,6 +166,7 @@ end
 
 --call when general bar options change
 function ChocolateBar:UpdateBarOptions(val)
+	bars.ChocolateBar1:UpdateAutoHide()
 	bars.ChocolateBar1:UpdateTexture()
 	bars.ChocolateBar1:UpdateColors()
 	bars.ChocolateBar1:UpdateScale()
