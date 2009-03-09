@@ -1,3 +1,5 @@
+-- DragAndDrop by yess
+-- this adds drag and drop support between bars/drop points for ChocolateBar
 local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("ChocolateBar")
 local Drag = ChocolateBar.Drag
 local frameslist = {}
@@ -5,7 +7,7 @@ local Debug = ChocolateBar.Debug
 local DragUpdate = CreateFrame("Frame")
 
 local counter = 0
-local delay = .2
+local delay = .1
 local focus = nil
 local choconame
 
@@ -13,7 +15,8 @@ local function ChangeFocus(newfocus)
 	if focus.LoseFocus then
 		focus:LoseFocus(choconame)
 	end
-	newfocus:Drag(choconame)
+	--newfocus:Drag(choconame)
+	newfocus:GetFocus(choconame)
 	focus = newfocus
 end
 
@@ -44,6 +47,7 @@ local function OnDragUpdate(frame, elapsed)
 	if counter >= delay then
 		GetFocus()
 		counter = 0
+		focus:SetAlpha(1 )
 	end
 	
 end
@@ -58,6 +62,7 @@ function Drag:RegisterFrame(frame)
 end
 
 function Drag:UnregisterFrame(frame)
+	frameslist[frame:GetName()] = nil
 end
 
 function Drag:Start(bar, name)
