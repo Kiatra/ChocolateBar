@@ -126,6 +126,11 @@ local function OnEnter(self)
 	local obj  = self.obj
 	local name = self.name
 		
+	if self.bar.autohide then
+		local bar = self.bar
+		bar:ShowAll()
+	end
+
 	if obj.tooltip then
 		PrepareTooltip(obj.tooltip, self)
 		if obj.tooltiptext then
@@ -152,6 +157,11 @@ local function OnLeave(self)
 	local obj  = self.obj
 	local name = self.name
 	
+	if self.bar.autohide then
+		local bar = self.bar
+		bar:HideAll()
+	end
+
 	if obj.OnLeave then
 		obj.OnLeave(self)
 	else
@@ -183,23 +193,20 @@ local function Update(self, f,key, value)
 end
 
 local function OnDragStart(frame)
-	if not ChocolateBar.db.profile.locked then 
-		GameTooltip:Hide();
-		local barName = frame.settings.barName			
-		local bar = frame.bar			
+	if not ChocolateBar.db.profile.locked or IsAltKeyDown() then 
+		local bar = frame.bar	
 		Drag:Start(bar, frame.name)
 		this:StartMoving()
 		this.isMoving = true
+		GameTooltip:Hide();
 	end
 end
 
 local function OnDragStop(frame)
-	if not ChocolateBar.db.profile.locked then 
+	if not ChocolateBar.db.profile.locked or IsAltKeyDown() then 
 		this:StopMovingOrSizing()
 		this.isMoving = false
 		Drag:Stop(frame)
-		this:StopMovingOrSizing()
-		this.isMoving = false
 	end
 end
 
@@ -227,16 +234,10 @@ function ChocolatePiece:New(name, obj, settings)
 		chocolate.text:SetPoint("LEFT", chocolate, "LEFT", 0, 0)
 	end
 	
-	chocolate:SetScript("OnEnter", function() 
-		ChocolateBar1:SetAlpha(1)
-		OnEnter(chocolate)
-	end)
-	chocolate:SetScript("OnLeave", function() 
-		if ChocolateBar.db.profile.hideonleave then
-			ChocolateBar1:SetAlpha(0)
-		end
-		OnLeave(chocolate)
-	end)
+	chocolate:SetScript("OnEnter", OnEnter)
+	
+	chocolate:SetScript("OnLeave", OnLeave)
+	
 	
 	chocolate:RegisterForClicks("AnyUp")
 	chocolate:SetScript("OnClick", obj.OnClick)

@@ -7,7 +7,8 @@ local jostle = LibStub("LibJostle-3.0-mod")
 
 function Bar:New(name, settings)
 	local frame = CreateFrame("Frame",name,UIParent)
-
+	frame.chocolist = {} --create list of chocolate chocolist in the bar
+	
 	-- add class methods to frame object
 	for k, v in pairs(Bar) do
 		frame[k] = v
@@ -19,13 +20,16 @@ function Bar:New(name, settings)
 	frame:SetPoint("RIGHT", "UIParent" ,"RIGHT",0, 0);
 	
 	frame:EnableMouse(true)
-	frame:SetScript("OnEnter", function() 
-		ChocolateBar1:SetAlpha(1)
+	frame:SetScript("OnEnter", function(self) 
+		Debug("OnEnter", self:GetName())
+		--self:SetAlpha(1)
+		self:ShowAll()
 	end)
 	--frame:SetScript("OnLeave", OnLeave)
-	frame:SetScript("OnLeave", function() 
-		if ChocolateBar.db.profile.hideonleave then
-			ChocolateBar1:SetAlpha(0)
+	frame:SetScript("OnLeave", function(self) 
+		if self.autohide then
+			--self:SetAlpha(0)
+			self:HideAll()
 		end
 	end)
 	
@@ -36,22 +40,32 @@ function Bar:New(name, settings)
 	end)
 	
 	frame.settings = settings
+	frame.autohide = settings.hideonleave
+
 	frame:UpdateTexture()
 	frame:UpdateColors()
 	frame:UpdateScale()
 	frame:UpdateAutoHide()
 	
-	frame.chocolist = {} --create list of chocolate chocolist in the bar
 	return frame
 end
 
-function Bar:UpdateAutoHide()
-	if ChocolateBar.db.profile.hideonleave then
-		ChocolateBar1:SetAlpha(0)
+function Bar:UpdateAutoHide() 
+	if self.settings.autohide then
+		self.autohide = true
+		self:HideAll()
 		jostle:Unregister(self)
 	else
-		ChocolateBar1:SetAlpha(1)
-		jostle:RegisterTop(self)
+		self.autohide = false
+		self:ShowAll()
+		jostle:Unregister(self)
+		if ChocolateBar.db.profile.moveFrames then
+			if self.settings.align == "bottom" then
+				jostle:RegisterBottom(self)
+			else
+				jostle:RegisterTop(self)
+			end
+		end
 	end
 end
 
@@ -81,6 +95,33 @@ function Bar:UpdateTexture()
 	self:SetBackdrop(bg);
 end
 
+local function updateDummy(self, choco, name)
+	local dummy = self.dummy
+	if not dummy then  
+		dummy = CreateFrame("Frame", "ChocolateDummy", self)
+		--dummy:SetAllPoints(chocolate.frame)
+		dummy.name = "dummy"
+		dummy:SetBackdrop({bgFile = "Interface/Tooltips/UI-Tooltip-Background", 
+		edgeFile = "Interface/Tooltips/UI-Tooltip-Border", 
+		tile = true, tileSize = 16, edgeSize = 6, 
+		insets = { left = 0, right = 0, top = 0, bottom = 0}})
+		dummy:SetBackdropColor(1,0,0,1)
+		dummy:SetBackdropBorderColor(1,0,0,0)
+		self.dummy = dummy
+	end
+	dummy:Show()
+	dummy:SetWidth(choco:GetWidth())
+	dummy:SetHeight(choco:GetHeight())
+	
+	local settings = {}
+	settings.index = choco.settings.index
+	dummy.settings = settings
+	dummy.settings.align = choco.settings.align
+	templeftchocolate = self.chocolist[name]
+	self.saved = choco
+	self.chocolist[name] = dummy
+end
+
 function GetTexture(frame)
 	Debug(frame:GetName())
 	regions = frame:GetRegions()
@@ -94,16 +135,17 @@ function Bar:AddChocolatePiece(choco, name,noupdate)
 	end
 	
 	chocolist[name] = choco
-	
 	choco:SetParent(self)
 	choco.bar = self
-	if not choco.settings.index then
-		choco.settings.index = 1
+	
+	local settings = choco.settings
+	settings.barName = self:GetName() 
+	if not settings.index then
+		settings.index = 1
 	end
 	if not noupdate then
 		self:UpdateBar()
 	end
-	--self:UpdateChocolte(name, key, value)
 end
 
 -- eat some chocolate from a ChocolateBar
@@ -116,6 +158,25 @@ function Bar:EatChocolatePiece(name)
 		self.chocolist[name] = nil
 		self:UpdateBar()
 	end
+end
+
+function Bar:HideAll()
+	self:SetAlpha(0)
+	for k, v in pairs(self.chocolist) do
+		v:Hide()
+	end
+end
+
+function Bar:ShowAll()
+	self:SetAlpha(1)
+	for k, v in pairs(self.chocolist) do
+		v:Show()
+	end
+end
+
+function Bar:Disable()
+	self:Hide()
+	jostle:Unregister(self)
 end
 
 function Bar:Drop(choco, pos)
@@ -171,11 +232,11 @@ function Bar:UpdateDragChocolate()
 		end
 	end
 	if not choco then 
-		Debug("Bar:UpdateDragChocolate(pos) cursour above: nil")
+		--Debug("Bar:UpdateDragChocolate(pos) cursour above: nil")
 		self.dummy.settings.index = 500
 		self:UpdateBar()
 	else
-		Debug("cursour above: ",choco.name)
+		--Debug("cursour above: ",choco.name)
 		if self.last ~= choco then
 			self.last = choco
 			self.dummy.settings.index = choco.settings.index - 0.5
@@ -185,42 +246,25 @@ function Bar:UpdateDragChocolate()
 	end
 end
 
+function Bar:GetFocus(name)
+	local choco = ChocolateBar:GetChocolate(name)
+	--choco.bar:EatChocolate()
+	--self:AddChocolatePiece(choco, name)
+	choco.bar = self
+	choco.settings.barName = self:GetName()
+	updateDummy(self, choco, name)
+	self:UpdateBar()
+end
+
 function Bar:Drag(name)
 	local choco = self.chocolist[name]
 	if not choco then 
-		if self.saved.name == name then
-			choco = self.saved
-		else
-			Debug("chocolate ", name, "not found in list")
-			return
+		if self.saved then
+			--if self.saved.name == name then
+				choco = self.saved	
 		end
 	end
-	
-	local dummy = self.dummy
-	if not dummy then  
-		dummy = CreateFrame("Frame", "ChocolateDummy", self)
-		--dummy:SetAllPoints(chocolate.frame)
-		dummy.name = "dummy"
-		dummy:SetBackdrop({bgFile = "Interface/Tooltips/UI-Tooltip-Background", 
-		edgeFile = "Interface/Tooltips/UI-Tooltip-Border", 
-		tile = true, tileSize = 16, edgeSize = 6, 
-		insets = { left = 0, right = 0, top = 0, bottom = 0}})
-		dummy:SetBackdropColor(1,0,0,1)
-		dummy:SetBackdropBorderColor(1,0,0,0)
-		self.dummy = dummy
-	end
-	dummy:Show()
-	dummy:SetWidth(choco:GetWidth())
-	dummy:SetHeight(choco:GetHeight())
-	
-	local settings = {}
-	settings.index = choco.settings.index
-	dummy.settings = settings
-	dummy.settings.align = choco.settings.align
-	templeftchocolate = self.chocolist[name]
-	self.saved = choco
-	self.chocolist[name] = dummy
-	TEST5 = self
+	updateDummy(self, choco, name)
 	self:UpdateBar()
 end
 
@@ -238,11 +282,11 @@ local function SortTab(tab)
 			index = 500
 		end
 		if v.settings.align == "left" then
-			table.insert(templeft,{k,index})
+			table.insert(templeft,{v,index})
 		elseif v.settings.align == "center" then
-			table.insert(tempcenter,{k,index})
+			table.insert(tempcenter,{v,index})
 		else
-			table.insert(tempright,{k,index})
+			table.insert(tempright,{v,index})
 		end
 	end
 	table.sort(templeft, function(a,b)return a[2] < b[2] end)
@@ -260,49 +304,48 @@ function Bar:UpdateBar(updateindex)
 	local yoff = 0
 	local relative = nil
 	for i, v in ipairs(templeft) do
-		k = v[1]
-		chocolates[k]:ClearAllPoints()
+		local choco = v[1]
+		choco:ClearAllPoints()
 		if(relative)then
-			chocolates[k]:SetPoint("TOPLEFT",relative,"TOPRIGHT", 0,0)
+			choco:SetPoint("TOPLEFT",relative,"TOPRIGHT", 0,0)
 		else
-			chocolates[k]:SetPoint("TOPLEFT",self, 6,yoff)
+			choco:SetPoint("TOPLEFT",self, 6,yoff)
 		end
 		if updateindex then
-			chocolates[k].settings.index = i
+			choco.settings.index = i
 		end
-		relative = chocolates[k]
+		relative = choco
 	end
 	
 	local relative = nil
 	for i, v in ipairs(tempcenter) do
-		k = v[1]
-		chocolates[k]:ClearAllPoints()
+		local choco = v[1]
+		choco:ClearAllPoints()
 		if(relative)then
-			chocolates[k]:SetPoint("TOPRIGHT",relative,"TOPLEFT", 0,0)
+			choco:SetPoint("TOPRIGHT",relative,"TOPLEFT", 0,0)
 		else
-			chocolates[k]:SetPoint("CENTER",self, 6,yoff)
+			choco:SetPoint("CENTER",self, 6,yoff)
 		end
 		if updateindex then
-			chocolates[k].settings.index = i
+			choco.settings.index = i
 		end
-		relative = chocolates[k]
+		relative = choco
 	end
 	
 	relative = nil
 	for i, v in ipairs(tempright) do
-		k = v[1]
-		chocolates[k]:ClearAllPoints()
+		local choco = v[1]
+		choco:ClearAllPoints()
 		if(relative)then
-			chocolates[k]:SetPoint("TOPRIGHT",relative,"TOPLEFT", 0,0)
+			choco:SetPoint("TOPRIGHT",relative,"TOPLEFT", 0,0)
 			--list them downwards
 			--chocolates[k]:SetPoint("TOPLEFT",relative,"BOTTOMLEFT", 0,-yoffset)
 		else
-			chocolates[k]:SetPoint("TOPRIGHT",self, 6,yoff)
+			choco:SetPoint("TOPRIGHT",self, 6,yoff)
 		end
 		if updateindex then
-			chocolates[k].settings.index = i
+			choco.settings.index = i
 		end
-		relative = chocolates[k]
-		--Debug("index=",i,k)
+		relative = choco
 	end
 end
