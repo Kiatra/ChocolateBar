@@ -161,6 +161,7 @@ aceoptions = {
 			--validate = function(info, value) end,
 			--guiHidden = true,
 			args={
+				--[[
 				header = {
 					order = 1,
 					type = "header",
@@ -190,6 +191,7 @@ aceoptions = {
 		            desc = "Eat all the bad guy's:)",
 		            func = "NewBar",
 				},
+				--]]
 			},
 		},
 	},

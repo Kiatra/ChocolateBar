@@ -21,14 +21,11 @@ function Bar:New(name, settings)
 	
 	frame:EnableMouse(true)
 	frame:SetScript("OnEnter", function(self) 
-		Debug("OnEnter", self:GetName())
-		--self:SetAlpha(1)
 		self:ShowAll()
 	end)
 	--frame:SetScript("OnLeave", OnLeave)
 	frame:SetScript("OnLeave", function(self) 
 		if self.autohide then
-			--self:SetAlpha(0)
 			self:HideAll()
 		end
 	end)
@@ -180,10 +177,10 @@ function Bar:Disable()
 end
 
 function Bar:Drop(choco, pos)
-	Debug("Bar:Drop", choco.name, pos)
+	--Debug("Bar:Drop", choco.name, pos)
 	self.dummy:Hide()
 	self.chocolist[choco.obj.name] = choco
-	Debug("frame:GetWidth() ", choco:GetWidth())
+	--Debug("frame:GetWidth() ", choco:GetWidth())
 	choco.settings.index = self.dummy.settings.index
 	choco.settings.align = self.dummy.settings.align
 	self:UpdateBar(true)
@@ -270,7 +267,8 @@ end
 
 local templeft = {}
 local tempright = {}
-local tempcenter = {}
+--todo
+tempcenter = {}
 local function SortTab(tab)
 	templeft = {}
 	tempright = {}
@@ -296,7 +294,7 @@ local function SortTab(tab)
 end
 
 -- rearange all chocolate chocolist in a given bar
--- called when chocolates are added, removed, moved
+-- called only when chocolates are added, removed or moved
 function Bar:UpdateBar(updateindex)
 	local chocolates =  self.chocolist
 	templeft, tempcenter ,tempright = SortTab(chocolates)
@@ -317,19 +315,40 @@ function Bar:UpdateBar(updateindex)
 		relative = choco
 	end
 	
+	
+	local centerIndex = math.ceil(#tempcenter/2)
+	local v = tempcenter[centerIndex]
 	local relative = nil
-	for i, v in ipairs(tempcenter) do
-		local choco = v[1]
-		choco:ClearAllPoints()
-		if(relative)then
-			choco:SetPoint("TOPRIGHT",relative,"TOPLEFT", 0,0)
-		else
-			choco:SetPoint("CENTER",self, 6,yoff)
+	
+	
+	if v then 
+		relative = v[1]
+		if relative then
+			relative:ClearAllPoints()
+			relative:SetPoint("CENTER",self, 0,yoff)
+			--Debug("centerIndex,relative:GetName()=",centerIndex,relative:GetName())	
+			
+			local relativeL = relative
+			local relativeR = relative
+			
+			for i, v in ipairs(tempcenter) do
+				local choco = v[1]
+				--Debug("i:",i," choco:",choco:GetName()," relativeL:",relativeL:GetName()," relativeR:",relativeR:GetName())
+				if i > centerIndex then
+					choco:ClearAllPoints()
+					choco:SetPoint("TOPRIGHT",relativeR,"TOPLEFT", 0,0)
+					relativeR = choco
+				elseif i < centerIndex then
+					choco:ClearAllPoints()
+					choco:SetPoint("TOPLEFT",relativeL,"TOPRIGHT", 0,0)
+					relativeL = choco
+				end
+				if updateindex then
+					choco.settings.index = i
+				end
+			end
+			
 		end
-		if updateindex then
-			choco.settings.index = i
-		end
-		relative = choco
 	end
 	
 	relative = nil

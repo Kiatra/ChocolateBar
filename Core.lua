@@ -257,7 +257,6 @@ function ChocolateBar:AddBar(name, settings, noupdate)
 	Drag:RegisterFrame(bar)
 	chocolateBars[name] = bar
 	ChocolateBar:AddBarOptions(name)
-	Debug("AddBar:", name, settings)
 	--barSettings[name] = settings
 	settings.barName = name
 	if not noupdate then
@@ -288,10 +287,10 @@ function ChocolateBar:UpdateBars()
 	end
 end
 
+-- return the number of burs aligend to align (top or bottom)
 function ChocolateBar:GetNumBars(align)
 	local i = 0
 	for k,v in pairs(chocolateBars) do
-		Debug("k,v.settings.aligin ",k,v.settings.aligin)
 		if v.settings.align == align then
 			i = i + 1
 		end
