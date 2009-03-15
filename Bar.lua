@@ -5,7 +5,7 @@ local chocolate = ChocolateBar.ChocolatePiece
 local Debug = ChocolateBar.Debug
 local jostle = LibStub("LibJostle-3.0-mod")
 
-function Bar:New(name, settings)
+function Bar:New(name, settings, db)
 	local frame = CreateFrame("Frame",name,UIParent)
 	frame.chocolist = {} --create list of chocolate chocolist in the bar
 	
@@ -39,15 +39,20 @@ function Bar:New(name, settings)
 	frame.settings = settings
 	frame.autohide = settings.hideonleave
 
-	frame:UpdateTexture()
-	frame:UpdateColors()
-	frame:UpdateScale()
-	frame:UpdateAutoHide()
+	frame:UpdateTexture(db)
+	frame:UpdateColors(db)
+	frame:UpdateScale(db)
+	frame:UpdateAutoHide(db)
+	frame:UpdateStrata(db)
 	
 	return frame
 end
 
-function Bar:UpdateAutoHide() 
+function Bar:UpdateStrata(db)
+	self:SetFrameStrata(db.strata)
+end
+
+function Bar:UpdateAutoHide(db) 
 	if self.settings.autohide then
 		self.autohide = true
 		self:HideAll()
@@ -55,32 +60,37 @@ function Bar:UpdateAutoHide()
 	else
 		self.autohide = false
 		self:ShowAll()
-		jostle:Unregister(self)
-		if ChocolateBar.db.profile.moveFrames then
-			if self.settings.align == "bottom" then
-				jostle:RegisterBottom(self)
-			else
-				jostle:RegisterTop(self)
-			end
+		self:UpdateJostle(db)
+	end
+end
+
+function Bar:UpdateJostle(db)
+	jostle:Unregister(self)
+	if db.moveFrames then
+		if self.settings.align == "bottom" then
+			jostle:RegisterBottom(self)
+		else
+			jostle:RegisterTop(self)
 		end
 	end
 end
 
-function Bar:UpdateScale()
-	self.scale = ChocolateBar.db.profile.scale
-	self:SetScale(self.scale)
+function Bar:UpdateScale(db)
+	self.scale = db.scale
+	self:SetScale(db.scale)
+	self:UpdateJostle(db)
 end
 
-function Bar:UpdateColors()
-	local bg = ChocolateBar.db.profile.background
+function Bar:UpdateColors(db)
+	local bg = db.background
 	local color = bg.borderColor
 	self:SetBackdropBorderColor(color.r,color.g,color.b,color.a)
 	color = bg.color
 	self:SetBackdropColor(color.r,color.g,color.b,color.a)
 end
 
-function Bar:UpdateTexture()
-	local background = LSM:Fetch("statusbar", ChocolateBar.db.profile.background.texture)
+function Bar:UpdateTexture(db)
+	local background = LSM:Fetch("statusbar", db.background.texture)
 	local bg = {
 		bgFile = background, 
 		edgeFile = "Interface/Tooltips/UI-Tooltip-Border", 
@@ -90,6 +100,7 @@ function Bar:UpdateTexture()
 	}
 	bg.bgFile = background
 	self:SetBackdrop(bg);
+	self:UpdateColors(db)
 end
 
 local function updateDummy(self, choco, name)
