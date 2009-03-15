@@ -2,7 +2,7 @@
 ## Title: ChocolateBar
 ## Notes: A display for LibDataBroker-1.1
 ## Author: yess
-## Version: 0.4
+## Version: 1.0
 ## X-Email: yessica@fantasymail.de
 ## OptionalDeps: Ace3, LibDataBroker-1.1
 ## X-Embeds: Ace3, LibDataBroker-1.1
@@ -32,4 +32,5 @@ DragAndDrop.lua
 Options.lua
 Chocolate.lua
 Bar.lua
+MoreChocolate.lua
 

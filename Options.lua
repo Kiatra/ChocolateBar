@@ -10,6 +10,53 @@ local Drag = ChocolateBar.Drag
 local version = GetAddOnMetadata("ChocolateBar","X-Curse-Packaged-Version") or ""
 local db
 local index = 0
+local moreChocolate
+
+
+local function GetStats(info)
+	local total = 0
+	local enabled = 0
+	local data = 0
+	for name, obj in LibStub("LibDataBroker-1.1"):DataObjectIterator() do
+		total = total + 1
+		if obj.type == "data source" then
+			data = data + 1
+		end
+		choco = ChocolateBar:GetChocolate(name)
+		if choco and choco.settings.enabled then
+			enabled = enabled +1
+		end
+	end
+	return "|cffffd200Enabled|r  "..enabled.."\n|cffffd200Disabled|r  "..total-enabled.."\n|cffffd200Total|r  "..total.."\n\n|cffffd200Data Source|r  "..data.."\n|cffffd200Other|r  "..total-data
+end
+
+local function EnableAll(info)
+	--[[
+	test = {}
+	for k, v in pairs(info) do
+		Debug(k,v)
+		test[k]=v
+	end
+	Debug(info[#info])
+	--]]
+	for name, obj in LibStub("LibDataBroker-1.1"):DataObjectIterator() do
+		ChocolateBar:EnableDataObject(name)
+	end
+end
+
+local function DisableAll(info)
+	for name, obj in LibStub("LibDataBroker-1.1"):DataObjectIterator() do
+		ChocolateBar:DisableDataObject(name)
+	end
+end
+
+local function DisableLauncher(info)
+	for name, obj in LibStub("LibDataBroker-1.1"):DataObjectIterator() do
+		if obj.type ~= "data source" then
+			ChocolateBar:DisableDataObject(name)
+		end
+	end
+end
 
 aceoptions = { 
     name = "ChocolateBar".." "..version,
@@ -24,25 +71,9 @@ aceoptions = {
 			order = 1,
 			--guiHidden = true,
 			args={
-				size = {
-					type = 'range',
-					order = 1,
-					name = "Bar Size",
-					desc = "Bar Size",
-					min = 0.5,
-					max = 1.5,
-					step = .1,
-					get = function(name)
-						return db.scale
-					end,
-					set = function(info, value)
-						ChocolateBar:UpdateBarOptions("UpdateScale")
-						db.scale = value
-					end,
-				},	
 				locked = {
 					type = 'toggle',
-					order = 2,
+					order = 1,
 					name = "Lock Chocolates",
 					desc = "Hold alt key to drag a chocolate.",
 					get = function(info, value)
@@ -52,11 +83,81 @@ aceoptions = {
 							db.locked = value
 					end,
 				},
+				moveFrames = {
+					type = 'toggle',
+					--width = "half",
+					order = 2,
+					name = "Adjust Blizzard Frames",
+					desc = "Move Blizzard frames above/below bars",
+					get = function(info, value)
+							return db.moveFrames
+					end,
+					set = function(info, value)
+							db.moveFrames = value
+							ChocolateBar:UpdateBarOptions("UpdateAutoHide")
+					end,
+				},
+				frameSettings = {
+					inline = true,
+					name="Frame Settings",
+					type="group",
+					order = 3,
+					args={
+						size = {
+							type = 'range',
+							order = 1,
+							name = "Bar Size",
+							desc = "Bar Size",
+							min = 0.5,
+							max = 1.5,
+							step = .1,
+							get = function(name)
+								return db.scale
+							end,
+							set = function(info, value)
+								ChocolateBar:UpdateBarOptions("UpdateScale")
+								db.scale = value
+							end,
+						},
+						gap = {
+							type = 'range',
+							order = 2,
+							name = "Gap",
+							desc = "Set the gap between the chocolates.",
+							min = 0,
+							max = 15,
+							step = 1,
+							get = function(name)
+								return db.gap
+							end,
+							set = function(info, value)
+								db.gap = value
+								ChocolateBar.ChocolatePiece:UpdateGap(value)
+								ChocolateBar:UpdateChoclates(value)
+							end,
+						},	
+						strata = {
+							type = 'select',
+							values = {FULLSCREEN_DIALOG="Fullscreen_Dialog",FULLSCREEN="Fullscreen", 
+										DIALOG="Dialog",HIGH="High",MEDIUM="Medium",LOW="Low",BACKGROUND="Background"},
+							order = 3,
+							name = "Frame Strata",
+							desc = "Frame Strata",
+							get = function() 
+								return db.strata
+							end,
+							set = function(info, value)
+								db.strata = value
+								ChocolateBar:UpdateBarOptions("UpdateStrata")
+							end,
+						},
+					},
+				},
 				backbround = {
 					inline = true,
 					name="Dark Chocolate?",
 					type="group",
-					order = 5,
+					order = 4,
 					args={
 						texture = {
 							type = 'select',
@@ -107,20 +208,6 @@ aceoptions = {
 						},
 					},
 				},
-				moveFrames = {
-					type = 'toggle',
-					--width = "half",
-					order = -1,
-					name = "Adjust Blizzard Frames",
-					desc = "Move Blizzard frames above/below bars",
-					get = function(info, value)
-							return db.moveFrames
-					end,
-					set = function(info, value)
-							db.moveFrames = value
-							ChocolateBar:UpdateBarOptions("UpdateAutoHide")
-					end,
-				},
 				debug = {
 					type = 'toggle',
 					--width = "half",
@@ -167,31 +254,53 @@ aceoptions = {
 					type = "header",
 					name =  "Quick Config",
 				},
-				enableAll = {
-					type = 'execute',
-		            --width = "half",
-					order = 2,
-					name = "Enable All",
-		            desc = "Get back my chocolate!",
-		            func = "NewBar",
-				},
-				disableAll = {
-					type = 'execute',
-		            --width = "half",
-					order = 3,
-					name = "Disable All",
-		            desc = "Eat all the chocolate at once, uff...",
-		            func = "NewBar",
-				},
-				disableLauncher = {
-					type = 'execute',
-		            --width = "half",
-					order = 4,
-					name = "Disable all Launchers",
-		            desc = "Eat all the bad guy's:)",
-		            func = "NewBar",
-				},
 				--]]
+				stats = {
+					inline = true,
+					name="Chocolate Statistics",
+					type="group",
+					order = 1,
+					args={
+						stats = {
+							order = 1,
+							type = "description",
+							name = GetStats,
+							--image = icon,
+						},
+					},
+				},
+				quickconfig = {
+					inline = true,
+					name="Quick Config",
+					type="group",
+					order = 2,
+					args={
+						enableAll = {
+							type = 'execute',
+							--width = "half",
+							order = 3,
+							name = "Enable All",
+							desc = "Get back my chocolate!",
+							func = EnableAll,
+						},
+						disableAll = {
+							type = 'execute',
+							--width = "half",
+							order = 4,
+							name = "Disable All",
+							desc = "Eat all the chocolate at once, uff...",
+							func = DisableAll,
+						},
+						disableLauncher = {
+							type = 'execute',
+							--width = "half",
+							order = 5,
+							name = "Disable all Launchers",
+							desc = "Eat all the bad guy's:)",
+							func = DisableLauncher,
+						},
+					},
+				},
 			},
 		},
 	},
@@ -230,7 +339,7 @@ local function SetBarAlign(info, value)
 		db.barSettings[name].align = value
 		bar = ChocolateBar:GetBar(name)
 		if bar then
-			bar:UpdateAutoHide()
+			bar:UpdateAutoHide(db)
 			ChocolateBar:AnchorBars()
 		end
 	end
@@ -316,7 +425,7 @@ local function setAutoHide(info, value)
 	local name = info[#info-1]
 	db.barSettings[name].autohide = value
 	bar = ChocolateBar:GetBar(name)
-	bar:UpdateAutoHide()
+	bar:UpdateAutoHide(db)
 	--ChocolateBar:UpdateBarOptions("UpdateAutoHide")
 end
 
@@ -333,17 +442,18 @@ end
 -----
 -- chocolate option functions
 -----
+
 local function GetName(info)
 	local cleanName = info[#info]
 	local name = chocolateOptions[cleanName].desc
 	local icon = chocolateOptions[cleanName].icon
 	if(not db.objSettings[name].enabled)then
 		cleanName = "|TZZ"..cleanName.."|t|T"..icon..":18|t |cFFFF0000"..cleanName.."|r"
-	--elseif ChocolateBar:GetChocolate(name).obj.type == "data source" then
-	else
-		cleanName = "|H"..cleanName.."|h|T"..icon..":18|t "..cleanName
+	elseif ChocolateBar:GetChocolate(name).obj.type == "data source" then
 	--else
-	--	cleanName = "|H"..cleanName.."|h|T"..icon..":18|t |c00777777"..cleanName.."|r"
+		cleanName = "|H"..cleanName.."|h|T"..icon..":18|t "..cleanName
+	else
+		cleanName = "|H"..cleanName.."|h|T"..icon..":18|t |cFFBBBBBB"..cleanName.."|r"
 	end
 	return cleanName
 end
@@ -445,6 +555,13 @@ end
 function ChocolateBar:RegisterOptions()
 	self.db = LibStub("AceDB-3.0"):New("ChocolateBarDB", defaults)
 
+	
+	-- change to a more modulare way once there is a need for real modules
+	moreChocolate = LibStub("LibDataBroker-1.1"):GetDataObjectByName("MoreChocolate")
+	if moreChocolate then
+		aceoptions.args.morechocolate = moreChocolate:GetOptions()
+	end
+	
 	LibStub("AceConfig-3.0"):RegisterOptionsTable("ChocolateBar", aceoptions)
 	aceoptions.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
     local optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("ChocolateBar", "ChocolateBar")
@@ -458,6 +575,10 @@ function ChocolateBar:RegisterOptions()
 			hideonleave = false,
 			scale = 1,
 			moveFrames = true,
+			strata = "HIGH",
+			gap = 7,
+			moreBar = "ChocolateBar2",
+			moreBarDelay = 4,
 			background = {
 				texture = "Tooltip",
 				borderTexture = "Tooltip-Border",
@@ -476,7 +597,6 @@ function ChocolateBar:RegisterOptions()
 					enabled = true,
 					showText = true,
 					showIcon = true,
-					space = 7,
 					index = 10,
 				},
 				['ChocolateBar1'] = {
@@ -486,7 +606,6 @@ function ChocolateBar:RegisterOptions()
 					enabled = true,
 					showText = true,
 					showIcon = true,
-					space = 7,
 					index = 1,
 				},
 			},
@@ -497,7 +616,6 @@ function ChocolateBar:RegisterOptions()
 					enabled = true,
 					showText = true,
 					showIcon = true,
-					space = 7,
 					index = 1,
 				},
 			},
@@ -528,6 +646,10 @@ function ChocolateBar:ChatCommand(input)
 end
 
 function ChocolateBar:AddBarOptions(name)
+
+	if moreChocolate then
+		moreChocolate.barNames[name] = name
+	end
 
 	barOptions[name] = {
 		name = GetBarName,
@@ -593,10 +715,14 @@ function ChocolateBar:RemoveBarOptions(name)
 	barOptions[name] = nil
 end
 
-function ChocolateBar:AddObjectOptions(name, icon)
+function ChocolateBar:AddObjectOptions(name,icon, t)
 	if not icon or icon == "Interface\\AddOns\\" then
 		icon = "Interface\\AddOns\\ChocolateBar\\pics\\ChocolatePiece"
 	end
+	--local curse = GetAddOnMetadata(name,"X-Curse-Packaged-Version") or ""
+	--local version = GetAddOnMetadata(name,"Version") or ""
+	
+	t = t or "not set"
 	local cleanName = string.gsub(name, "\|c........", "")
 	cleanName = string.gsub(cleanName, "\|r", "")
 	cleanName = string.gsub(cleanName, "[%c \127]", "")
@@ -612,20 +738,18 @@ function ChocolateBar:AddObjectOptions(name, icon)
 				order = 1,
 				type = "header",
 				--name = "|T"..icon..":25|t "..name,
-				name = "|T"..icon..":0|t "..name,
+				name = "|T"..icon..":18|t "..name,
 			},
-			--[[
 			label = {
-				order = 0,
+				order = 2,
 				type = "description",
-				name = "",
-				image = icon,
+				name = "Type: "..t.."\n",
+				--image = icon,
 			},
-			--]]
 			enabled = {
 				type = 'toggle',
 				--width "half",
-				order = 2,
+				order = 3,
 				name = "Enabled",
 				desc = "Enabled",
 				get = GetEnabled,
@@ -634,7 +758,7 @@ function ChocolateBar:AddObjectOptions(name, icon)
 			text = {
 				type = 'toggle',
 				--width = "half",
-				order = 3,
+				order = 4,
 				name = "Show Text",
 				desc = "Show Text",
 				get = GetText,
@@ -643,7 +767,7 @@ function ChocolateBar:AddObjectOptions(name, icon)
 			icon = {
 				type = 'toggle',
 				--width = "half",
-				order = 4,
+				order = 5,
 				name = "Show Icon",
 				desc = "Show Icon",
 				get = GetIcon,

@@ -11,7 +11,7 @@ local Chocolate = ChocolateBar.ChocolatePiece
 local Bar = ChocolateBar.Bar
 
 local chocolateBars = {}
---ChocolateBar.chocolateBars = chocolateBars
+
 local chocolateObjects = {}
 local dataObjects = {}
 local db
@@ -39,15 +39,6 @@ local function RGBToHex(r, g, b)
 	return ("%02x%02x%02x"):format(r*255, g*255, b*255)	
 end
 
---[[
-local function count(t)
-	local i = 0
-	for k,v in pairs(t) do
-		i = i + 1
-	end
-	return i
-end
---]]
 --------
 -- Ace3 callbacks
 --------
@@ -74,6 +65,11 @@ function ChocolateBar:OnEnable()
 	ChocolateBar:UpdateBars() --update chocolateBars here
 
 	broker.RegisterCallback(self, "LibDataBroker_DataObjectCreated")
+	
+	local moreChocolate = LibStub("LibDataBroker-1.1"):GetDataObjectByName("MoreChocolate")
+	if moreChocolate then
+		moreChocolate:SetBar(db)
+	end
 end
 
 function ChocolateBar:OnDisable()
@@ -103,7 +99,7 @@ function ChocolateBar:LibDataBroker_DataObjectCreated(event, name, obj, noupdate
 	if db.objSettings[name].enabled then
 		self:EnableDataObject(name, noupdate)
 	end
-	self:AddObjectOptions(name, obj.icon)
+	self:AddObjectOptions(name, obj.icon, t)
 end
 
 function ChocolateBar:EnableDataObject(name, noupdate)
@@ -128,7 +124,7 @@ function ChocolateBar:EnableDataObject(name, noupdate)
 	obj.name = name
 	
 	settings.enabled = true
-	local choco = Chocolate:New(name, obj, settings)
+	local choco = Chocolate:New(name, obj, settings, db)
 	chocolateObjects[name] = choco
 	
 	local bar = chocolateBars[barName]
@@ -167,11 +163,11 @@ end
 
 -- call when general bar options change
 -- updatekey: the key of the update function
-function ChocolateBar:UpdateBarOptions(updatekey)
-	for k,v in pairs(chocolateBars) do
-		local func = v[updatekey]
+function ChocolateBar:UpdateBarOptions(updatekey, value)
+	for name,bar in pairs(chocolateBars) do
+		local func = bar[updatekey]
 		if func then
-			func(v)
+			func(bar, db)
 		else
 			Debug("UpdateBarOptions: invalid updatekey", updatekey)
 		end
@@ -184,6 +180,17 @@ end
 
 function ChocolateBar:GetBar(name)
 	return chocolateBars[name]
+end
+
+function ChocolateBar:GetBarNames()
+	Debug("ChocolateBar:GetBarNames()")
+	barNames = {}
+	for k,v in pairs(chocolateBars) do
+		--table.insert(temptop,{k,k})
+		Debug("k=",k)
+		barNames[k] = k
+	end
+	return barNames
 end
 
 function ChocolateBar:OnProfileChanged(event, database, newProfileKey)
@@ -242,6 +249,12 @@ local function getFreeBarName()
 	Debug("no name found ")
 end
 
+function ChocolateBar:UpdateChoclates()
+	for name,choco in pairs(chocolateObjects) do
+		choco:Update(choco, "updateSettings", value)
+	end
+end
+
 --------
 -- Bars Management
 --------
@@ -253,7 +266,7 @@ function ChocolateBar:AddBar(name, settings, noupdate)
 	if not settings then
 		settings = db.barSettings[name]
 	end
-	local bar = Bar:New(name,settings)
+	local bar = Bar:New(name,settings,db)
 	Drag:RegisterFrame(bar)
 	chocolateBars[name] = bar
 	ChocolateBar:AddBarOptions(name)

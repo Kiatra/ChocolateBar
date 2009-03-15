@@ -2,10 +2,11 @@
 local ChocolatePiece = ChocolateBar.ChocolatePiece
 local Drag = ChocolateBar.Drag
 local Debug = ChocolateBar.Debug
+local gap = 7
 
 local function resizeFrame(self)
 	local settings = self.settings
-	local width = settings.space
+	local width = gap
 	if self.icon and settings.showIcon then
 		width = width + self.icon:GetWidth()
 	end
@@ -157,7 +158,8 @@ local function OnLeave(self)
 	local obj  = self.obj
 	local name = self.name
 	
-	if self.bar.autohide then
+	local bar = self.bar
+	if bar.autohide then
 		local bar = self.bar
 		bar:HideAll()
 	end
@@ -207,10 +209,12 @@ local function OnDragStop(frame)
 		this:StopMovingOrSizing()
 		this.isMoving = false
 		Drag:Stop(frame)
+		frame:SetParent(frame.bar)
 	end
 end
 
-function ChocolatePiece:New(name, obj, settings)
+function ChocolatePiece:New(name, obj, settings, db)
+	gap = db.gap
 	local height = 15
 	local text = obj.text
 	local icon = obj.icon
@@ -255,9 +259,7 @@ function ChocolatePiece:New(name, obj, settings)
 	if icon then
 		chocolate.icon:SetTexture(icon)
 	end
-	
-	--resizeFrame(chocolate)
-	
+
 	SettingsUpdater(chocolate, settings.showText )
 	
 	chocolate.name = name
@@ -268,4 +270,8 @@ function ChocolatePiece:New(name, obj, settings)
 	chocolate:SetScript("OnDragStop", OnDragStop)
 	
 	return chocolate
+end
+
+function ChocolatePiece:UpdateGap(val)
+	gap = val
 end
