@@ -577,7 +577,7 @@ function ChocolateBar:RegisterOptions()
 			moveFrames = true,
 			strata = "HIGH",
 			gap = 7,
-			moreBar = "ChocolateBar2",
+			moreBar = "none",
 			moreBarDelay = 4,
 			background = {
 				texture = "Tooltip",
@@ -639,17 +639,14 @@ end
 
 function ChocolateBar:ChatCommand(input)
 	if not input or input:trim() == "" then
-        LibStub("AceConfigDialog-3.0"):Open("ChocolateBar")
+        test = LibStub("AceConfigDialog-3.0"):GetGetStatusTable("ChocolateBar", {"groups","groups"})
+		LibStub("AceConfigDialog-3.0"):Open("ChocolateBar")
     else
         LibStub("AceConfigCmd-3.0").HandleCommand(ChocolateBar, "cb", "ChocolateBar", input)
     end
 end
 
 function ChocolateBar:AddBarOptions(name)
-
-	if moreChocolate then
-		moreChocolate.barNames[name] = name
-	end
 
 	barOptions[name] = {
 		name = GetBarName,

@@ -28,6 +28,17 @@ local moreChocolate = LibStub("LibDataBroker-1.1"):NewDataObject("MoreChocolate"
 })
 moreChocolate.barNames = {none = "none"}
 
+function GetList()
+	wipe(moreChocolate.barNames)
+	
+	moreChocolate.barNames.none = "none"
+	
+	for k,v in pairs(ChocolateBar:GetBars()) do
+		moreChocolate.barNames[k] = k
+	end
+	return moreChocolate.barNames
+end
+
 function Timer:OnUpdate(elapsed)
 	counter = counter + elapsed
 	if counter >= delay and bar then
@@ -74,7 +85,7 @@ function moreChocolate:GetOptions()
 				},
 				selectBar = {
 					type = 'select',
-					values = moreChocolate.barNames,
+					values = GetList,
 					order = 3,
 					name = "SelectBar",
 					desc = "SelectBar",

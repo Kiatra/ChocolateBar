@@ -23,7 +23,6 @@ function Bar:New(name, settings, db)
 	frame:SetScript("OnEnter", function(self) 
 		self:ShowAll()
 	end)
-	--frame:SetScript("OnLeave", OnLeave)
 	frame:SetScript("OnLeave", function(self) 
 		if self.autohide then
 			self:HideAll()
@@ -169,16 +168,20 @@ function Bar:EatChocolatePiece(name)
 end
 
 function Bar:HideAll()
-	self:SetAlpha(0)
-	for k, v in pairs(self.chocolist) do
-		v:Hide()
+	if not ChocolateBar.dargging then
+		self:SetAlpha(0)
+		for k, v in pairs(self.chocolist) do
+			v:Hide()
+		end
 	end
 end
 
 function Bar:ShowAll()
-	self:SetAlpha(1)
-	for k, v in pairs(self.chocolist) do
-		v:Show()
+	if not ChocolateBar.dargging then
+		self:SetAlpha(1)
+		for k, v in pairs(self.chocolist) do
+			v:Show()
+		end
 	end
 end
 

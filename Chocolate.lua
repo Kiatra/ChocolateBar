@@ -3,6 +3,7 @@ local ChocolatePiece = ChocolateBar.ChocolatePiece
 local Drag = ChocolateBar.Drag
 local Debug = ChocolateBar.Debug
 local gap = 7
+local tempAutoHide
 
 local function resizeFrame(self)
 	local settings = self.settings
@@ -102,6 +103,7 @@ end
 
 --code taken with permission from fortress 
 local function GT_OnLeave(self)
+	Debug("GT_OnLeave(self)",self:GetName())
 	self:SetScript("OnLeave", self.fortressOnLeave)
 	self:Hide()
 	GameTooltip:EnableMouse(false)
@@ -160,7 +162,6 @@ local function OnLeave(self)
 	
 	local bar = self.bar
 	if bar.autohide then
-		local bar = self.bar
 		bar:HideAll()
 	end
 
@@ -196,21 +197,26 @@ end
 
 local function OnDragStart(frame)
 	if not ChocolateBar.db.profile.locked or IsAltKeyDown() then 
-		local bar = frame.bar	
-		Drag:Start(bar, frame.name)
-		this:StartMoving()
-		this.isMoving = true
-		GameTooltip:Hide();
+		local bar = frame.bar
+		if not bar.autohide then
+			Debug("bar:GetAlpha()",bar:GetAlpha(),frame:GetName(), frame.isMoving,this.isMoving)
+			--ChocolateBar:TempDisAutohide(true)
+			Drag:Start(bar, frame.name)
+			frame:StartMoving()
+			frame.isMoving = true
+			GameTooltip:Hide();
+		end
 	end
 end
 
 local function OnDragStop(frame)
-	if not ChocolateBar.db.profile.locked or IsAltKeyDown() then 
-		this:StopMovingOrSizing()
-		this.isMoving = false
+	--if not ChocolateBar.db.profile.locked or IsAltKeyDown() then 
+		frame:StopMovingOrSizing()
+		frame.isMoving = false
 		Drag:Stop(frame)
 		frame:SetParent(frame.bar)
-	end
+		--ChocolateBar:TempDisAutohide()
+	--end
 end
 
 function ChocolatePiece:New(name, obj, settings, db)

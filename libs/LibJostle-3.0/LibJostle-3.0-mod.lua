@@ -192,7 +192,8 @@ function Jostle:GetScreenBottom()
 	local top = 0
 	for _,frame in ipairs(self.bottomFrames) do
 		if frame.IsShown and frame:IsShown() and frame.GetTop and frame:GetTop() and frame:GetTop() > top then
-			top = frame:GetTop()
+			-- added * frame:GetScale() by yess
+			top = frame:GetTop() * frame:GetScale()
 		end
 	end
 	return top
