@@ -15,6 +15,7 @@ local chocolateBars = {}
 local chocolateObjects = {}
 local dataObjects = {}
 local db
+
 --------
 -- utility functions
 --------
@@ -161,9 +162,27 @@ function ChocolateBar:AttributeChanged(event, name, key, value)
 	choco:Update(choco, key, value)
 end
 
+--[[
+-- autohide and drag and drop is making problems this is a quick fix
+function ChocolateBar:TempDisAutohide(value)
+	for name,bar in pairs(chocolateBars) do
+		if value then
+			bar.tempHide = bar.autohide
+			bar.autohide = false
+			bar:ShowAll()
+		else
+			if bar.tempHide then
+				bar.autohide = true
+				bar:HideAll()
+			end
+		end
+	end
+end
+--]]
+
 -- call when general bar options change
 -- updatekey: the key of the update function
-function ChocolateBar:UpdateBarOptions(updatekey, value)
+function ChocolateBar:UpdateBarOption(updatekey, value)
 	for name,bar in pairs(chocolateBars) do
 		local func = bar[updatekey]
 		if func then
@@ -182,15 +201,8 @@ function ChocolateBar:GetBar(name)
 	return chocolateBars[name]
 end
 
-function ChocolateBar:GetBarNames()
-	Debug("ChocolateBar:GetBarNames()")
-	barNames = {}
-	for k,v in pairs(chocolateBars) do
-		--table.insert(temptop,{k,k})
-		Debug("k=",k)
-		barNames[k] = k
-	end
-	return barNames
+function ChocolateBar:GetBars()
+	return chocolateBars
 end
 
 function ChocolateBar:OnProfileChanged(event, database, newProfileKey)
@@ -280,6 +292,7 @@ end
 -- remove a bar and disalbe all plugins in it
 function ChocolateBar:RemoveBar(name)
 	local bar = chocolateBars[name]
+	Drag:UnregisterFrame(bar)
 	if bar then
 		ChocolateBar:RemoveBarOptions(name)
 		bar:Disable()
