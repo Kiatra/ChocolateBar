@@ -63,7 +63,7 @@ function ChocolateBar:OnEnable()
 	for name, obj in broker:DataObjectIterator() do
 		self:LibDataBroker_DataObjectCreated(nil, name, obj, true) --force noupdate on chocolateBars
 	end
-	ChocolateBar:UpdateBars() --update chocolateBars here
+	self:UpdateBars() --update chocolateBars here
 
 	broker.RegisterCallback(self, "LibDataBroker_DataObjectCreated")
 	
@@ -182,7 +182,7 @@ end
 
 -- call when general bar options change
 -- updatekey: the key of the update function
-function ChocolateBar:UpdateBarOption(updatekey, value)
+function ChocolateBar:UpdateBarOptions(updatekey, value)
 	for name,bar in pairs(chocolateBars) do
 		local func = bar[updatekey]
 		if func then
@@ -236,7 +236,7 @@ function ChocolateBar:OnProfileChanged(event, database, newProfileKey)
 			self:DisableDataObject(name)
 		end
 	end
-	ChocolateBar:UpdateBars() --update chocolateBars here
+	self:UpdateBars() --update chocolateBars here
 end
 
 -- find lowest free bar number
@@ -308,6 +308,7 @@ end
 function ChocolateBar:UpdateBars()
 	for k,v in pairs(chocolateBars) do
 		v:UpdateBar()
+		v:UpdateAutoHide(db) 
 	end
 end
 

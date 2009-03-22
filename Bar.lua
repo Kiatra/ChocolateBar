@@ -41,7 +41,7 @@ function Bar:New(name, settings, db)
 	frame:UpdateTexture(db)
 	frame:UpdateColors(db)
 	frame:UpdateScale(db)
-	frame:UpdateAutoHide(db)
+	--frame:UpdateAutoHide(db)
 	frame:UpdateStrata(db)
 	
 	return frame
@@ -51,7 +51,7 @@ function Bar:UpdateStrata(db)
 	self:SetFrameStrata(db.strata)
 end
 
-function Bar:UpdateAutoHide(db) 
+function Bar:UpdateAutoHide(db)
 	if self.settings.autohide then
 		self.autohide = true
 		self:HideAll()
