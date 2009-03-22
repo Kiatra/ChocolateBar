@@ -198,25 +198,22 @@ end
 local function OnDragStart(frame)
 	if not ChocolateBar.db.profile.locked or IsAltKeyDown() then 
 		local bar = frame.bar
-		if not bar.autohide then
-			Debug("bar:GetAlpha()",bar:GetAlpha(),frame:GetName(), frame.isMoving,this.isMoving)
-			--ChocolateBar:TempDisAutohide(true)
-			Drag:Start(bar, frame.name)
-			frame:StartMoving()
-			frame.isMoving = true
-			GameTooltip:Hide();
-		end
+		ChocolateBar:TempDisAutohide(true)
+		ChocolateBar.dragging = true
+		Drag:Start(bar, frame.name)
+		frame:StartMoving()
+		frame.isMoving = true
+		GameTooltip:Hide();
 	end
 end
 
 local function OnDragStop(frame)
-	--if not ChocolateBar.db.profile.locked or IsAltKeyDown() then 
-		frame:StopMovingOrSizing()
-		frame.isMoving = false
-		Drag:Stop(frame)
-		frame:SetParent(frame.bar)
-		--ChocolateBar:TempDisAutohide()
-	--end
+	frame:StopMovingOrSizing()
+	frame.isMoving = false
+	Drag:Stop(frame)
+	ChocolateBar.dragging = false
+	frame:SetParent(frame.bar)
+	ChocolateBar:TempDisAutohide()
 end
 
 function ChocolatePiece:New(name, obj, settings, db)

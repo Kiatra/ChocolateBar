@@ -130,7 +130,6 @@ local function updateDummy(self, choco, name)
 end
 
 function GetTexture(frame)
-	Debug(frame:GetName())
 	regions = frame:GetRegions()
 end
 
@@ -168,19 +167,28 @@ function Bar:EatChocolatePiece(name)
 end
 
 function Bar:HideAll()
-	if not ChocolateBar.dargging then
-		self:SetAlpha(0)
-		for k, v in pairs(self.chocolist) do
-			v:Hide()
+	self:SetAlpha(0)
+	for k, v in pairs(self.chocolist) do
+		v.text:Hide()
+		if v.icon then 
+			v.icon:Hide()
 		end
 	end
 end
 
 function Bar:ShowAll()
-	if not ChocolateBar.dargging then
-		self:SetAlpha(1)
-		for k, v in pairs(self.chocolist) do
-			v:Show()
+	--Timer:SetScript("OnUpdate", nil)
+	
+	self:SetAlpha(1)
+	local settings
+	for k, v in pairs(self.chocolist) do
+		settings = v.settings 
+		--v:Show()
+		if settings.showText then
+			v.text:Show()
+		end
+		if settings.showIcon and v.icon then
+			v.icon:Show()
 		end
 	end
 end
