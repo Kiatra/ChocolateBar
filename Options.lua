@@ -639,7 +639,7 @@ end
 
 function ChocolateBar:ChatCommand(input)
 	if not input or input:trim() == "" then
-        test = LibStub("AceConfigDialog-3.0"):GetGetStatusTable("ChocolateBar", {"groups","groups"})
+        --test = LibStub("AceConfigDialog-3.0"):GetGetStatusTable("ChocolateBar", {"groups","groups"})
 		LibStub("AceConfigDialog-3.0"):Open("ChocolateBar")
     else
         LibStub("AceConfigCmd-3.0").HandleCommand(ChocolateBar, "cb", "ChocolateBar", input)

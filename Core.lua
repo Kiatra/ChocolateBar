@@ -162,8 +162,8 @@ function ChocolateBar:AttributeChanged(event, name, key, value)
 	choco:Update(choco, key, value)
 end
 
---[[
--- autohide and drag and drop is making problems this is a quick fix
+
+-- disable autohide for all bars during drag and drop
 function ChocolateBar:TempDisAutohide(value)
 	for name,bar in pairs(chocolateBars) do
 		if value then
@@ -178,7 +178,7 @@ function ChocolateBar:TempDisAutohide(value)
 		end
 	end
 end
---]]
+
 
 -- call when general bar options change
 -- updatekey: the key of the update function
@@ -247,13 +247,11 @@ local function getFreeBarName()
 	for i=1,100 do
 		name = "ChocolateBar"..i
 		for k,v in pairs(chocolateBars) do
-			Debug("temp / v:GetName():", name, v:GetName())
 			if name == v:GetName() then
 				used = true
 			end
 		end
 		if not used then
-			Debug("free name:", name)
 			return name
 		end
 		used = false
