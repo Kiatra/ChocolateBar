@@ -208,12 +208,14 @@ local function OnDragStart(frame)
 end
 
 local function OnDragStop(frame)
-	frame:StopMovingOrSizing()
-	frame.isMoving = false
-	Drag:Stop(frame)
-	ChocolateBar.dragging = false
-	frame:SetParent(frame.bar)
-	ChocolateBar:TempDisAutohide()
+	if not ChocolateBar.db.profile.locked then 
+		frame:StopMovingOrSizing()
+		frame.isMoving = false
+		Drag:Stop(frame)
+		ChocolateBar.dragging = false
+		frame:SetParent(frame.bar)
+		ChocolateBar:TempDisAutohide()
+	end
 end
 
 function ChocolatePiece:New(name, obj, settings, db)
