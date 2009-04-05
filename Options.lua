@@ -11,6 +11,7 @@ local version = GetAddOnMetadata("ChocolateBar","X-Curse-Packaged-Version") or "
 local db
 local index = 0
 local moreChocolate
+local firstOpen = true
 
 
 local function GetStats(info)
@@ -68,34 +69,86 @@ aceoptions = {
 		general={
 			name="General",
 			type="group",
-			order = 1,
+			order = 0,
 			--guiHidden = true,
 			args={
-				locked = {
-					type = 'toggle',
-					order = 1,
-					name = "Lock Chocolates",
-					desc = "Hold alt key to drag a chocolate.",
-					get = function(info, value)
-							return db.locked
-					end,
-					set = function(info, value)
-							db.locked = value
-					end,
+				general = {
+					inline = true,
+					name="Generall",
+					type="group",
+					order = 0,
+					args={
+						locked = {
+							type = 'toggle',
+							order = 1,
+							name = "Lock Chocolates",
+							desc = "Hold alt key to drag a chocolate.",
+							get = function(info, value)
+									return db.locked
+							end,
+							set = function(info, value)
+									db.locked = value
+							end,
+						},
+						moveFrames = {
+							type = 'toggle',
+							width = "double",
+							order = 2,
+							name = "Adjust Blizzard Frames",
+							desc = "Move Blizzard frames above/below bars",
+							get = function(info, value)
+									return db.moveFrames
+							end,
+							set = function(info, value)
+									db.moveFrames = value
+									ChocolateBar:UpdateBarOptions("UpdateAutoHide")
+							end,
+						},
+					},
 				},
-				moveFrames = {
-					type = 'toggle',
-					--width = "half",
-					order = 2,
-					name = "Adjust Blizzard Frames",
-					desc = "Move Blizzard frames above/below bars",
-					get = function(info, value)
-							return db.moveFrames
-					end,
-					set = function(info, value)
-							db.moveFrames = value
-							ChocolateBar:UpdateBarOptions("UpdateAutoHide")
-					end,
+				combat = {
+					inline = true,
+					name="In Combat",
+					type="group",
+					order = 0,
+					args={
+						hidetooltip = {
+							type = 'toggle',
+							order = 1,
+							name = "Disable Tooltips",
+							desc = "Disable Tooltips",
+							get = function(info, value)
+									return db.combathidetip
+							end,
+							set = function(info, value)
+									db.combathidetip = value
+							end,
+						},
+						hidebar = {
+							type = 'toggle',
+							order = 2,
+							name = "Hide Bars",
+							desc = "Hide Bars",
+							get = function(info, value)
+									return db.combathidebar
+							end,
+							set = function(info, value)
+									db.combathidebar = value
+							end,
+						},
+						disablebar = {
+							type = 'toggle',
+							order = 2,
+							name = "Disable Clicking",
+							desc = "Disable Clicking",
+							get = function(info, value)
+									return db.combatdisbar
+							end,
+							set = function(info, value)
+									db.combatdisbar = value
+							end,
+						},
+					},
 				},
 				frameSettings = {
 					inline = true,
@@ -211,7 +264,7 @@ aceoptions = {
 				debug = {
 					type = 'toggle',
 					--width = "half",
-					order = -1,
+					order = 20,
 					name = "Debug",
 					desc = "This one is for me, not for you :P",
 					get = function(info, value)
@@ -527,6 +580,7 @@ local function createDropPoint(name, dropfunc, offx, text, texture)
 	local frame = CreateFrame("Frame", name, UIParent)
 	frame:SetWidth(100)
 	frame:SetHeight(100)
+	frame:SetFrameStrata("DIALOG")
 	frame:SetPoint("CENTER",offx,320)
 	frame:SetBackdrop({bgFile = texture, 
 			edgeFile = "Interface/Tooltips/UI-Tooltip-Border", 
@@ -564,14 +618,18 @@ function ChocolateBar:RegisterOptions()
 	
 	LibStub("AceConfig-3.0"):RegisterOptionsTable("ChocolateBar", aceoptions)
 	aceoptions.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
-    local optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("ChocolateBar", "ChocolateBar")
-	LibStub("AceConfigDialog-3.0"):SetDefaultSize("ChocolateBar", 500, 400)
+    local optionsFrame = AceCfgDlg:AddToBlizOptions("ChocolateBar", "ChocolateBar")
+	AceCfgDlg:SetDefaultSize("ChocolateBar", 600, 600)
+	AceCfgDlg:SelectGroup("ChocolateBar", "chocolates")
 	
 	self:RegisterChatCommand("cb", "ChatCommand")
     self:RegisterChatCommand("chocolatebar", "ChatCommand")
 	
 	self.db:RegisterDefaults({
 		profile = {
+			combathidetip = false,
+			combathidebar = false,
+			combatdisbar = false,
 			hideonleave = false,
 			scale = 1,
 			moveFrames = true,
@@ -638,9 +696,9 @@ function ChocolateBar:RegisterOptions()
 end
 
 function ChocolateBar:ChatCommand(input)
+	
 	if not input or input:trim() == "" then
-        --test = LibStub("AceConfigDialog-3.0"):GetGetStatusTable("ChocolateBar", {"groups","groups"})
-		LibStub("AceConfigDialog-3.0"):Open("ChocolateBar")
+		AceCfgDlg:Open("ChocolateBar")
     else
         LibStub("AceConfigCmd-3.0").HandleCommand(ChocolateBar, "cb", "ChocolateBar", input)
     end

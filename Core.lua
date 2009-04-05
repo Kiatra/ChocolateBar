@@ -48,7 +48,9 @@ function ChocolateBar:OnInitialize()
 	self.db.RegisterCallback(self, "OnProfileChanged", "OnProfileChanged")
 	self.db.RegisterCallback(self, "OnProfileCopied", "OnProfileChanged")
 	self.db.RegisterCallback(self, "OnProfileReset", "OnProfileChanged")
-
+	
+	self:RegisterEvent("PLAYER_REGEN_DISABLED",ChocolateBar.OnEnterCombat)
+	self:RegisterEvent("PLAYER_REGEN_ENABLED",ChocolateBar.OnLeaveCombat)
 	db = self.db.profile
 	
 	local barSettings = db.barSettings
@@ -83,6 +85,27 @@ function ChocolateBar:OnDisable()
 	broker.UnregisterCallback(self, "LibDataBroker_DataObjectCreated")
 end
 
+function ChocolateBar.OnEnterCombat()
+	--Debug("ChocolateBar.OnEnterCombat()")
+	ChocolateBar.InCombat = true
+	if db.combathidebar then
+		for name,bar in pairs(chocolateBars) do
+			bar:HideAll()
+		end
+	end
+end
+
+function ChocolateBar.OnLeaveCombat()
+	--Debug("ChocolateBar.OnLeaveCombat()")
+	ChocolateBar.InCombat = false
+	if db.combathidebar then
+		for name,bar in pairs(chocolateBars) do
+			if not bar.autohide then
+				bar:ShowAll()
+			end
+		end
+	end
+end
 --------
 -- LDB callbacks
 --------

@@ -2,12 +2,12 @@
 local ChocolatePiece = ChocolateBar.ChocolatePiece
 local Drag = ChocolateBar.Drag
 local Debug = ChocolateBar.Debug
-local gap = 7
 local tempAutoHide
+local db
 
 local function resizeFrame(self)
 	local settings = self.settings
-	local width = gap
+	local width = db.gap
 	if self.icon and settings.showIcon then
 		width = width + self.icon:GetWidth()
 	end
@@ -126,6 +126,8 @@ local function PrepareTooltip(frame, anchorFrame)
 end
 
 local function OnEnter(self)
+	if db.combathidebar and ChocolateBar.InCombat then return end
+	
 	local obj  = self.obj
 	local name = self.name
 		
@@ -133,7 +135,9 @@ local function OnEnter(self)
 		local bar = self.bar
 		bar:ShowAll()
 	end
-
+	
+	if db.combathidetip and ChocolateBar.InCombat then return end
+	
 	if obj.tooltip then
 		PrepareTooltip(obj.tooltip, self)
 		if obj.tooltiptext then
@@ -157,6 +161,8 @@ local function OnEnter(self)
 end
 
 local function OnLeave(self)
+	if db.combathidebar and ChocolateBar.InCombat then return end
+	
 	local obj  = self.obj
 	local name = self.name
 	
@@ -165,11 +171,17 @@ local function OnLeave(self)
 		bar:HideAll()
 	end
 
+	if db.combathidetip and ChocolateBar.InCombat then return end
 	if obj.OnLeave then
 		obj.OnLeave(self)
 	else
 		GameTooltip:Hide()
 	end
+end
+
+local function OnClick(self)
+	if db.combatdisbar and ChocolateBar.InCombat then return end
+	self.obj.OnClick()
 end
 
 -- PrepareTooltip code taken with permission from fortress 
@@ -218,8 +230,8 @@ local function OnDragStop(frame)
 	end
 end
 
-function ChocolatePiece:New(name, obj, settings, db)
-	gap = db.gap
+function ChocolatePiece:New(name, obj, settings, database)
+	db = database
 	local height = 15
 	local text = obj.text
 	local icon = obj.icon
@@ -249,7 +261,8 @@ function ChocolatePiece:New(name, obj, settings, db)
 	
 	
 	chocolate:RegisterForClicks("AnyUp")
-	chocolate:SetScript("OnClick", obj.OnClick)
+	--chocolate:SetScript("OnClick", obj.OnClick)
+	chocolate:SetScript("OnClick", OnClick)
 	
 	chocolate:Show()
 	chocolate.settings = settings
@@ -278,5 +291,5 @@ function ChocolatePiece:New(name, obj, settings, db)
 end
 
 function ChocolatePiece:UpdateGap(val)
-	gap = val
+	db.gap = val
 end

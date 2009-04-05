@@ -71,51 +71,61 @@ function moreChocolate:GetOptions()
 	local options ={
 			name="MoreChocolate",
 			type="group",
-			order = -1,
+			order = 9,
 			args={
+				--[[
 				header = {
 					order = 1,
 					type = "header",
 					name =  "MoreChocolate",
 				},
-					label = {
-					order = 2,
-					type = "description",
-					name = "A broker plugin to toggle a bar.",
+				--]]
+				moreChocolate = {
+					inline = true,
+					name="MoreChocolate",
+					type="group",
+					order = 0,
+					args={
+						label = {
+							order = 2,
+							type = "description",
+							name = "A broker plugin to toggle a bar.",
+						},
+						selectBar = {
+							type = 'select',
+							values = GetList,
+							order = 3,
+							name = "SelectBar",
+							desc = "SelectBar",
+							get = function() 
+								return ChocolateBar.db.profile.moreBar
+							end,
+							set = function(info, value)
+								if bar then
+									bar:Show()
+								end
+								ChocolateBar.db.profile.moreBar = value
+								moreChocolate:SetBar(ChocolateBar.db.profile)
+							end,
+						},
+						delay = {
+							type = 'range',
+							order = 4,
+							name = "Delay",
+							desc = "Set seconds until bar will hide.",
+							min = 0,
+							max = 15,
+							step = 1,
+							get = function(name)
+								return ChocolateBar.db.profile.moreBarDelay
+							end,
+							set = function(info, value)
+								delay = value
+								ChocolateBar.db.profile.moreBarDelay = value
+							end,
+						},	
+					},
 				},
-				selectBar = {
-					type = 'select',
-					values = GetList,
-					order = 3,
-					name = "SelectBar",
-					desc = "SelectBar",
-					get = function() 
-						return ChocolateBar.db.profile.moreBar
-					end,
-					set = function(info, value)
-						if bar then
-							bar:Show()
-						end
-						ChocolateBar.db.profile.moreBar = value
-						moreChocolate:SetBar(ChocolateBar.db.profile)
-					end,
-				},
-				delay = {
-					type = 'range',
-					order = 4,
-					name = "Delay",
-					desc = "Set seconds until bar will hide.",
-					min = 0,
-					max = 15,
-					step = 1,
-					get = function(name)
-						return ChocolateBar.db.profile.moreBarDelay
-					end,
-					set = function(info, value)
-						delay = value
-						ChocolateBar.db.profile.moreBarDelay = value
-					end,
-				},	
 			},
 		}
 	return options
