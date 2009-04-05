@@ -21,9 +21,11 @@ function Bar:New(name, settings, db)
 	
 	frame:EnableMouse(true)
 	frame:SetScript("OnEnter", function(self) 
+		if db.combathidebar and ChocolateBar.InCombat then return end
 		self:ShowAll()
 	end)
 	frame:SetScript("OnLeave", function(self) 
+		if db.combathidebar and ChocolateBar.InCombat then return end
 		if self.autohide then
 			self:HideAll()
 		end
@@ -31,7 +33,8 @@ function Bar:New(name, settings, db)
 	
 	frame:SetScript("OnMouseUp", function() 
 		if arg1 == "RightButton" then
-			LibStub("AceConfigDialog-3.0"):Open("ChocolateBar")
+			--LibStub("AceConfigDialog-3.0"):Open("ChocolateBar")
+			ChocolateBar:ChatCommand()
 		end
 	end)
 	
