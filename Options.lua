@@ -74,7 +74,7 @@ aceoptions = {
 			args={
 				general = {
 					inline = true,
-					name="Generall",
+					name="General",
 					type="group",
 					order = 0,
 					args={
@@ -387,7 +387,7 @@ local function GetBarIndex(info)
 end
 
 local function SetBarAlign(info, value)
-	local name = info[#info-1]
+	local name = info[#info-2]
 	if value then
 		db.barSettings[name].align = value
 		bar = ChocolateBar:GetBar(name)
@@ -399,18 +399,18 @@ local function SetBarAlign(info, value)
 end
 
 local function GetBarAlign(info, value)
-	local name = info[#info-1]
+	local name = info[#info-2]
 	--Debug("GetBarAlign",name, value)
 	return db.barSettings[name].align
 end
 
 local function EatBar(info, value)
-	local name = info[#info-1]
+	local name = info[#info-2]
 	ChocolateBar:RemoveBar(name)
 end
 
 local function MoveUp(info, value)
-	local name = info[#info-1]
+	local name = info[#info-2]
 	bar = ChocolateBar:GetBar(name)
 	local index = bar.settings.index
 	if bar then
@@ -429,7 +429,7 @@ local function MoveUp(info, value)
 end
 
 local function MoveDown(info, value)
-	local name = info[#info-1]
+	local name = info[#info-2]
 	bar = ChocolateBar:GetBar(name)
 	local index = bar.settings.index
 	if bar then
@@ -448,7 +448,7 @@ local function MoveDown(info, value)
 end
 
 local function isMoveDown(info)
-	local name = info[#info-1]
+	local name = info[#info-2]
 	bar = ChocolateBar:GetBar(name)
 	if db.barSettings[name].align == "bottom" then
 		if bar.settings.index < 1.5 then
@@ -459,7 +459,7 @@ local function isMoveDown(info)
 end
 
 local function isMoveUp(info)
-	local name = info[#info-1]
+	local name = info[#info-2]
 	bar = ChocolateBar:GetBar(name)
 	if db.barSettings[name].align == "top" then
 		if bar.settings.index < 1.5 then
@@ -470,12 +470,12 @@ local function isMoveUp(info)
 end
 	
 local function getAutoHide(info, value)
-	local name = info[#info-1]
+	local name = info[#info-2]
 	return db.barSettings[name].autohide
 end
 
 local function setAutoHide(info, value)
-	local name = info[#info-1]
+	local name = info[#info-2]
 	db.barSettings[name].autohide = value
 	bar = ChocolateBar:GetBar(name)
 	bar:UpdateAutoHide(db)
@@ -484,7 +484,7 @@ end
 
 --return true if RemoveBar is disabled
 function isRemoveBar(info)
-	local name = info[#info-1]
+	local name = info[#info-2]
 	--Debug("valRemoveBar ",name)
 	if name == "ChocolateBar1" then
 		return true
@@ -501,18 +501,19 @@ local function GetName(info)
 	local name = chocolateOptions[cleanName].desc
 	local icon = chocolateOptions[cleanName].icon
 	if(not db.objSettings[name].enabled)then
-		cleanName = "|TZZ"..cleanName.."|t|T"..icon..":18|t |cFFFF0000"..cleanName.."|r"
+		--cleanName = "|TZZ"..cleanName.."|t|T"..icon..":18|t |cFFFF0000"..cleanName.."|r"
+		cleanName = "|cFFFF0000"..cleanName.."|r"
 	elseif ChocolateBar:GetChocolate(name).obj.type == "data source" then
 	--else
-		cleanName = "|H"..cleanName.."|h|T"..icon..":18|t "..cleanName
+		cleanName = cleanName
 	else
-		cleanName = "|H"..cleanName.."|h|T"..icon..":18|t |cFFBBBBBB"..cleanName.."|r"
+		cleanName = "|cFFBBBBBB"..cleanName.."|r"
 	end
 	return cleanName
 end
 
 local function SetEnabled(info, value)
-	local cleanName = info[#info-1]
+	local cleanName = info[#info-2]
 	local name = chocolateOptions[cleanName].desc
 	if value then
 		ChocolateBar:EnableDataObject(name)
@@ -522,19 +523,19 @@ local function SetEnabled(info, value)
 end
 
 local function GetEnabled(info, value)
-	local cleanName = info[#info-1]
+	local cleanName = info[#info-2]
 	local name = chocolateOptions[cleanName].desc
 	return db.objSettings[name].enabled
 end
 
 local function GetIcon(info, value)
-	local cleanName = info[#info-1]
+	local cleanName = info[#info-2]
 	local name = chocolateOptions[cleanName].desc
 	return db.objSettings[name].showIcon
 end
 
 local function SetIcon(info, value)
-	local cleanName = info[#info-1]
+	local cleanName = info[#info-2]
 	local name = chocolateOptions[cleanName].desc
 	db.objSettings[name].showIcon = value
 	ChocolateBar:AttributeChanged(nil, name, "updateSettings", value)
@@ -542,18 +543,43 @@ end
 
 
 local function GetText(info, value)
-	local cleanName = info[#info-1]
+	local cleanName = info[#info-2]
 	local name = chocolateOptions[cleanName].desc
 	return db.objSettings[name].showText
 end
 
 local function SetText(info, value)
-	local cleanName = info[#info-1]
+	local cleanName = info[#info-2]
 	local name = chocolateOptions[cleanName].desc
 	db.objSettings[name].showText = value
 	ChocolateBar:AttributeChanged(nil, name, "updateSettings", value)
 end
 
+local function GetIconImage(info, name)
+	if info then
+		local cleanName = info[#info]
+		name = chocolateOptions[cleanName].desc
+	end
+	choco = ChocolateBar:GetChocolate(name)
+	if choco and choco.obj.icon then	
+		return choco.obj.icon	
+	end
+	return "Interface\\AddOns\\ChocolateBar\\pics\\ChocolatePiece"
+end
+
+local function GetHeaderName(info)
+	local cleanName = info[#info-1]
+	local name = chocolateOptions[cleanName].desc
+	return "|T"..GetIconImage(nil, name)..":18|t "..name
+end
+
+local function GetHeaderImage(info)
+	local cleanName = info[#info-2]
+	local name = chocolateOptions[cleanName].desc
+	return GetIconImage(nil, name), 20 ,20
+end
+
+-- drop points
 local function dropText(frame, choco)
 		local name = choco.name
 		db.objSettings[name].showText = not db.objSettings[name].showText
@@ -713,54 +739,46 @@ function ChocolateBar:AddBarOptions(name)
 		type = "group",
 		order = GetBarIndex,
 		args={
-			header = {
+			barSettings = {
+				inline = true,
+				name=name,
+				type="group",
 				order = 1,
-				type = "header",
-				name = name,
-			},
-			--[[
-			align = {
-				type = 'select',
-				values = {top = "top",bottom = "bottom"},
-				order = 2,
-				name = "Alignment",
-				desc = "Stick to...",
-				get = GetBarAlign,
-				set = SetBarAlign,
-			},
-			--]]
-			moveup = {
-				type = 'execute',
-				order = 3,
-				name = "Move Up",
-				desc = "Move Up",
-				func = MoveUp,
-				disabled = isMoveUp,
-			},
-			movedown = {
-				type = 'execute',
-				order = 4,
-				name = "Move Down",
-				desc = "Move Down",
-				func = MoveDown,
-				disabled = isMoveDown,
-			},
-			autohide = {
-				type = 'toggle',
-				order = 5,
-				name = "Autohide",
-				desc = "Autohide",
-				get = getAutoHide,
-				set = setAutoHide,
-			},
-			eatBar = {
-				type = 'execute',
-				order = 6,
-				name = "Remove Bar",
-				desc = "Eat a whole chocolate bar, oh my..",
-				func = EatBar,
-				disabled = isRemoveBar,
-				confirm = true,
+				args={
+					moveup = {
+						type = 'execute',
+						order = 3,
+						name = "Move Up",
+						desc = "Move Up",
+						func = MoveUp,
+						disabled = isMoveUp,
+					},
+					movedown = {
+						type = 'execute',
+						order = 4,
+						name = "Move Down",
+						desc = "Move Down",
+						func = MoveDown,
+						disabled = isMoveDown,
+					},
+					autohide = {
+						type = 'toggle',
+						order = 5,
+						name = "Autohide",
+						desc = "Autohide",
+						get = getAutoHide,
+						set = setAutoHide,
+					},
+					eatBar = {
+						type = 'execute',
+						order = 6,
+						name = "Remove Bar",
+						desc = "Eat a whole chocolate bar, oh my..",
+						func = EatBar,
+						disabled = isRemoveBar,
+						confirm = true,
+					},
+				},
 			},
 		},
 	}
@@ -771,9 +789,7 @@ function ChocolateBar:RemoveBarOptions(name)
 end
 
 function ChocolateBar:AddObjectOptions(name,icon, t)
-	if not icon or icon == "Interface\\AddOns\\" then
-		icon = "Interface\\AddOns\\ChocolateBar\\pics\\ChocolatePiece"
-	end
+	
 	--local curse = GetAddOnMetadata(name,"X-Curse-Packaged-Version") or ""
 	--local version = GetAddOnMetadata(name,"Version") or ""
 	
@@ -786,47 +802,57 @@ function ChocolateBar:AddObjectOptions(name,icon, t)
 	chocolateOptions[cleanName] = {
 		name = GetName,
 		desc = name,
-		icon = icon,
+		icon = GetIconImage,
 		type = "group",
 		args={
+			--[[
 			header = {
 				order = 1,
 				type = "header",
 				--name = "|T"..icon..":25|t "..name,
-				name = "|T"..icon..":18|t "..name,
+				name = GetHeaderName,
 			},
-			label = {
-				order = 2,
-				type = "description",
-				name = "Type: "..t.."\n",
-				--image = icon,
-			},
-			enabled = {
-				type = 'toggle',
-				--width "half",
-				order = 3,
-				name = "Enabled",
-				desc = "Enabled",
-				get = GetEnabled,
-				set = SetEnabled,
-			},
-			text = {
-				type = 'toggle',
-				--width = "half",
-				order = 4,
-				name = "Show Text",
-				desc = "Show Text",
-				get = GetText,
-				set = SetText,
-			},
-			icon = {
-				type = 'toggle',
-				--width = "half",
-				order = 5,
-				name = "Show Icon",
-				desc = "Show Icon",
-				get = GetIcon,
-				set = SetIcon,
+			--]]
+			chocoSettings = {
+				inline = true,
+				name=GetHeaderName,
+				type="group",
+				order = 1,
+				args={
+					label = {
+						order = 2,
+						type = "description",
+						name = "Type: "..t.."\n",
+						--image = GetHeaderImage,
+					},
+					enabled = {
+						type = 'toggle',
+						--width "half",
+						order = 3,
+						name = "Enabled",
+						desc = "Enabled",
+						get = GetEnabled,
+						set = SetEnabled,
+					},
+					text = {
+						type = 'toggle',
+						--width = "half",
+						order = 4,
+						name = "Show Text",
+						desc = "Show Text",
+						get = GetText,
+						set = SetText,
+					},
+					icon = {
+						type = 'toggle',
+						--width = "half",
+						order = 5,
+						name = "Show Icon",
+						desc = "Show Icon",
+						get = GetIcon,
+						set = SetIcon,
+					},
+				},
 			},
 		},
 	}
