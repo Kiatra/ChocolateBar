@@ -32,6 +32,7 @@ function Bar:New(name, settings, db)
 	end)
 	
 	frame:SetScript("OnMouseUp", function() 
+		if db.combatdisbar and ChocolateBar.InCombat then return end
 		if arg1 == "RightButton" then
 			--LibStub("AceConfigDialog-3.0"):Open("ChocolateBar")
 			ChocolateBar:ChatCommand()

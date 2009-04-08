@@ -179,9 +179,9 @@ local function OnLeave(self)
 	end
 end
 
-local function OnClick(self)
+local function OnClick(self, ...)
 	if db.combatdisbar and ChocolateBar.InCombat then return end
-	self.obj.OnClick()
+	self.obj.OnClick(self, ...)
 end
 
 -- PrepareTooltip code taken with permission from fortress 
