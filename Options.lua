@@ -567,6 +567,22 @@ local function GetIconImage(info, name)
 	return "Interface\\AddOns\\ChocolateBar\\pics\\ChocolatePiece"
 end
 
+--[[
+local function GetIconCoords(info, name)
+	Debug("GetIconCoords")
+	if info then
+		local cleanName = info[#info]
+		name = chocolateOptions[cleanName].desc
+	end
+	choco = ChocolateBar:GetChocolate(name)
+	if choco and choco.obj.iconCoords then	
+		Debug(name, choco.obj.iconCoords)
+		return choco.obj.iconCoords	
+	end
+	return nil
+end
+--]]
+
 local function GetHeaderName(info)
 	local cleanName = info[#info-1]
 	local name = chocolateOptions[cleanName].desc
@@ -803,6 +819,7 @@ function ChocolateBar:AddObjectOptions(name,icon, t)
 		name = GetName,
 		desc = name,
 		icon = GetIconImage,
+		--iconCoords = GetIconCoords,
 		type = "group",
 		args={
 			--[[

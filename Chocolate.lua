@@ -43,6 +43,18 @@ local function SettingsUpdater(self, value, name)
 	resizeFrame(self)
 end
 
+local function IconColorUpdater(frame, value, name)
+	if value then
+		local obj = frame.obj
+		local r = obj.iconR or 1
+		local g = obj.iconG or 1
+		local b = obj.iconB or 1
+		frame.icon:SetVertexColor(r, g, b)
+	else
+		frame.icon:SetVertexColor(1, 1, 1)
+	end
+end
+
 -- updaters code taken with permission from fortress 
 local uniqueUpdaters = {
 	text = TextUpdater,
@@ -73,6 +85,16 @@ local uniqueUpdaters = {
 	OnClick = function(frame, value, name)
 		frame:SetScript("OnClick", value)
 	end,
+	
+	iconCoords = function(frame, value, name)
+		if value and frame.icon then
+			frame.icon:SetTexCoord(unpack(value))
+		end
+	end,
+	
+	iconR = IconColorUpdater,
+	iconG = IconColorUpdater,
+	iconB = IconColorUpdater,
 }
 
 -- updaters code taken with permission from fortress 
@@ -278,6 +300,9 @@ function ChocolatePiece:New(name, obj, settings, database)
 
 	if icon then
 		chocolate.icon:SetTexture(icon)
+		if obj.iconCoords then
+			chocolate.icon:SetTexCoord(unpack(obj.iconCoords))
+		end
 	end
 
 	SettingsUpdater(chocolate, settings.showText )
