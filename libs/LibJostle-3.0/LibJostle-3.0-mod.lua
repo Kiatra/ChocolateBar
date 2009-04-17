@@ -12,7 +12,7 @@ added frame scale by yess
 ]]
 
 local MAJOR_VERSION = "LibJostle-3.0-mod"
-local MINOR_VERSION = tonumber(("$Revision: 43 $"):match("(%d+)")) + 90000
+local MINOR_VERSION = tonumber(("$Revision: 44 $"):match("(%d+)")) + 90000
 
 if not LibStub then error(MAJOR_VERSION .. " requires LibStub") end
 
@@ -380,7 +380,7 @@ function Jostle:Refresh(...)
 
 		local framescale = frame and frame.GetScale and frame:GetScale() or 1
 
-		if ((frame and frame.IsUserPlaced and not frame:IsUserPlaced()) or frame == FramerateLabel) then
+		if ((frame and frame.IsUserPlaced and not frame:IsUserPlaced()) or ((frame == DEFAULT_CHAT_FRAME or frame == ChatFrame2) and SIMPLE_CHAT == "1") or frame == FramerateLabel) and (frame ~= ChatFrame2 or SIMPLE_CHAT == "1") then
 			local frameData = blizzardFramesData[frame]
 			if (select(2, frame:GetPoint(1)) ~= UIParent and select(2, frame:GetPoint(1)) ~= WorldFrame) then
 				-- do nothing
@@ -428,8 +428,7 @@ function Jostle:Refresh(...)
 					if frame == MinimapCluster and not MinimapBorderTop:IsShown() then
 						offset = offset + MinimapBorderTop:GetHeight() * 3/5
 					elseif frame == TemporaryEnchantFrame and TicketStatusFrame:IsShown() then
-						offset = offset - TicketStatusFrame:GetHeight() * TicketStatusFrame:GetScale()
-					
+						offset = offset - TicketStatusFrame:GetHeight() * TicketStatusFrame:GetScale()		
 					elseif frame == DEFAULT_CHAT_FRAME then
 						y = MainMenuBar:GetHeight() * MainMenuBar:GetScale() + 32
 						if PetActionBarFrame:IsShown() or ShapeshiftBarFrame:IsShown() then
@@ -437,14 +436,12 @@ function Jostle:Refresh(...)
 						end
 						if MultiBarBottomLeft:IsShown() then
 							offset = offset + MultiBarBottomLeft:GetHeight() * MultiBarBottomLeft:GetScale() - 21
-						end
-					
+						end	
 					elseif frame == ChatFrame2 then
 						y = MainMenuBar:GetHeight() * MainMenuBar:GetScale() + 32
 						if MultiBarBottomRight:IsShown() then
 							offset = offset + MultiBarBottomRight:GetHeight() * MultiBarBottomRight:GetScale() - 21
-						end
-					
+						end		
 					elseif frame == CastingBarFrame then
 						y = MainMenuBar:GetHeight() * MainMenuBar:GetScale() + 17
 						if PetActionBarFrame:IsShown() or ShapeshiftBarFrame:IsShown() then
@@ -462,7 +459,7 @@ function Jostle:Refresh(...)
 						x = 0
 						y = 0
 						offset = 0
-						if frame ~= QuestTimerFrame and QuestTimerFrame:IsShown() then
+						if QuestTimerFrame and frame ~= QuestTimerFrame and QuestTimerFrame:IsShown() then
 							y = y - QuestTimerFrame:GetHeight() * QuestTimerFrame:GetScale()
 						end
 						if frame == QuestWatchFrame and DurabilityFrame:IsShown() then
