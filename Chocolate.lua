@@ -259,7 +259,7 @@ function ChocolatePiece:New(name, obj, settings, database)
 	local height = 15
 	local text = obj.text
 	local icon = obj.icon
-	local chocolate = CreateFrame("Button", "Chocolate" .. name, parent)
+	local chocolate = CreateFrame("Button", "Chocolate" .. name)
 	chocolate.Update = Update
 	--local frame = chocolate
 	--frame:SetWidth(width)
