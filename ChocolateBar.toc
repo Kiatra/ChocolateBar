@@ -4,7 +4,7 @@
 ## Author: yess
 ## Version: 1.7
 ## X-Email: yessica@fantasymail.de
-## OptionalDeps: Ace3, LibDataBroker-1.1
+## OptionalDeps: Ace3, LibSharedMedia-3.0
 ## X-Embeds: Ace3, LibDataBroker-1.1
 
 ## SavedVariables: ChocolateBarDB
