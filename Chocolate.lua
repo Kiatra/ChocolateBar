@@ -123,30 +123,17 @@ local function GetAnchors(frame)
 	end
 end
 
---code taken with permission from fortress 
-local function GT_OnLeave(self)
-	Debug("GT_OnLeave(self)",self:GetName())
-	self:SetScript("OnLeave", self.fortressOnLeave)
-	self:Hide()
-	GameTooltip:EnableMouse(false)
-end
-
--- PrepareTooltip code taken with permission from fortress 
+-- some code taken with permission from fortress 
 local function PrepareTooltip(frame, anchorFrame)
-	if frame == GameTooltip then
-		frame.fortressOnLeave = frame:GetScript("OnLeave")
-		frame.fortressBlock = anchorFrame
-		frame.fortressName = anchorFrame.name
-		
-		frame:EnableMouse(true)
-		frame:SetScript("OnLeave", GT_OnLeave)
-	end
+	Debug("PrepareTooltip")
+	
 	frame:SetOwner(anchorFrame, "ANCHOR_NONE")
 	frame:ClearAllPoints()
 	local a1, a2 = GetAnchors(anchorFrame)
 	frame:SetPoint(a1, anchorFrame, a2)	
 end
 
+-- some code taken with permission from fortress 
 local function OnEnter(self)
 	if db.combathidebar and ChocolateBar.InCombat then return end
 	
