@@ -75,7 +75,7 @@ local uniqueUpdaters = {
 	-- tooltiptext is no longer in the data spec, but 
 	-- I'll continue to support it, as some plugins seem to use it
 	tooltiptext = function(frame, value, name)
-		local object = dataObjects[name]
+		local object = frame.obj
 		local tt = object.tooltip or GameTooltip
 		if tt:GetOwner() == frame then
 			tt:SetText(object.tooltiptext)
