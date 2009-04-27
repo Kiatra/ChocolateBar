@@ -24,7 +24,7 @@ libs\LibSharedMedia-3.0\lib.xml
 libs\AceGUI-3.0-SharedMediaWidgets\widget.xml
 #@end-no-lib-strip@
 
-libs\LibJostle-3.0\LibJostle-3.0-mod.lua
+libs\LibJostle-3.0-mod\LibJostle-3.0-mod.lua
 libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
 
 Core.lua
