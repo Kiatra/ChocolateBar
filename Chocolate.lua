@@ -125,8 +125,7 @@ end
 
 -- some code taken with permission from fortress 
 local function PrepareTooltip(frame, anchorFrame)
-	Debug("PrepareTooltip")
-	
+	--Debug("PrepareTooltip")
 	frame:SetOwner(anchorFrame, "ANCHOR_NONE")
 	frame:ClearAllPoints()
 	local a1, a2 = GetAnchors(anchorFrame)
@@ -231,12 +230,14 @@ local function OnDragStart(frame)
 end
 
 local function OnDragStop(frame)
-	frame:StopMovingOrSizing()
-	frame.isMoving = false
-	Drag:Stop(frame)
-	ChocolateBar.dragging = false
-	frame:SetParent(frame.bar)
-	ChocolateBar:TempDisAutohide()
+	if ChocolateBar.dragging then
+		frame:StopMovingOrSizing()
+		frame.isMoving = false
+		Drag:Stop(frame)
+		ChocolateBar.dragging = false
+		frame:SetParent(frame.bar)
+		ChocolateBar:TempDisAutohide()
+	end
 end
 
 function ChocolatePiece:New(name, obj, settings, database)
