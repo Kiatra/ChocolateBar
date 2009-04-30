@@ -502,12 +502,12 @@ local function GetName(info)
 	local icon = chocolateOptions[cleanName].icon
 	if(not db.objSettings[name].enabled)then
 		--cleanName = "|TZZ"..cleanName.."|t|T"..icon..":18|t |cFFFF0000"..cleanName.."|r"
-		cleanName = "|cFFFF0000"..cleanName.."|r"
+		cleanName = "|H"..cleanName.."|h|cFFFF0000"..cleanName.."|r"
 	elseif ChocolateBar:GetChocolate(name).obj.type == "data source" then
 	--else
-		cleanName = cleanName
+		cleanName = "|H"..cleanName.."|h"..cleanName
 	else
-		cleanName = "|cFFBBBBBB"..cleanName.."|r"
+		cleanName = "|H"..cleanName.."|h|cFFBBBBBB"..cleanName.."|r"
 	end
 	return cleanName
 end
