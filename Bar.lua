@@ -138,7 +138,7 @@ function GetTexture(frame)
 end
 
 -- add some chocolate to a bar
-function Bar:AddChocolatePiece(choco, name,noupdate)
+function Bar:AddChocolatePiece(choco, name, noupdate)
 	local chocolist = self.chocolist
 	if chocolist[name] then
 		return
@@ -155,6 +155,13 @@ function Bar:AddChocolatePiece(choco, name,noupdate)
 	end
 	if not noupdate then
 		self:UpdateBar()
+	end
+	
+	if self:GetAlpha() < 1 then
+		choco.text:Hide()
+		if choco.icon then 
+			choco.icon:Hide()
+		end
 	end
 end
 
