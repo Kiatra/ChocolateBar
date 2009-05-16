@@ -11,7 +11,6 @@ local Chocolate = ChocolateBar.ChocolatePiece
 local Bar = ChocolateBar.Bar
 
 local chocolateBars = {}
-
 local chocolateObjects = {}
 local dataObjects = {}
 local db
@@ -86,7 +85,6 @@ function ChocolateBar:OnDisable()
 end
 
 function ChocolateBar.OnEnterCombat()
-	--Debug("ChocolateBar.OnEnterCombat()")
 	ChocolateBar.InCombat = true
 	if db.combathidebar then
 		for name,bar in pairs(chocolateBars) do
@@ -96,16 +94,14 @@ function ChocolateBar.OnEnterCombat()
 end
 
 function ChocolateBar.OnLeaveCombat()
-	--Debug("ChocolateBar.OnLeaveCombat()")
 	ChocolateBar.InCombat = false
 	if db.combathidebar then
 		for name,bar in pairs(chocolateBars) do
-			--if not bar.autohide then
 			bar:Show()
-			--end
 		end
 	end
 end
+
 --------
 -- LDB callbacks
 --------
@@ -185,7 +181,6 @@ function ChocolateBar:AttributeChanged(event, name, key, value)
 	choco:Update(choco, key, value)
 end
 
-
 -- disable autohide for all bars during drag and drop
 function ChocolateBar:TempDisAutohide(value)
 	for name,bar in pairs(chocolateBars) do
@@ -201,7 +196,6 @@ function ChocolateBar:TempDisAutohide(value)
 		end
 	end
 end
-
 
 -- call when general bar options change
 -- updatekey: the key of the update function
@@ -279,7 +273,7 @@ local function getFreeBarName()
 		end
 		used = false
 	end
-	Debug("no name found ")
+	Debug("no free bar name found ")
 end
 
 function ChocolateBar:UpdateChoclates()
