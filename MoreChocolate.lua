@@ -41,7 +41,7 @@ end
 
 function Timer:OnUpdate(elapsed)
 	counter = counter + elapsed
-	if counter >= delay and bar then
+	if counter >= delay and bar and not ChocolateBar.dragging then
 		bar:Hide()
 		counter = 0
 		Timer:SetScript("OnUpdate", nil)
