@@ -210,8 +210,13 @@ function ChocolateBar:UpdateBarOptions(updatekey, value)
 	end
 end
 
+-- returns nil if the plugin is disabled 
 function ChocolateBar:GetChocolate(name)
 	return chocolateObjects[name]
+end
+
+function ChocolateBar:GetDataObject(name)
+	return dataObjects[name]
 end
 
 function ChocolateBar:GetBar(name)

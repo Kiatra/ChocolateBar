@@ -499,7 +499,7 @@ end
 local function GetName(info)
 	local cleanName = info[#info]
 	local name = chocolateOptions[cleanName].desc
-	local icon = chocolateOptions[cleanName].icon
+	--local icon = chocolateOptions[cleanName].icon
 	if(not db.objSettings[name].enabled)then
 		--cleanName = "|TZZ"..cleanName.."|t|T"..icon..":18|t |cFFFF0000"..cleanName.."|r"
 		cleanName = "|H"..cleanName.."|h|cFFFF0000"..cleanName.."|r"
@@ -560,9 +560,9 @@ local function GetIconImage(info, name)
 		local cleanName = info[#info]
 		name = chocolateOptions[cleanName].desc
 	end
-	choco = ChocolateBar:GetChocolate(name)
-	if choco and choco.obj.icon then	
-		return choco.obj.icon	
+	local obj = ChocolateBar:GetDataObject(name)
+	if obj and obj.icon then	
+		return obj.icon	
 	end
 	return "Interface\\AddOns\\ChocolateBar\\pics\\ChocolatePiece"
 end
