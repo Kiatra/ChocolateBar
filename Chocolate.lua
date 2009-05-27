@@ -12,9 +12,12 @@ local function resizeFrame(self)
 		width = width + self.icon:GetWidth()
 	end
 	if settings.showText then
-		local textWidth = self.text:GetStringWidth()
-		--self.text:SetWidth(textWidth)
-		width = width + textWidth	
+		if settings.width == 0 then
+			local textWidth = self.text:GetStringWidth()
+			width = width + textWidth
+		else
+			width = width + settings.width
+		end
 	end
 	self:SetWidth(width)
 end
@@ -37,7 +40,8 @@ local function SettingsUpdater(self, value, name)
 			self.text:SetPoint("LEFT", self, "LEFT", 0, 0)
 		else
 			self.icon:Show()
-			self.text:SetPoint("LEFT", self.icon, "RIGHT", 0, 0)
+			self.text:SetPoint("TOPLEFT", self ,"TOPLEFT", 15, 0)
+			self.text:SetPoint("BOTTOMRIGHT", self ,"BOTTOMRIGHT", 0, 0)
 		end
 	end
 	resizeFrame(self)
@@ -255,20 +259,23 @@ function ChocolatePiece:New(name, obj, settings, database)
 	chocolate:SetClampedToScreen(true)
 	
 	chocolate.text = chocolate:CreateFontString(nil, nil, "GameFontHighlight")
+	chocolate.text:SetJustifyH("LEFT")
+	
+	local iconTex
 	if icon then
-		chocolate.icon = chocolate:CreateTexture()
-		chocolate.icon:SetHeight(height)
-		chocolate.icon:SetWidth(height)
-		chocolate.icon:SetPoint("LEFT", chocolate, "LEFT", 0, 0)
-		chocolate.text:SetPoint("LEFT", chocolate.icon, "RIGHT", 0, 0)
-	else
-		chocolate.text:SetPoint("LEFT", chocolate, "LEFT", 0, 0)
+		iconTex = chocolate:CreateTexture()
+		iconTex:SetHeight(height)
+		iconTex:SetWidth(height)
+		iconTex:SetPoint("LEFT", chocolate, "LEFT", 0, 0)
+		iconTex:SetTexture(icon)
+		if obj.iconCoords then
+			iconTex:SetTexCoord(unpack(obj.iconCoords))
+		end
+		chocolate.icon = iconTex
 	end
 	
 	chocolate:SetScript("OnEnter", OnEnter)
-	
 	chocolate:SetScript("OnLeave", OnLeave)
-	
 	
 	chocolate:RegisterForClicks("AnyUp")
 	--chocolate:SetScript("OnClick", obj.OnClick)
@@ -282,13 +289,6 @@ function ChocolatePiece:New(name, obj, settings, database)
 	else
 		obj.text = name
 		chocolate.text:SetText(name)
-	end
-
-	if icon then
-		chocolate.icon:SetTexture(icon)
-		if obj.iconCoords then
-			chocolate.icon:SetTexCoord(unpack(obj.iconCoords))
-		end
 	end
 
 	SettingsUpdater(chocolate, settings.showText )
