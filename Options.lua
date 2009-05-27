@@ -400,7 +400,6 @@ end
 
 local function GetBarAlign(info, value)
 	local name = info[#info-2]
-	--Debug("GetBarAlign",name, value)
 	return db.barSettings[name].align
 end
 
@@ -485,7 +484,6 @@ end
 --return true if RemoveBar is disabled
 function isRemoveBar(info)
 	local name = info[#info-2]
-	--Debug("valRemoveBar ",name)
 	if name == "ChocolateBar1" then
 		return true
 	else
@@ -552,6 +550,19 @@ local function SetText(info, value)
 	local cleanName = info[#info-2]
 	local name = chocolateOptions[cleanName].desc
 	db.objSettings[name].showText = value
+	ChocolateBar:AttributeChanged(nil, name, "updateSettings", value)
+end
+
+local function GetWidth(info)
+	local cleanName = info[#info-2]
+	local name = chocolateOptions[cleanName].desc
+	return db.objSettings[name].width
+end
+
+local function SetWidth(info, value)
+	local cleanName = info[#info-2]
+	local name = chocolateOptions[cleanName].desc
+	db.objSettings[name].width = value
 	ChocolateBar:AttributeChanged(nil, name, "updateSettings", value)
 end
 
@@ -717,6 +728,7 @@ function ChocolateBar:RegisterOptions()
 					showText = true,
 					showIcon = true,
 					index = 1,
+					width = 0,
 				},
 			},
 		},
@@ -868,6 +880,17 @@ function ChocolateBar:AddObjectOptions(name,icon, t)
 						desc = "Show Icon",
 						get = GetIcon,
 						set = SetIcon,
+					},
+					width = {
+						type = 'range',
+						order = 6,
+						name = "Fixed Text Width",
+						desc = "Set a width for the text. Set 0 to disable fixed text width.",
+						min = 0,
+						max = 500,
+						step = 1,
+						get = GetWidth,
+						set = SetWidth,
 					},
 				},
 			},
