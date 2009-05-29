@@ -22,28 +22,32 @@ local function resizeFrame(self)
 	self:SetWidth(width)
 end
 
-local function TextUpdater(frame, value, name)
+local function TextUpdater(frame, value)
 	frame.text:SetText(value)
 	resizeFrame(frame)
 end
 
-local function SettingsUpdater(self, value, name)
+local function SettingsUpdater(self, value)
 	local settings = self.settings
 	if not settings.showText then
 		self.text:Hide()
 	else
 		self.text:Show()
 	end
+	
 	if self.icon then 
-		if not settings.showIcon then
+		if not settings.showIcon then -- hide icon
 			self.icon:Hide()
-			self.text:SetPoint("LEFT", self, "LEFT", 0, 0)
+			self.text:SetAllPoints(self);
 		else
 			self.icon:Show()
 			self.text:SetPoint("TOPLEFT", self ,"TOPLEFT", 15, 0)
 			self.text:SetPoint("BOTTOMRIGHT", self ,"BOTTOMRIGHT", 0, 0)
 		end
+	else -- no icon
+		self.text:SetAllPoints(self);
 	end
+	
 	resizeFrame(self)
 end
 
@@ -250,9 +254,10 @@ function ChocolatePiece:New(name, obj, settings, database)
 	local text = obj.text
 	local icon = obj.icon
 	local chocolate = CreateFrame("Button", "Chocolate" .. name)
+	
+	--set update function
 	chocolate.Update = Update
-	--local frame = chocolate
-	--frame:SetWidth(width)
+	
 	chocolate:SetHeight(20) --get from bar
 	chocolate:EnableMouse(true)
 	chocolate:RegisterForDrag("LeftButton")
