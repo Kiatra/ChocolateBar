@@ -4,7 +4,7 @@
 ## Author: yess
 ## Version: 1.7
 ## X-Email: yessica@fantasymail.de
-## OptionalDeps: Ace3, LibSharedMedia-3.0
+## OptionalDeps: Ace3, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets
 ## X-Embeds: Ace3, LibDataBroker-1.1
 
 ## SavedVariables: ChocolateBarDB
@@ -26,6 +26,9 @@ libs\AceGUI-3.0-SharedMediaWidgets\widget.xml
 
 libs\LibJostle-3.0-mod\LibJostle-3.0-mod.lua
 libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
+
+localization\enUS.lua
+localization\deDE.lua
 
 Core.lua
 DragAndDrop.lua

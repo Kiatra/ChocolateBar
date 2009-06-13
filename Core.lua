@@ -88,6 +88,7 @@ function ChocolateBar.OnEnterCombat()
 	ChocolateBar.InCombat = true
 	if db.combathidebar then
 		for name,bar in pairs(chocolateBars) do
+			bar.tempHide = bar:IsShown()
 			bar:Hide()
 		end
 	end
@@ -97,7 +98,9 @@ function ChocolateBar.OnLeaveCombat()
 	ChocolateBar.InCombat = false
 	if db.combathidebar then
 		for name,bar in pairs(chocolateBars) do
-			bar:Show()
+			if bar.tempHide then
+				bar:Show()
+			end
 		end
 	end
 end

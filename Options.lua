@@ -6,6 +6,8 @@ local AceCfgReg = LibStub("AceConfigRegistry-3.0")
 local AceCfgDlg = LibStub("AceConfigDialog-3.0")
 local Drag = ChocolateBar.Drag
 
+local L = LibStub("AceLocale-3.0"):GetLocale("ChocolateBar")
+
 --local version = GetAddOnMetadata("ChocolateBar","Version") or ""
 local version = GetAddOnMetadata("ChocolateBar","X-Curse-Packaged-Version") or ""
 local db
@@ -28,7 +30,16 @@ local function GetStats(info)
 			enabled = enabled +1
 		end
 	end
-	return "|cffffd200Enabled|r  "..enabled.."\n|cffffd200Disabled|r  "..total-enabled.."\n|cffffd200Total|r  "..total.."\n\n|cffffd200Data Source|r  "..data.."\n|cffffd200Other|r  "..total-data
+	
+	return strjoin("\n","|cffffd200"..L["Enabled"].."|r  "..enabled, 
+						"|cffffd200"..L["Disabled"].."|r  "..total-enabled,
+						"|cffffd200"..L["Total"].."|r  "..total,
+						"",
+						"|cffffd200"..L["Data Source"].."|r  "..data,
+						"|cffffd200"..L["Other"].."|r  "..total-data
+	) 
+	
+	
 end
 
 local function EnableAll(info)
@@ -67,22 +78,22 @@ aceoptions = {
 	desc = "ChocolateBar",
     args = {
 		general={
-			name="General",
+			name = L["General"],
 			type="group",
 			order = 0,
 			--guiHidden = true,
 			args={
 				general = {
 					inline = true,
-					name="General",
+					name = L["General"],
 					type="group",
 					order = 0,
 					args={
 						locked = {
 							type = 'toggle',
 							order = 1,
-							name = "Lock Chocolates",
-							desc = "Hold alt key to drag a chocolate.",
+							name = L["Lock Chocolates"],
+							desc = L["Hold alt key to drag a chocolate."],
 							get = function(info, value)
 									return db.locked
 							end,
@@ -94,8 +105,8 @@ aceoptions = {
 							type = 'toggle',
 							width = "double",
 							order = 2,
-							name = "Adjust Blizzard Frames",
-							desc = "Move Blizzard frames above/below bars",
+							name = L["Adjust Blizzard Frames"],
+							desc = L["Move Blizzard frames above/below bars"],
 							get = function(info, value)
 									return db.moveFrames
 							end,
@@ -108,15 +119,15 @@ aceoptions = {
 				},
 				combat = {
 					inline = true,
-					name="In Combat",
+					name= L["In Combat"],
 					type="group",
 					order = 0,
 					args={
 						hidetooltip = {
 							type = 'toggle',
 							order = 1,
-							name = "Disable Tooltips",
-							desc = "Disable Tooltips",
+							name = L["Disable Tooltips"],
+							desc = L["Disable Tooltips"],
 							get = function(info, value)
 									return db.combathidetip
 							end,
@@ -127,8 +138,8 @@ aceoptions = {
 						hidebar = {
 							type = 'toggle',
 							order = 2,
-							name = "Hide Bars",
-							desc = "Hide Bars",
+							name = L["Hide Bars"],
+							desc = L["Hide Bars"],
 							get = function(info, value)
 									return db.combathidebar
 							end,
@@ -139,8 +150,8 @@ aceoptions = {
 						disablebar = {
 							type = 'toggle',
 							order = 2,
-							name = "Disable Clicking",
-							desc = "Disable Clicking",
+							name = L["Disable Clicking"],
+							desc = L["Disable Clicking"],
 							get = function(info, value)
 									return db.combatdisbar
 							end,
@@ -152,15 +163,15 @@ aceoptions = {
 				},
 				frameSettings = {
 					inline = true,
-					name="Frame Settings",
-					type="group",
+					name = L["Bar Settings"],
+					type = "group",
 					order = 3,
 					args={
 						size = {
 							type = 'range',
 							order = 1,
-							name = "Bar Size",
-							desc = "Bar Size",
+							name = L["Bar Size"],
+							desc = L["Bar Size"],
 							min = 0.5,
 							max = 1.5,
 							step = .1,
@@ -175,8 +186,8 @@ aceoptions = {
 						gap = {
 							type = 'range',
 							order = 2,
-							name = "Gap",
-							desc = "Set the gap between the chocolates.",
+							name = L["Gap"],
+							desc = L["Set the gap between the chocolates."],
 							min = 0,
 							max = 15,
 							step = 1,
@@ -194,8 +205,8 @@ aceoptions = {
 							values = {FULLSCREEN_DIALOG="Fullscreen_Dialog",FULLSCREEN="Fullscreen", 
 										DIALOG="Dialog",HIGH="High",MEDIUM="Medium",LOW="Low",BACKGROUND="Background"},
 							order = 3,
-							name = "Frame Strata",
-							desc = "Frame Strata",
+							name = L["Bar Strata"],
+							desc = L["Bar Strata"],
 							get = function() 
 								return db.strata
 							end,
@@ -208,17 +219,17 @@ aceoptions = {
 				},
 				backbround = {
 					inline = true,
-					name="Dark Chocolate?",
-					type="group",
+					name = L["Dark Chocolate?"],
+					type = "group",
 					order = 4,
-					args={
+					args ={
 						texture = {
 							type = 'select',
 							dialogControl = 'LSM30_Statusbar', --Select your widget here
 							values = AceGUIWidgetLSMlists.statusbar,
 							order = 1,
-							name = "Background Texture",
-							desc = "Background Texture",
+							name = L["Background Texture"],
+							desc = L["Background Texture"],
 							get = function() 
 								return db.background.texture
 							end,
@@ -230,8 +241,8 @@ aceoptions = {
 						colour = {
 							type = "color",
 							order = 1,
-							name = "Bar color",
-							desc = "Bar color",
+							name = L["Bar color"],
+							desc = L["Bar color"],
 							hasAlpha = true,
 							get = function(info)
 								local t = db.background.color
@@ -246,8 +257,8 @@ aceoptions = {
 						bordercolour = {
 							type = "color",
 							order = 2,
-							name = "Bar border color",
-							desc = "Bar border color",
+							name = L["Bar border color"],
+							desc = L["Bar border color"],
 							hasAlpha = true,
 							get = function(info)
 								local t = db.background.borderColor
@@ -265,8 +276,8 @@ aceoptions = {
 					type = 'toggle',
 					--width = "half",
 					order = 20,
-					name = "Debug",
-					desc = "This one is for me, not for you :P",
+					name = L["Debug"],
+					desc = L["This one is for me, not for you :P"],
 					get = function(info, value)
 							return ChocolateBar.db.char.debug
 					end,
@@ -277,16 +288,16 @@ aceoptions = {
 			},
 		},
 		bars={
-			name="Bars",
-			type="group",
+			name = L["Bars"],
+			type ="group",
 			order = 20,
-			args={
+			args ={
 				new = {
 					type = 'execute',
 		            --width = "half",
 					order = 0,
-					name = "Create Bar",
-		            desc = "Create New Bar",
+					name = L["Create Bar"],
+		            desc = L["Create New Bar"],
 		            func = function()
 						ChocolateBar:AddBar()
 					end,
@@ -294,7 +305,7 @@ aceoptions = {
 			},
 		},
 		chocolates={
-			name="Chocolates",
+			name = L["Chocolates"],
 			type="group",
 			order = -1,
 			--childGroups = "select", 
@@ -310,7 +321,7 @@ aceoptions = {
 				--]]
 				stats = {
 					inline = true,
-					name="Chocolate Statistics",
+					name = L["Chocolate Statistics"],
 					type="group",
 					order = 1,
 					args={
@@ -324,32 +335,32 @@ aceoptions = {
 				},
 				quickconfig = {
 					inline = true,
-					name="Quick Config",
-					type="group",
+					name = L["Quick Config"],
+					type = "group",
 					order = 2,
-					args={
+					args ={
 						enableAll = {
 							type = 'execute',
 							--width = "half",
 							order = 3,
-							name = "Enable All",
-							desc = "Get back my chocolate!",
+							name = L["Enable All"],
+							desc = L["Get back my chocolate!"],
 							func = EnableAll,
 						},
 						disableAll = {
 							type = 'execute',
 							--width = "half",
 							order = 4,
-							name = "Disable All",
-							desc = "Eat all the chocolate at once, uff...",
+							name = L["Disable All"],
+							desc = L["Eat all the chocolate at once, uff..."],
 							func = DisableAll,
 						},
 						disableLauncher = {
 							type = 'execute',
 							--width = "half",
 							order = 5,
-							name = "Disable all Launchers",
-							desc = "Eat all the bad guy's:)",
+							name = L["Disable all Launchers"],
+							desc = L["Eat all the bad guy's:)"],
 							func = DisableLauncher,
 						},
 					},
@@ -776,32 +787,32 @@ function ChocolateBar:AddBarOptions(name)
 					moveup = {
 						type = 'execute',
 						order = 3,
-						name = "Move Up",
-						desc = "Move Up",
+						name = L["Move Up"],
+						desc = L["Move Up"],
 						func = MoveUp,
 						disabled = isMoveUp,
 					},
 					movedown = {
 						type = 'execute',
 						order = 4,
-						name = "Move Down",
-						desc = "Move Down",
+						name = L["Move Down"],
+						desc = L["Move Down"],
 						func = MoveDown,
 						disabled = isMoveDown,
 					},
 					autohide = {
 						type = 'toggle',
 						order = 5,
-						name = "Autohide",
-						desc = "Autohide",
+						name = L["Autohide"],
+						desc = L["Autohide"],
 						get = getAutoHide,
 						set = setAutoHide,
 					},
 					eatBar = {
 						type = 'execute',
 						order = 6,
-						name = "Remove Bar",
-						desc = "Eat a whole chocolate bar, oh my..",
+						name = L["Remove Bar"],
+						desc = L["Eat a whole chocolate bar, oh my.."],
 						func = EatBar,
 						disabled = isRemoveBar,
 						confirm = true,
@@ -838,7 +849,7 @@ function ChocolateBar:AddObjectOptions(name,icon, t)
 			header = {
 				order = 1,
 				type = "header",
-				--name = "|T"..icon..":25|t "..name,
+				--name = L["|T"..icon..":25|t "..name],
 				name = GetHeaderName,
 			},
 			--]]
@@ -851,15 +862,15 @@ function ChocolateBar:AddObjectOptions(name,icon, t)
 					label = {
 						order = 2,
 						type = "description",
-						name = "Type: "..t.."\n",
+						name = L["Type"]..": "..t.."\n",
 						--image = GetHeaderImage,
 					},
 					enabled = {
 						type = 'toggle',
 						--width "half",
 						order = 3,
-						name = "Enabled",
-						desc = "Enabled",
+						name = L["Enabled"],
+						desc = L["Enabled"],
 						get = GetEnabled,
 						set = SetEnabled,
 					},
@@ -867,8 +878,8 @@ function ChocolateBar:AddObjectOptions(name,icon, t)
 						type = 'toggle',
 						--width = "half",
 						order = 4,
-						name = "Show Text",
-						desc = "Show Text",
+						name = L["Show Text"],
+						desc = L["Show Text"],
 						get = GetText,
 						set = SetText,
 					},
@@ -876,16 +887,16 @@ function ChocolateBar:AddObjectOptions(name,icon, t)
 						type = 'toggle',
 						--width = "half",
 						order = 5,
-						name = "Show Icon",
-						desc = "Show Icon",
+						name = L["Show Icon"],
+						desc = L["Show Icon"],
 						get = GetIcon,
 						set = SetIcon,
 					},
 					width = {
 						type = 'range',
 						order = 6,
-						name = "Fixed Text Width",
-						desc = "Set a width for the text. Set 0 to disable fixed text width.",
+						name = L["Fixed Text Width"],
+						desc = L["Set a width for the text. Set 0 to disable fixed text width."],
 						min = 0,
 						max = 500,
 						step = 1,
