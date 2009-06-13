@@ -1,9 +1,11 @@
 ﻿-- a LDB object that will show/hide the chocolatebar set in the chocolatebar options
+local LibStub = LibStub
 local counter = 0
 local delay = 4
 local Timer = CreateFrame("Frame")
 local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("ChocolateBar")
 local bar
+local L = LibStub("AceLocale-3.0"):GetLocale("ChocolateBar")
 
 local moreChocolate = LibStub("LibDataBroker-1.1"):NewDataObject("MoreChocolate", {
 	type = "launcher",
@@ -31,7 +33,7 @@ moreChocolate.barNames = {none = "none"}
 function GetList()
 	wipe(moreChocolate.barNames)
 	
-	moreChocolate.barNames.none = "none"
+	moreChocolate.barNames.none = L["None"]
 	
 	for k,v in pairs(ChocolateBar:GetBars()) do
 		moreChocolate.barNames[k] = k
@@ -89,14 +91,14 @@ function moreChocolate:GetOptions()
 						label = {
 							order = 2,
 							type = "description",
-							name = "A broker plugin to toggle a bar.",
+							name = L["A broker plugin to toggle a bar."],
 						},
 						selectBar = {
 							type = 'select',
 							values = GetList,
 							order = 3,
-							name = "SelectBar",
-							desc = "SelectBar",
+							name = L["SelectBar"],
+							desc = L["SelectBar"],
 							get = function() 
 								return ChocolateBar.db.profile.moreBar
 							end,
@@ -111,8 +113,8 @@ function moreChocolate:GetOptions()
 						delay = {
 							type = 'range',
 							order = 4,
-							name = "Delay",
-							desc = "Set seconds until bar will hide.",
+							name = L["Delay"],
+							desc = L["Set seconds until bar will hide."],
 							min = 0,
 							max = 15,
 							step = 1,
