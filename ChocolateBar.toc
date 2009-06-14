@@ -29,6 +29,7 @@ libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
 
 localization\enUS.lua
 localization\deDE.lua
+localization\zhTW.lua
 
 Core.lua
 DragAndDrop.lua
