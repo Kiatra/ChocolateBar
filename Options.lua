@@ -270,6 +270,23 @@ aceoptions = {
 								ChocolateBar:UpdateBarOptions("UpdateColors")
 							end,
 						},
+						textcolour = {
+							type = "color",
+							order = 2,
+							name = L["Text color"],
+							desc = L["Default text color of a plugin. This will not overwrite plugins that use own colors."],
+							hasAlpha = true,
+							get = function(info)
+								local t = db.textColor or {r = 1, g = 1, b = 1, a = 1}
+								return t.r, t.g, t.b, t.a
+							end,
+							set = function(info, r, g, b, a)
+								db.textColor = db.textColor or {r = 1, g = 1, b = 1, a = 1}
+								local t = db.textColor
+								t.r, t.g, t.b, t.a = r, g, b, a
+								ChocolateBar:UpdateChoclates()
+							end,
+						},
 					},
 				},
 				debug = {
@@ -711,6 +728,7 @@ function ChocolateBar:RegisterOptions()
 				edgeSize = 8,
 				barInset = 3,
 			},
+			textColor = nil,
 			barSettings = {
 				['*'] = {
 					barName = "ChocolateBar1",

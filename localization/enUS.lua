@@ -2,6 +2,8 @@ local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
 local L = AceLocale:NewLocale("ChocolateBar", "enUS", true)
 if not L then return end
 
+L["Text color"] = true
+L["Default text color of a plugin. This will not overwrite plugins that use own colors."] = true
 L["Lock Chocolates"] = true
 L["Hold alt key to drag a chocolate."] = true
 L["Adjust Blizzard Frames"] = true
@@ -55,3 +57,4 @@ L["SelectBar"] = true
 L["Delay"] = true
 L["Set seconds until bar will hide."] = true
 L["None"] = true
+
