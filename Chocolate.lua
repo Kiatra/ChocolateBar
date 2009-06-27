@@ -33,6 +33,10 @@ local function SettingsUpdater(self, value)
 		self.text:Hide()
 	else
 		self.text:Show()
+		local c = db.textColor
+		if c then
+			self.text:SetTextColor(c.r, c.g, c.b,c.a)
+		end
 	end
 	
 	if self.icon then 

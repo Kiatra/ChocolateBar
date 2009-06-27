@@ -286,7 +286,7 @@ end
 
 function ChocolateBar:UpdateChoclates()
 	for name,choco in pairs(chocolateObjects) do
-		choco:Update(choco, "updateSettings", value)
+		choco:Update(choco, "updateSettings")
 	end
 end
 
@@ -337,7 +337,7 @@ function ChocolateBar:UpdateBars()
 	end
 end
 
--- return the number of burs aligend to align (top or bottom)
+-- return the number of bars aligend to align (top or bottom)
 function ChocolateBar:GetNumBars(align)
 	local i = 0
 	for k,v in pairs(chocolateBars) do
@@ -348,6 +348,7 @@ function ChocolateBar:GetNumBars(align)
 	return i
 end
 
+-- sort and anchor all bars
 local temptop = {}
 local tempbottom = {}
 function ChocolateBar:AnchorBars()
