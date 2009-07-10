@@ -34,7 +34,6 @@ function Bar:New(name, settings, db)
 	frame:SetScript("OnMouseUp", function() 
 		if db.combatdisbar and ChocolateBar.InCombat then return end
 		if arg1 == "RightButton" then
-			--LibStub("AceConfigDialog-3.0"):Open("ChocolateBar")
 			ChocolateBar:ChatCommand()
 		end
 	end)
@@ -42,7 +41,7 @@ function Bar:New(name, settings, db)
 	frame.settings = settings
 	frame.autohide = settings.hideonleave
 
-	frame:UpdateTexture(db)
+	--frame:UpdateTexture(db)
 	frame:UpdateColors(db)
 	frame:UpdateScale(db)
 	--frame:UpdateAutoHide(db)
@@ -210,10 +209,8 @@ function Bar:Disable()
 end
 
 function Bar:Drop(choco, pos)
-	--Debug("Bar:Drop", choco.name, pos)
 	self.dummy:Hide()
 	self.chocolist[choco.obj.name] = choco
-	--Debug("frame:GetWidth() ", choco:GetWidth())
 	choco.settings.index = self.dummy.settings.index
 	choco.settings.align = self.dummy.settings.align
 	self:UpdateBar(true)
@@ -262,11 +259,9 @@ function Bar:UpdateDragChocolate()
 		end
 	end
 	if not choco then 
-		--Debug("Bar:UpdateDragChocolate(pos) cursour above: nil")
 		self.dummy.settings.index = 500
 		self:UpdateBar()
 	else
-		--Debug("cursour above: ",choco.name)
 		if self.last ~= choco then
 			self.last = choco
 			self.dummy.settings.index = choco.settings.index - 0.5
@@ -359,14 +354,12 @@ function Bar:UpdateBar(updateindex)
 		if relative then
 			relative:ClearAllPoints()
 			relative:SetPoint("CENTER",self, 0,yoff)
-			--Debug("centerIndex,relative:GetName()=",centerIndex,relative:GetName())	
 			
 			local relativeL = relative
 			local relativeR = relative
 			
 			for i, v in ipairs(tempcenter) do
 				local choco = v[1]
-				--Debug("i:",i," choco:",choco:GetName()," relativeL:",relativeL:GetName()," relativeR:",relativeR:GetName())
 				if i > centerIndex then
 					choco:ClearAllPoints()
 					choco:SetPoint("TOPRIGHT",relativeR,"TOPLEFT", 0,0)

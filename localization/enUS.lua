@@ -2,6 +2,13 @@ local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
 local L = AceLocale:NewLocale("ChocolateBar", "enUS", true)
 if not L then return end
 
+L["Colors and Textures"] = true
+L["Look and Feel"] = true
+L["Defaults"] = true
+L["Launcher"] = true
+L["Automatically disable new plugins of type:"] = true
+L["If enabled new plugins of type launcher will automatically be disabled."] = true
+L["If enabled new plugins of type data source will automatically be disabled."] = true
 L["Text color"] = true
 L["Default text color of a plugin. This will not overwrite plugins that use own colors."] = true
 L["Lock Chocolates"] = true
@@ -53,7 +60,7 @@ L["Other"] = true
 L["Chocolates"] = true
 
 L["A broker plugin to toggle a bar."] = true
-L["SelectBar"] = true
+L["Select Bar"] = true
 L["Delay"] = true
 L["Set seconds until bar will hide."] = true
 L["None"] = true
