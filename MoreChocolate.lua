@@ -14,17 +14,21 @@ local moreChocolate = LibStub("LibDataBroker-1.1"):NewDataObject("MoreChocolate"
 	text  = "MoreChocolate",
 	
 	OnClick = function(self, btn)
-		if bar then
-			if bar:IsShown() then
-				bar:Hide()
-				Timer:SetScript("OnUpdate", nil)
-			else
-				bar:Show()
-				--bar:ShowAll()
-				if delay > 0 then
-					Timer:SetScript("OnUpdate", Timer.OnUpdate)
+		if btn == "LeftButton" then 
+			if bar then
+				if bar:IsShown() then
+					bar:Hide()
+					Timer:SetScript("OnUpdate", nil)
+				else
+					bar:Show()
+					--bar:ShowAll()
+					if delay > 0 then
+						Timer:SetScript("OnUpdate", Timer.OnUpdate)
+					end
 				end
 			end
+		else
+			InterfaceOptionsFrame_OpenToCategory("ChocolateBar");
 		end
 	end,
 })
@@ -97,8 +101,8 @@ function moreChocolate:GetOptions()
 							type = 'select',
 							values = GetList,
 							order = 3,
-							name = L["SelectBar"],
-							desc = L["SelectBar"],
+							name = L["Select Bar"],
+							desc = L["Select Bar"],
 							get = function() 
 								return ChocolateBar.db.profile.moreBar
 							end,

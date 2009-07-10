@@ -13,7 +13,7 @@ local Bar = ChocolateBar.Bar
 local chocolateBars = {}
 local chocolateObjects = {}
 local dataObjects = {}
-local db
+local db --reference to ChocolateBar.db.profile
 
 --------
 -- utility functions
@@ -50,6 +50,7 @@ function ChocolateBar:OnInitialize()
 	
 	self:RegisterEvent("PLAYER_REGEN_DISABLED",ChocolateBar.OnEnterCombat)
 	self:RegisterEvent("PLAYER_REGEN_ENABLED",ChocolateBar.OnLeaveCombat)
+	self:RegisterEvent("PLAYER_ENTERING_WORLD","OnEnterWorld")
 	db = self.db.profile
 	
 	local barSettings = db.barSettings
@@ -105,6 +106,18 @@ function ChocolateBar.OnLeaveCombat()
 	end
 end
 
+function ChocolateBar:OnEnterWorld()
+	self:UpdateBarOptions("UpdateTexture")
+	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+	
+	local LSM = LibStub("LibSharedMedia-3.0")
+	LSM:RegisterCallback("LibSharedMedia_Registered", function(event, mediaType, value)
+		if mediaType == "statusbar" then
+			UpdateBarOptions("UpdateTexture")
+		end
+	end)
+end
+
 --------
 -- LDB callbacks
 --------
@@ -128,6 +141,7 @@ end
 function ChocolateBar:EnableDataObject(name, noupdate)
 	local obj = dataObjects[name]
 	local settings = db.objSettings[name]
+	settings.enabled = true
 	
 	--get bar from setings
 	local barName = settings.barName
@@ -139,14 +153,21 @@ function ChocolateBar:EnableDataObject(name, noupdate)
 		if t and t == "data source" then
 			settings.align = "left"
 			settings.showText = true
+			if db.autodissource then 
+				settings.enabled = false
+				return
+			end
 		else	
 			settings.align = "right"
 			settings.showText = false
+			if db.autodislauncher then 
+				settings.enabled = false
+				return
+			end
 		end
 	end
 	obj.name = name
 	
-	settings.enabled = true
 	local choco = Chocolate:New(name, obj, settings, db)
 	chocolateObjects[name] = choco
 	

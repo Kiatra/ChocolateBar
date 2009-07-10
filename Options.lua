@@ -36,10 +36,8 @@ local function GetStats(info)
 						"|cffffd200"..L["Total"].."|r  "..total,
 						"",
 						"|cffffd200"..L["Data Source"].."|r  "..data,
-						"|cffffd200"..L["Other"].."|r  "..total-data
+						"|cffffd200"..L["Launcher"].."|r  "..total-data
 	) 
-	
-	
 end
 
 local function EnableAll(info)
@@ -78,7 +76,7 @@ aceoptions = {
 	desc = "ChocolateBar",
     args = {
 		general={
-			name = L["General"],
+			name = L["Look and Feel"],
 			type="group",
 			order = 0,
 			--guiHidden = true,
@@ -101,88 +99,6 @@ aceoptions = {
 									db.locked = value
 							end,
 						},
-						moveFrames = {
-							type = 'toggle',
-							width = "double",
-							order = 2,
-							name = L["Adjust Blizzard Frames"],
-							desc = L["Move Blizzard frames above/below bars"],
-							get = function(info, value)
-									return db.moveFrames
-							end,
-							set = function(info, value)
-									db.moveFrames = value
-									ChocolateBar:UpdateBarOptions("UpdateAutoHide")
-							end,
-						},
-					},
-				},
-				combat = {
-					inline = true,
-					name= L["In Combat"],
-					type="group",
-					order = 0,
-					args={
-						hidetooltip = {
-							type = 'toggle',
-							order = 1,
-							name = L["Disable Tooltips"],
-							desc = L["Disable Tooltips"],
-							get = function(info, value)
-									return db.combathidetip
-							end,
-							set = function(info, value)
-									db.combathidetip = value
-							end,
-						},
-						hidebar = {
-							type = 'toggle',
-							order = 2,
-							name = L["Hide Bars"],
-							desc = L["Hide Bars"],
-							get = function(info, value)
-									return db.combathidebar
-							end,
-							set = function(info, value)
-									db.combathidebar = value
-							end,
-						},
-						disablebar = {
-							type = 'toggle',
-							order = 2,
-							name = L["Disable Clicking"],
-							desc = L["Disable Clicking"],
-							get = function(info, value)
-									return db.combatdisbar
-							end,
-							set = function(info, value)
-									db.combatdisbar = value
-							end,
-						},
-					},
-				},
-				frameSettings = {
-					inline = true,
-					name = L["Bar Settings"],
-					type = "group",
-					order = 3,
-					args={
-						size = {
-							type = 'range',
-							order = 1,
-							name = L["Bar Size"],
-							desc = L["Bar Size"],
-							min = 0.5,
-							max = 1.5,
-							step = .1,
-							get = function(name)
-								return db.scale
-							end,
-							set = function(info, value)
-								ChocolateBar:UpdateBarOptions("UpdateScale")
-								db.scale = value
-							end,
-						},
 						gap = {
 							type = 'range',
 							order = 2,
@@ -199,12 +115,28 @@ aceoptions = {
 								ChocolateBar.ChocolatePiece:UpdateGap(value)
 								ChocolateBar:UpdateChoclates(value)
 							end,
-						},	
+						},
+						size = {
+							type = 'range',
+							order = 3,
+							name = L["Bar Size"],
+							desc = L["Bar Size"],
+							min = 0.5,
+							max = 1.5,
+							step = .1,
+							get = function(name)
+								return db.scale
+							end,
+							set = function(info, value)
+								ChocolateBar:UpdateBarOptions("UpdateScale")
+								db.scale = value
+							end,
+						},
 						strata = {
 							type = 'select',
 							values = {FULLSCREEN_DIALOG="Fullscreen_Dialog",FULLSCREEN="Fullscreen", 
 										DIALOG="Dialog",HIGH="High",MEDIUM="Medium",LOW="Low",BACKGROUND="Background"},
-							order = 3,
+							order = 4,
 							name = L["Bar Strata"],
 							desc = L["Bar Strata"],
 							get = function() 
@@ -215,80 +147,192 @@ aceoptions = {
 								ChocolateBar:UpdateBarOptions("UpdateStrata")
 							end,
 						},
+						moveFrames = {
+							type = 'toggle',
+							width = "double",
+							order = 5,
+							name = L["Adjust Blizzard Frames"],
+							desc = L["Move Blizzard frames above/below bars"],
+							get = function(info, value)
+									return db.moveFrames
+							end,
+							set = function(info, value)
+									db.moveFrames = value
+									ChocolateBar:UpdateBarOptions("UpdateAutoHide")
+							end,
+						},
+					},
+				},
+				defaults = {
+					inline = true,
+					name= L["Defaults"],
+					type="group",
+					order = 2,
+					args={
+						label = {
+							order = 0,
+							type = "description",
+							name = L["Automatically disable new plugins of type:"],
+						},
+						dataobjects = {
+							type = 'toggle',
+							order = 1,
+							name = L["Data Source"],
+							desc = L["If enabled new plugins of type data source will automatically be disabled."],
+							get = function()
+									return db.autodissource
+							end,
+							set = function(info, value)
+									db.autodissource = value
+							end,
+						},
+						launchers = {
+							type = 'toggle',
+							order = 2,
+							name = L["Launcher"],
+							desc = L["If enabled new plugins of type launcher will automatically be disabled."],
+							get = function()
+									return db.autodislauncher
+							end,
+							set = function(info, value)
+									db.autodislauncher = value
+							end,
+						},
+					},
+				},
+				combat = {
+					--inline = true,
+					name= L["In Combat"],
+					type="group",
+					order = 0,
+					args={
+						combat = {
+							inline = true,
+							name= L["In Combat"],
+							type="group",
+							order = 0,
+							args={
+								hidetooltip = {
+									type = 'toggle',
+									order = 1,
+									name = L["Disable Tooltips"],
+									desc = L["Disable Tooltips"],
+									get = function(info, value)
+											return db.combathidetip
+									end,
+									set = function(info, value)
+											db.combathidetip = value
+									end,
+								},
+								hidebar = {
+									type = 'toggle',
+									order = 2,
+									name = L["Hide Bars"],
+									desc = L["Hide Bars"],
+									get = function(info, value)
+											return db.combathidebar
+									end,
+									set = function(info, value)
+											db.combathidebar = value
+									end,
+								},
+								disablebar = {
+									type = 'toggle',
+									order = 2,
+									name = L["Disable Clicking"],
+									desc = L["Disable Clicking"],
+									get = function(info, value)
+											return db.combatdisbar
+									end,
+									set = function(info, value)
+											db.combatdisbar = value
+									end,
+								},
+							},
+						},
 					},
 				},
 				backbround = {
-					inline = true,
-					name = L["Dark Chocolate?"],
+					--inline = true,
+					name = L["Colors and Textures"],
 					type = "group",
 					order = 4,
 					args ={
-						texture = {
-							type = 'select',
-							dialogControl = 'LSM30_Statusbar', --Select your widget here
-							values = AceGUIWidgetLSMlists.statusbar,
-							order = 1,
-							name = L["Background Texture"],
-							desc = L["Background Texture"],
-							get = function() 
-								return db.background.texture
-							end,
-							set = function(info, value)
-								db.background.texture = value 
-								ChocolateBar:UpdateBarOptions("UpdateTexture")
-							end,
-						},
-						colour = {
-							type = "color",
-							order = 1,
-							name = L["Bar color"],
-							desc = L["Bar color"],
-							hasAlpha = true,
-							get = function(info)
-								local t = db.background.color
-								return t.r, t.g, t.b, t.a
-							end,
-							set = function(info, r, g, b, a)
-								local t = db.background.color
-								t.r, t.g, t.b, t.a = r, g, b, a
-								ChocolateBar:UpdateBarOptions("UpdateColors")
-							end,
-						},
-						bordercolour = {
-							type = "color",
-							order = 2,
-							name = L["Bar border color"],
-							desc = L["Bar border color"],
-							hasAlpha = true,
-							get = function(info)
-								local t = db.background.borderColor
-								return t.r, t.g, t.b, t.a
-							end,
-							set = function(info, r, g, b, a)
-								local t = db.background.borderColor
-								t.r, t.g, t.b, t.a = r, g, b, a
-								ChocolateBar:UpdateBarOptions("UpdateColors")
-							end,
-						},
-						textcolour = {
-							type = "color",
-							order = 2,
-							name = L["Text color"],
-							desc = L["Default text color of a plugin. This will not overwrite plugins that use own colors."],
-							hasAlpha = true,
-							get = function(info)
-								local t = db.textColor or {r = 1, g = 1, b = 1, a = 1}
-								return t.r, t.g, t.b, t.a
-							end,
-							set = function(info, r, g, b, a)
-								db.textColor = db.textColor or {r = 1, g = 1, b = 1, a = 1}
-								local t = db.textColor
-								t.r, t.g, t.b, t.a = r, g, b, a
-								ChocolateBar:UpdateChoclates()
-							end,
+						backbround = {
+							inline = true,
+							name = L["Colors and Textures"],
+							type = "group",
+							order = 4,
+							args ={
+								texture = {
+									type = 'select',
+									dialogControl = 'LSM30_Statusbar', --Select your widget here
+									values = AceGUIWidgetLSMlists.statusbar,
+									order = 1,
+									name = L["Background Texture"],
+									desc = L["Background Texture"],
+									get = function() 
+										return db.background.texture
+									end,
+									set = function(info, value)
+										db.background.texture = value
+										ChocolateBar:UpdateBarOptions("UpdateTexture")
+									end,
+								},
+								colour = {
+									type = "color",
+									order = 1,
+									name = L["Bar color"],
+									desc = L["Bar color"],
+									hasAlpha = true,
+									get = function(info)
+										local t = db.background.color
+										return t.r, t.g, t.b, t.a
+									end,
+									set = function(info, r, g, b, a)
+										local t = db.background.color
+										t.r, t.g, t.b, t.a = r, g, b, a
+										ChocolateBar:UpdateBarOptions("UpdateColors")
+									end,
+								},
+								bordercolour = {
+									type = "color",
+									order = 2,
+									name = L["Bar border color"],
+									desc = L["Bar border color"],
+									hasAlpha = true,
+									get = function(info)
+										local t = db.background.borderColor
+										return t.r, t.g, t.b, t.a
+									end,
+									set = function(info, r, g, b, a)
+										local t = db.background.borderColor
+										t.r, t.g, t.b, t.a = r, g, b, a
+										ChocolateBar:UpdateBarOptions("UpdateColors")
+									end,
+								},
+								textcolour = {
+									type = "color",
+									order = 2,
+									name = L["Text color"],
+									desc = L["Default text color of a plugin. This will not overwrite plugins that use own colors."],
+									hasAlpha = true,
+									get = function(info)
+										local t = db.textColor or {r = 1, g = 1, b = 1, a = 1}
+										return t.r, t.g, t.b, t.a
+									end,
+									set = function(info, r, g, b, a)
+										db.textColor = db.textColor or {r = 1, g = 1, b = 1, a = 1}
+										local t = db.textColor
+										t.r, t.g, t.b, t.a = r, g, b, a
+										ChocolateBar:UpdateChoclates()
+									end,
+								},
+							},
 						},
 					},
 				},
+				--@debug@
 				debug = {
 					type = 'toggle',
 					--width = "half",
@@ -302,6 +346,7 @@ aceoptions = {
 							ChocolateBar.db.char.debug = value
 					end,
 				},
+				--@end-debug@
 			},
 		},
 		bars={
@@ -538,6 +583,17 @@ local function GetName(info)
 	return cleanName
 end
 
+local function GetType(info)
+	local cleanName = info[#info-2]
+	local name = chocolateOptions[cleanName].desc
+	if db.objSettings[name].type == "data source" then
+		return L["Type"]..": "..L["Data Source"].."\n"
+	else
+		return L["Type"]..": "..L["Launcher"].."\n"
+	end
+end
+
+
 local function SetEnabled(info, value)
 	local cleanName = info[#info-2]
 	local name = chocolateOptions[cleanName].desc
@@ -772,7 +828,7 @@ function ChocolateBar:RegisterOptions()
 	LSM:Register("statusbar", "Blizzard Parchment","Interface\\AchievementFrame\\UI-Achievement-Parchment-Horizontal")
 	LSM:Register("statusbar", "Chocolate","Interface\\AddOns\\ChocolateBar\\pics\\ChocolateBar")
 	LSM:Register("statusbar", "Titan","Interface\\AddOns\\ChocolateBar\\pics\\Titan")
-	
+		
 	createDropPoint("ChocolateTextDrop", dropText, -150,"Toggle Text","Interface/ICONS/Achievement_BG_winbyten")
 	createDropPoint("ChocolateCenterDrop", dropCenter,0,"Align Center","Interface/Icons/Spell_Holy_GreaterBlessingofSalvation") 
 	createDropPoint("ChocolateDisableDrop", dropDisable, 150,"Eat Chocolate", "Interface/ICONS/Achievement_Halloween_Smiley_01")
@@ -880,7 +936,7 @@ function ChocolateBar:AddObjectOptions(name,icon, t)
 					label = {
 						order = 2,
 						type = "description",
-						name = L["Type"]..": "..t.."\n",
+						name = GetType,
 						--image = GetHeaderImage,
 					},
 					enabled = {
