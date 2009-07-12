@@ -113,7 +113,7 @@ function ChocolateBar:OnEnterWorld()
 	local LSM = LibStub("LibSharedMedia-3.0")
 	LSM:RegisterCallback("LibSharedMedia_Registered", function(event, mediaType, value)
 		if mediaType == "statusbar" then
-			UpdateBarOptions("UpdateTexture")
+			self:UpdateBarOptions("UpdateTexture")
 		end
 	end)
 end
