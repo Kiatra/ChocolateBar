@@ -41,14 +41,6 @@ local function GetStats(info)
 end
 
 local function EnableAll(info)
-	--[[
-	test = {}
-	for k, v in pairs(info) do
-		Debug(k,v)
-		test[k]=v
-	end
-	Debug(info[#info])
-	--]]
 	for name, obj in LibStub("LibDataBroker-1.1"):DataObjectIterator() do
 		ChocolateBar:EnableDataObject(name)
 	end
@@ -71,7 +63,6 @@ end
 aceoptions = { 
     name = "ChocolateBar".." "..version,
     handler = ChocolateBar,
-	--childGroups = "tab",
 	type='group',
 	desc = "ChocolateBar",
     args = {
@@ -79,7 +70,6 @@ aceoptions = {
 			name = L["Look and Feel"],
 			type="group",
 			order = 0,
-			--guiHidden = true,
 			args={
 				general = {
 					inline = true,
@@ -90,8 +80,8 @@ aceoptions = {
 						locked = {
 							type = 'toggle',
 							order = 1,
-							name = L["Lock Chocolates"],
-							desc = L["Hold alt key to drag a chocolate."],
+							name = L["Lock Plugins"],
+							desc = L["Hold alt key to drag a plugin."],
 							get = function(info, value)
 									return db.locked
 							end,
@@ -103,7 +93,7 @@ aceoptions = {
 							type = 'range',
 							order = 2,
 							name = L["Gap"],
-							desc = L["Set the gap between the chocolates."],
+							desc = L["Set the gap between the plugins."],
 							min = 0,
 							max = 15,
 							step = 1,
@@ -337,8 +327,8 @@ aceoptions = {
 					type = 'toggle',
 					--width = "half",
 					order = 20,
-					name = L["Debug"],
-					desc = L["This one is for me, not for you :P"],
+					name = "Debug",
+					desc = "This one is for me, not for you :P",
 					get = function(info, value)
 							return ChocolateBar.db.char.debug
 					end,
@@ -367,23 +357,13 @@ aceoptions = {
 			},
 		},
 		chocolates={
-			name = L["Chocolates"],
+			name = L["Plugins"],
 			type="group",
 			order = -1,
-			--childGroups = "select", 
-			--validate = function(info, value) end,
-			--guiHidden = true,
 			args={
-				--[[
-				header = {
-					order = 1,
-					type = "header",
-					name =  "Quick Config",
-				},
-				--]]
 				stats = {
 					inline = true,
-					name = L["Chocolate Statistics"],
+					name = L["Plugin Statistics"],
 					type="group",
 					order = 1,
 					args={
@@ -391,7 +371,6 @@ aceoptions = {
 							order = 1,
 							type = "description",
 							name = GetStats,
-							--image = icon,
 						},
 					},
 				},
@@ -403,15 +382,13 @@ aceoptions = {
 					args ={
 						enableAll = {
 							type = 'execute',
-							--width = "half",
 							order = 3,
 							name = L["Enable All"],
-							desc = L["Get back my chocolate!"],
+							desc = L["Get back my plugins!"],
 							func = EnableAll,
 						},
 						disableAll = {
 							type = 'execute',
-							--width = "half",
 							order = 4,
 							name = L["Disable All"],
 							desc = L["Eat all the chocolate at once, uff..."],
@@ -419,10 +396,9 @@ aceoptions = {
 						},
 						disableLauncher = {
 							type = 'execute',
-							--width = "half",
 							order = 5,
 							name = L["Disable all Launchers"],
-							desc = L["Eat all the bad guy's:)"],
+							desc = L["Disable all the bad guy's:)"],
 							func = DisableLauncher,
 						},
 					},
@@ -453,7 +429,7 @@ local function GetBarIndex(info)
 	bar = ChocolateBar:GetBar(name)
 	local index = bar.settings.index
 	if db.barSettings[name].align == "bottom" then
-		--reverse order and force below to bars
+		--reverse order and force below top bars
 		index = index *-1 + 100
 	end
 	return index
@@ -563,10 +539,10 @@ function isRemoveBar(info)
 		return false
 	end
 end
+
 -----
 -- chocolate option functions
 -----
-
 local function GetName(info)
 	local cleanName = info[#info]
 	local name = chocolateOptions[cleanName].desc
@@ -592,7 +568,6 @@ local function GetType(info)
 		return L["Type"]..": "..L["Launcher"].."\n"
 	end
 end
-
 
 local function SetEnabled(info, value)
 	local cleanName = info[#info-2]
@@ -622,7 +597,6 @@ local function SetIcon(info, value)
 	db.objSettings[name].showIcon = value
 	ChocolateBar:AttributeChanged(nil, name, "updateSettings", value)
 end
-
 
 local function GetText(info, value)
 	local cleanName = info[#info-2]
@@ -662,22 +636,6 @@ local function GetIconImage(info, name)
 	return "Interface\\AddOns\\ChocolateBar\\pics\\ChocolatePiece"
 end
 
---[[
-local function GetIconCoords(info, name)
-	Debug("GetIconCoords")
-	if info then
-		local cleanName = info[#info]
-		name = chocolateOptions[cleanName].desc
-	end
-	choco = ChocolateBar:GetChocolate(name)
-	if choco and choco.obj.iconCoords then	
-		Debug(name, choco.obj.iconCoords)
-		return choco.obj.iconCoords	
-	end
-	return nil
-end
---]]
-
 local function GetHeaderName(info)
 	local cleanName = info[#info-1]
 	local name = chocolateOptions[cleanName].desc
@@ -696,7 +654,7 @@ local function dropText(frame, choco)
 		db.objSettings[name].showText = not db.objSettings[name].showText
 		ChocolateBar:AttributeChanged(nil, name, "updateSettings", db.objSettings[name].showText)
 		choco.bar:AddChocolatePiece(choco, name,noupdate)
-		frame:SetBackdropColor(1,1,1,1) 
+		frame:SetBackdropColor(0,0,0,1)
 end
 
 local function dropCenter(frame, choco)
@@ -704,13 +662,13 @@ local function dropCenter(frame, choco)
 		db.objSettings[name].align = "center"
 		--ChocolateBar:AttributeChanged(nil, name, "updateSettings", db.objSettings[name].center)
 		choco.bar:AddChocolatePiece(choco, name,noupdate)
-		frame:SetBackdropColor(1,1,1,1) 
+		frame:SetBackdropColor(0,0,0,1)
 end
 
 local function dropDisable(frame, choco)
 		choco:Hide()
 		ChocolateBar:DisableDataObject(choco.name)
-		frame:SetBackdropColor(1,1,1,1) 
+		frame:SetBackdropColor(0,0,0,1) 
 end
 
 local function createDropPoint(name, dropfunc, offx, text, texture)
@@ -719,11 +677,18 @@ local function createDropPoint(name, dropfunc, offx, text, texture)
 	frame:SetHeight(100)
 	frame:SetFrameStrata("DIALOG")
 	frame:SetPoint("CENTER",offx,320)
-	frame:SetBackdrop({bgFile = texture, 
+	frame:SetBackdrop({bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", 
 			edgeFile = "Interface/Tooltips/UI-Tooltip-Border", 
 			tile = false, tileSize = 16, edgeSize = 16, 
 			insets = { left = 4, right = 4, top = 4, bottom = 4 }});	
-	frame:SetBackdropBorderColor(1,1,1,0)
+	frame:SetBackdropColor(0,0,0,1)
+	
+	local tex = frame:CreateTexture()
+	tex:SetWidth(50)
+	tex:SetHeight(50)
+	tex:SetTexture(texture)
+	tex:SetPoint("TOPLEFT",25,-35)
+
 	frame.text = frame:CreateFontString(nil, nil, "GameFontHighlight")
 	--frame.text:SetPoint("LEFT", frame, "LEFT", 0, 0)
 	frame.text:SetPoint("CENTER",0, 30)
@@ -735,7 +700,7 @@ local function createDropPoint(name, dropfunc, offx, text, texture)
 	frame.GetFocus = function(frame) frame:SetBackdropColor(1,0,0,1) end
 		
 	frame.Drag = function(frame) end
-	frame.LoseFocus = function(frame) frame:SetBackdropColor(1,1,1,1) end
+	frame.LoseFocus = function(frame) frame:SetBackdropColor(0,0,0,1) end
 	Drag:RegisterFrame(frame)
 end
 
@@ -745,9 +710,7 @@ end
 
 function ChocolateBar:RegisterOptions()
 	self.db = LibStub("AceDB-3.0"):New("ChocolateBarDB", defaults)
-
 	
-	-- change to a more modulare way once there is a need for real modules
 	moreChocolate = LibStub("LibDataBroker-1.1"):GetDataObjectByName("MoreChocolate")
 	if moreChocolate then
 		aceoptions.args.morechocolate = moreChocolate:GetOptions()
@@ -828,14 +791,13 @@ function ChocolateBar:RegisterOptions()
 	LSM:Register("statusbar", "Blizzard Parchment","Interface\\AchievementFrame\\UI-Achievement-Parchment-Horizontal")
 	LSM:Register("statusbar", "Chocolate","Interface\\AddOns\\ChocolateBar\\pics\\ChocolateBar")
 	LSM:Register("statusbar", "Titan","Interface\\AddOns\\ChocolateBar\\pics\\Titan")
-		
-	createDropPoint("ChocolateTextDrop", dropText, -150,"Toggle Text","Interface/ICONS/Achievement_BG_winbyten")
-	createDropPoint("ChocolateCenterDrop", dropCenter,0,"Align Center","Interface/Icons/Spell_Holy_GreaterBlessingofSalvation") 
-	createDropPoint("ChocolateDisableDrop", dropDisable, 150,"Eat Chocolate", "Interface/ICONS/Achievement_Halloween_Smiley_01")
+
+	createDropPoint("ChocolateTextDrop", dropText, -150,L["Toggle Text"],"Interface/ICONS/INV_Inscription_Tradeskill01")
+	createDropPoint("ChocolateCenterDrop", dropCenter,0,L["Align Center"],"Interface/Icons/Spell_Holy_GreaterBlessingofSalvation") 
+	createDropPoint("ChocolateDisableDrop", dropDisable, 150,L["Disable Plugin"], "Interface/ICONS/Spell_ChargeNEgative")
 end
 
 function ChocolateBar:ChatCommand(input)
-	
 	if not input or input:trim() == "" then
 		AceCfgDlg:Open("ChocolateBar")
     else
@@ -844,7 +806,6 @@ function ChocolateBar:ChatCommand(input)
 end
 
 function ChocolateBar:AddBarOptions(name)
-
 	barOptions[name] = {
 		name = GetBarName,
 		desc = name,
@@ -919,14 +880,6 @@ function ChocolateBar:AddObjectOptions(name,icon, t)
 		--iconCoords = GetIconCoords,
 		type = "group",
 		args={
-			--[[
-			header = {
-				order = 1,
-				type = "header",
-				--name = L["|T"..icon..":25|t "..name],
-				name = GetHeaderName,
-			},
-			--]]
 			chocoSettings = {
 				inline = true,
 				name=GetHeaderName,
