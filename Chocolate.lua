@@ -83,6 +83,10 @@ local uniqueUpdaters = {
 		end
 	end,
 	
+	updatefont = function(self)
+		self.text:SetFont(db.fontPath,db.fontSize)
+		resizeFrame(self)
+	end,
 	updateSettings = SettingsUpdater,
 	-- tooltiptext is no longer in the data spec, but 
 	-- I'll continue to support it, as some plugins seem to use it
@@ -268,6 +272,7 @@ function ChocolatePiece:New(name, obj, settings, database)
 	chocolate:SetClampedToScreen(true)
 	
 	chocolate.text = chocolate:CreateFontString(nil, nil, "GameFontHighlight")
+    chocolate.text:SetFont(db.fontPath, db.fontSize) --will onl be set when db.fontPath is vald 
 	chocolate.text:SetJustifyH("LEFT")
 	
 	local iconTex

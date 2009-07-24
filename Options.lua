@@ -103,7 +103,7 @@ aceoptions = {
 							set = function(info, value)
 								db.gap = value
 								ChocolateBar.ChocolatePiece:UpdateGap(value)
-								ChocolateBar:UpdateChoclates(value)
+								ChocolateBar:UpdateChoclates("updateSettings")
 							end,
 						},
 						size = {
@@ -118,15 +118,47 @@ aceoptions = {
 								return db.scale
 							end,
 							set = function(info, value)
-								ChocolateBar:UpdateBarOptions("UpdateScale")
 								db.scale = value
+								ChocolateBar:UpdateBarOptions("UpdateScale")
+							end,
+						},
+						font = {
+							type = 'select',
+							dialogControl = 'LSM30_Font',
+							values = AceGUIWidgetLSMlists.font,
+							order = 4,
+							name = L["Font"],
+							desc = L["Some of the fonts may depend on other addons."],
+							get = function() 
+								return db.fontName
+							end,
+							set = function(info, value)
+								db.fontPath = LSM:Fetch("font", value)
+								db.fontName = value
+								ChocolateBar:UpdateChoclates("updatefont")
+							end,
+						},
+						fontSize = {
+							type = 'range',
+							order = 5,
+							name = L["Font Size"],
+							desc = L["Font Size"],
+							min = 8,
+							max = 20,
+							step = .5,
+							get = function(name)
+								return db.fontSize
+							end,
+							set = function(info, value)
+								db.fontSize = value
+								ChocolateBar:UpdateChoclates("updatefont")
 							end,
 						},
 						strata = {
 							type = 'select',
 							values = {FULLSCREEN_DIALOG="Fullscreen_Dialog",FULLSCREEN="Fullscreen", 
 										DIALOG="Dialog",HIGH="High",MEDIUM="Medium",LOW="Low",BACKGROUND="Background"},
-							order = 4,
+							order = 6,
 							name = L["Bar Strata"],
 							desc = L["Bar Strata"],
 							get = function() 
@@ -140,7 +172,7 @@ aceoptions = {
 						moveFrames = {
 							type = 'toggle',
 							width = "double",
-							order = 5,
+							order = 7,
 							name = L["Adjust Blizzard Frames"],
 							desc = L["Move Blizzard frames above/below bars"],
 							get = function(info, value)
@@ -260,12 +292,13 @@ aceoptions = {
 									values = AceGUIWidgetLSMlists.statusbar,
 									order = 1,
 									name = L["Background Texture"],
-									desc = L["Background Texture"],
+									desc = L["Some of the textures may depend on other addons."],
 									get = function() 
-										return db.background.texture
+										return db.background.textureName
 									end,
 									set = function(info, value)
-										db.background.texture = value
+										db.background.texture = LSM:Fetch("statusbar", value)
+										db.background.textureName = value
 										ChocolateBar:UpdateBarOptions("UpdateTexture")
 									end,
 								},
@@ -315,7 +348,7 @@ aceoptions = {
 										db.textColor = db.textColor or {r = 1, g = 1, b = 1, a = 1}
 										local t = db.textColor
 										t.r, t.g, t.b, t.a = r, g, b, a
-										ChocolateBar:UpdateChoclates()
+										ChocolateBar:UpdateChoclates("updateSettings")
 									end,
 								},
 							},
@@ -676,7 +709,10 @@ local function createDropPoint(name, dropfunc, offx, text, texture)
 	frame:SetWidth(100)
 	frame:SetHeight(100)
 	frame:SetFrameStrata("DIALOG")
-	frame:SetPoint("CENTER",offx,320)
+	frame:SetPoint("TOPLEFT",(UIParent:GetWidth()/2)-100+offx,-100)
+	--ChocolateBar:Debug(UIParent:GetScale())
+	--frame:SetPoint("CENTER",offx,250*UIParent:GetEffectiveScale() )
+	
 	frame:SetBackdrop({bgFile = "Interface\\Tooltips\\UI-Tooltip-Background", 
 			edgeFile = "Interface/Tooltips/UI-Tooltip-Border", 
 			tile = false, tileSize = 16, edgeSize = 16, 
@@ -737,8 +773,11 @@ function ChocolateBar:RegisterOptions()
 			gap = 7,
 			moreBar = "none",
 			moreBarDelay = 4,
+			fontPath = "",
+			fontSize = 12,
+			textureName = "Tooltip",
 			background = {
-				texture = "Tooltip",
+				texture = "Interface/Tooltips/UI-Tooltip-Background",
 				borderTexture = "Tooltip-Border",
 				color = {r = 0, g = 0, b = 0, a = .5,},
 				borderColor = {r = 0, g = 0, b = 0, a = 0,},

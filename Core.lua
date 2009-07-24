@@ -34,11 +34,6 @@ function ChocolateBar:Debug(...)
 end
 local Debug = ChocolateBar.Debug
 
--- RGBToHex code taken with permission from fortress 
-local function RGBToHex(r, g, b)
-	return ("%02x%02x%02x"):format(r*255, g*255, b*255)	
-end
-
 --------
 -- Ace3 callbacks
 --------
@@ -50,7 +45,6 @@ function ChocolateBar:OnInitialize()
 	
 	self:RegisterEvent("PLAYER_REGEN_DISABLED",ChocolateBar.OnEnterCombat)
 	self:RegisterEvent("PLAYER_REGEN_ENABLED",ChocolateBar.OnLeaveCombat)
-	self:RegisterEvent("PLAYER_ENTERING_WORLD","OnEnterWorld")
 	db = self.db.profile
 	
 	local barSettings = db.barSettings
@@ -104,18 +98,6 @@ function ChocolateBar.OnLeaveCombat()
 			end
 		end
 	end
-end
-
-function ChocolateBar:OnEnterWorld()
-	self:UpdateBarOptions("UpdateTexture")
-	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-	
-	local LSM = LibStub("LibSharedMedia-3.0")
-	LSM:RegisterCallback("LibSharedMedia_Registered", function(event, mediaType, value)
-		if mediaType == "statusbar" then
-			self:UpdateBarOptions("UpdateTexture")
-		end
-	end)
 end
 
 --------
@@ -184,13 +166,7 @@ function ChocolateBar:DisableDataObject(name)
 	--get bar from setings
 	db.objSettings[name].enabled = false
 	local barName = db.objSettings[name].barName 
-	if(not barName or not chocolateBars[barName])then
-		--local choco = chocolateObjects[name]
-		--if choco and choco.Hide then
-		--	choco:Hide()
-		--end
-	else
-		--remove frame from bar
+	if(barName or chocolateBars[barName])then
 		chocolateBars[barName]:EatChocolatePiece(name)
 	end
 end
@@ -305,9 +281,9 @@ local function getFreeBarName()
 	Debug("no free bar name found ")
 end
 
-function ChocolateBar:UpdateChoclates()
+function ChocolateBar:UpdateChoclates(key, val)
 	for name,choco in pairs(chocolateObjects) do
-		choco:Update(choco, "updateSettings")
+		choco:Update(choco, key, val)
 	end
 end
 
