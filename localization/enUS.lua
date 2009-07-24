@@ -2,6 +2,10 @@ local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
 local L = AceLocale:NewLocale("ChocolateBar", "enUS", true)
 if not L then return end
 
+L["Some of the fonts may depend on other addons."] = true
+L["Some of the textures may depend on other addons."] = true
+L["Font Size"] = true
+L["Font"] = true
 L["Toggle Text"] = true
 L["Align Center"] = true
 L["Disable Plugin"] = true

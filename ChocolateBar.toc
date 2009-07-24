@@ -2,7 +2,7 @@
 ## Title: ChocolateBar
 ## Notes: A display for LibDataBroker-1.1
 ## Author: yess
-## Version: 1.7
+## Version: 1.8
 ## X-Email: yessica@fantasymail.de
 ## OptionalDeps: Ace3, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets
 
@@ -29,6 +29,7 @@ libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
 localization\enUS.lua
 localization\deDE.lua
 localization\zhTW.lua
+localization\esES.lua
 
 Core.lua
 DragAndDrop.lua

@@ -41,7 +41,7 @@ function Bar:New(name, settings, db)
 	frame.settings = settings
 	frame.autohide = settings.hideonleave
 
-	--frame:UpdateTexture(db)
+	frame:UpdateTexture(db)
 	frame:UpdateColors(db)
 	frame:UpdateScale(db)
 	--frame:UpdateAutoHide(db)
@@ -92,7 +92,8 @@ function Bar:UpdateColors(db)
 end
 
 function Bar:UpdateTexture(db)
-	local background = LSM:Fetch("statusbar", db.background.texture)
+	--local background = LSM:Fetch("statusbar", db.background.texture)
+	local background = db.background.texture
 	local bg = {
 		bgFile = background, 
 		edgeFile = "Interface/Tooltips/UI-Tooltip-Border", 
@@ -100,7 +101,7 @@ function Bar:UpdateTexture(db)
 		--insets = { left = 4, right = 4, top = 4, bottom = 4}
 		insets = { left = 0, right = 0, top = 0, bottom = 0}
 	}
-	bg.bgFile = background
+	--bg.bgFile = background
 	self:SetBackdrop(bg);
 	self:UpdateColors(db)
 end
@@ -384,7 +385,7 @@ function Bar:UpdateBar(updateindex)
 		if(relative)then
 			choco:SetPoint("TOPRIGHT",relative,"TOPLEFT", 0,0)
 			--list them downwards
-			--chocolates[k]:SetPoint("TOPLEFT",relative,"BOTTOMLEFT", 0,-yoffset)
+			--choco:SetPoint("TOPLEFT",relative,"BOTTOMLEFT", 0,0)
 		else
 			choco:SetPoint("TOPRIGHT",self, 6,yoff)
 		end
