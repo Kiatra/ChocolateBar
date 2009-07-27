@@ -3,7 +3,7 @@ local LSM = LibStub("LibSharedMedia-3.0")
 local Bar = ChocolateBar.Bar
 local chocolate = ChocolateBar.ChocolatePiece
 local Debug = ChocolateBar.Debug
-local jostle = LibStub("LibJostle-3.0-mod")
+local jostle = LibStub("LibJostle-3.0", true)
 
 function Bar:New(name, settings, db)
 	local frame = CreateFrame("Frame",name,UIParent)
@@ -14,7 +14,7 @@ function Bar:New(name, settings, db)
 		frame[k] = v
 	end
 	
-	frame:SetHeight(21)
+	frame:SetHeight(db.height)
 	frame:SetPoint("TOPLEFT",-1,1);
 	--frame:SetPoint("TOPLEFT", settings.xoff, settings.yoff);
 	frame:SetPoint("RIGHT", "UIParent" ,"RIGHT",0, 0);
@@ -43,7 +43,7 @@ function Bar:New(name, settings, db)
 
 	frame:UpdateTexture(db)
 	frame:UpdateColors(db)
-	frame:UpdateScale(db)
+	--frame:UpdateScale(db)
 	--frame:UpdateAutoHide(db)
 	frame:UpdateStrata(db)
 	
@@ -58,7 +58,7 @@ function Bar:UpdateAutoHide(db)
 	if self.settings.autohide then
 		self.autohide = true
 		self:HideAll()
-		jostle:Unregister(self)
+		if jostle then jostle:Unregister(self) end
 	else
 		self.autohide = false
 		self:ShowAll()
@@ -67,12 +67,14 @@ function Bar:UpdateAutoHide(db)
 end
 
 function Bar:UpdateJostle(db)
-	jostle:Unregister(self)
-	if db.moveFrames then
-		if self.settings.align == "bottom" then
-			jostle:RegisterBottom(self)
-		else
-			jostle:RegisterTop(self)
+	if jostle then 
+		jostle:Unregister(self)
+		if db.moveFrames then
+			if self.settings.align == "bottom" then
+				jostle:RegisterBottom(self)
+			else
+				jostle:RegisterTop(self)
+			end
 		end
 	end
 end
@@ -80,6 +82,16 @@ end
 function Bar:UpdateScale(db)
 	self.scale = db.scale
 	self:SetScale(db.scale)
+	self:UpdateJostle(db)
+end
+
+function Bar:UpdateHeight(db)
+	local height = db.height
+	self.height = height
+	self:SetHeight(height)
+	ChocolateBar:UpdateChoclates("updateSettings")
+	db.fontSize = height - 8 
+	ChocolateBar:UpdateChoclates("updatefont")
 	self:UpdateJostle(db)
 end
 
@@ -328,15 +340,17 @@ function Bar:UpdateBar(updateindex)
 	local chocolates =  self.chocolist
 	templeft, tempcenter ,tempright = SortTab(chocolates)
 	
-	local yoff = 0
+	local yoff = -1
 	local relative = nil
 	for i, v in ipairs(templeft) do
 		local choco = v[1]
 		choco:ClearAllPoints()
 		if(relative)then
 			choco:SetPoint("TOPLEFT",relative,"TOPRIGHT", 0,0)
+			choco:SetPoint("BOTTOM",self,"BOTTOM", 0,0)
 		else
 			choco:SetPoint("TOPLEFT",self, 6,yoff)
+			choco:SetPoint("BOTTOM",self,"BOTTOM", 0,0)
 		end
 		if updateindex then
 			choco.settings.index = i
@@ -364,10 +378,12 @@ function Bar:UpdateBar(updateindex)
 				if i > centerIndex then
 					choco:ClearAllPoints()
 					choco:SetPoint("TOPRIGHT",relativeR,"TOPLEFT", 0,0)
+					choco:SetPoint("BOTTOM",self,"BOTTOM", 0,0)
 					relativeR = choco
 				elseif i < centerIndex then
 					choco:ClearAllPoints()
 					choco:SetPoint("TOPLEFT",relativeL,"TOPRIGHT", 0,0)
+					choco:SetPoint("BOTTOM",self,"BOTTOM", 0,0)
 					relativeL = choco
 				end
 				if updateindex then
@@ -384,10 +400,12 @@ function Bar:UpdateBar(updateindex)
 		choco:ClearAllPoints()
 		if(relative)then
 			choco:SetPoint("TOPRIGHT",relative,"TOPLEFT", 0,0)
+			choco:SetPoint("BOTTOM",self,"BOTTOM", 0,0)
 			--list them downwards
 			--choco:SetPoint("TOPLEFT",relative,"BOTTOMLEFT", 0,0)
 		else
 			choco:SetPoint("TOPRIGHT",self, 6,yoff)
+			choco:SetPoint("BOTTOM",self,"BOTTOM", 0,0)
 		end
 		if updateindex then
 			choco.settings.index = i

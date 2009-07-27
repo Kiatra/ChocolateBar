@@ -44,9 +44,11 @@ local function SettingsUpdater(self, value)
 			self.icon:Hide()
 			self.text:SetAllPoints(self);
 		else
+			ChocolateBar:Debug(self:GetHeight(),db.height)
+			self.icon:SetWidth(db.height-5)
 			self.icon:Show()
-			self.text:SetPoint("TOPLEFT", self ,"TOPLEFT", 15, 0)
-			self.text:SetPoint("BOTTOMRIGHT", self ,"BOTTOMRIGHT", 0, 0)
+			self.text:SetPoint("TOPLEFT", self.icon,"TOPRIGHT", 0, 4)
+			self.text:SetPoint("BOTTOMRIGHT", self, 0, 0)
 		end
 	else -- no icon
 		self.text:SetAllPoints(self);
@@ -258,15 +260,12 @@ end
 
 function ChocolatePiece:New(name, obj, settings, database)
 	db = database
-	local height = 15
 	local text = obj.text
 	local icon = obj.icon
 	local chocolate = CreateFrame("Button", "Chocolate" .. name)
-	
 	--set update function
 	chocolate.Update = Update
-	
-	chocolate:SetHeight(20) --get from bar
+
 	chocolate:EnableMouse(true)
 	chocolate:RegisterForDrag("LeftButton")
 	chocolate:SetClampedToScreen(true)
@@ -274,13 +273,14 @@ function ChocolatePiece:New(name, obj, settings, database)
 	chocolate.text = chocolate:CreateFontString(nil, nil, "GameFontHighlight")
     chocolate.text:SetFont(db.fontPath, db.fontSize) --will onl be set when db.fontPath is vald 
 	chocolate.text:SetJustifyH("LEFT")
+	--chocolate.text:SetJustifyV("CENTER")
 	
 	local iconTex
 	if icon then
 		iconTex = chocolate:CreateTexture()
-		iconTex:SetHeight(height)
-		iconTex:SetWidth(height)
-		iconTex:SetPoint("LEFT", chocolate, "LEFT", 0, 0)
+		iconTex:SetWidth(db.height - 5)
+		iconTex:SetPoint("TOPLEFT", chocolate, 0, -2)
+		iconTex:SetPoint("BOTTOM", chocolate, 0, 3)
 		iconTex:SetTexture(icon)
 		if obj.iconCoords then
 			iconTex:SetTexCoord(unpack(obj.iconCoords))
