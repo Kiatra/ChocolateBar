@@ -111,47 +111,18 @@ aceoptions = {
 							order = 3,
 							name = L["Bar Size"],
 							desc = L["Bar Size"],
-							min = 0.5,
-							max = 1.5,
-							step = .1,
+							min = 12,
+							max = 30,
+							step = 1,
 							get = function(name)
-								return db.scale
+								--return db.scale
+								return db.height
 							end,
 							set = function(info, value)
-								db.scale = value
-								ChocolateBar:UpdateBarOptions("UpdateScale")
-							end,
-						},
-						font = {
-							type = 'select',
-							dialogControl = 'LSM30_Font',
-							values = AceGUIWidgetLSMlists.font,
-							order = 4,
-							name = L["Font"],
-							desc = L["Some of the fonts may depend on other addons."],
-							get = function() 
-								return db.fontName
-							end,
-							set = function(info, value)
-								db.fontPath = LSM:Fetch("font", value)
-								db.fontName = value
-								ChocolateBar:UpdateChoclates("updatefont")
-							end,
-						},
-						fontSize = {
-							type = 'range',
-							order = 5,
-							name = L["Font Size"],
-							desc = L["Font Size"],
-							min = 8,
-							max = 20,
-							step = .5,
-							get = function(name)
-								return db.fontSize
-							end,
-							set = function(info, value)
-								db.fontSize = value
-								ChocolateBar:UpdateChoclates("updatefont")
+								--db.scale = value
+								--ChocolateBar:UpdateBarOptions("UpdateScale")
+								db.height = value
+								ChocolateBar:UpdateBarOptions("UpdateHeight")
 							end,
 						},
 						strata = {
@@ -276,15 +247,15 @@ aceoptions = {
 				},
 				backbround = {
 					--inline = true,
-					name = L["Colors and Textures"],
+					name = L["Fonts and Textures"],
 					type = "group",
 					order = 4,
 					args ={
 						backbround = {
 							inline = true,
-							name = L["Colors and Textures"],
+							name = L["Textures"],
 							type = "group",
-							order = 4,
+							order = 1,
 							args ={
 								texture = {
 									type = 'select',
@@ -334,9 +305,49 @@ aceoptions = {
 										ChocolateBar:UpdateBarOptions("UpdateColors")
 									end,
 								},
+							},
+						},
+						fonts = {
+							inline = true,
+							name = L["Font"],
+							type = "group",
+							order = 2,
+							args ={
+								font = {
+								type = 'select',
+								dialogControl = 'LSM30_Font',
+								values = AceGUIWidgetLSMlists.font,
+								order = 1,
+								name = L["Font"],
+								desc = L["Some of the fonts may depend on other addons."],
+								get = function() 
+									return db.fontName
+								end,
+								set = function(info, value)
+									db.fontPath = LSM:Fetch("font", value)
+									db.fontName = value
+									ChocolateBar:UpdateChoclates("updatefont")
+								end,
+								},
+								fontSize = {
+									type = 'range',
+									order = 2,
+									name = L["Font Size"],
+									desc = L["Font Size"],
+									min = 8,
+									max = 20,
+									step = .5,
+									get = function(name)
+										return db.fontSize
+									end,
+									set = function(info, value)
+										db.fontSize = value
+										ChocolateBar:UpdateChoclates("updatefont")
+									end,
+								},
 								textcolour = {
 									type = "color",
-									order = 2,
+									order = 3,
 									name = L["Text color"],
 									desc = L["Default text color of a plugin. This will not overwrite plugins that use own colors."],
 									hasAlpha = true,
@@ -768,6 +779,7 @@ function ChocolateBar:RegisterOptions()
 			combatdisbar = false,
 			hideonleave = false,
 			scale = 1,
+			height = 21,
 			moveFrames = true,
 			strata = "HIGH",
 			gap = 7,
