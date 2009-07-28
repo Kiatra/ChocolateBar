@@ -70,8 +70,9 @@ local function IconColorUpdater(frame, value, name)
 end
 
 -- updaters code taken with permission from fortress 
-local uniqueUpdaters = {
+local updaters = {
 	text = TextUpdater,
+	label  = TextUpdater,
 	
 	icon = function(frame, value, name)
 		--if value and self.db.icon then
@@ -114,16 +115,6 @@ local uniqueUpdaters = {
 	iconG = IconColorUpdater,
 	iconB = IconColorUpdater,
 }
-
--- updaters code taken with permission from fortress 
-local updaters = {
-	label  = TextUpdater,
-	value  = TextUpdater,
-	suffix = TextUpdater,
-}
-for k, v in pairs(uniqueUpdaters) do
-	updaters[k] = v
-end
 
 -- GetAnchors code taken with permission from fortress 
 local function GetAnchors(frame)
@@ -230,6 +221,7 @@ end
 
 local function Update(self, f,key, value)
 	local update = updaters[key]
+	--local update = uniqueUpdaters[key]
 	if update then
 		update(f, value, name)
 	end

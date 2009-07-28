@@ -60,9 +60,8 @@ function ChocolateBar:OnEnable()
 		self:LibDataBroker_DataObjectCreated(nil, name, obj, true) --force noupdate on chocolateBars
 	end
 	self:UpdateBars() --update chocolateBars here
-
 	broker.RegisterCallback(self, "LibDataBroker_DataObjectCreated")
-	
+
 	local moreChocolate = LibStub("LibDataBroker-1.1"):GetDataObjectByName("MoreChocolate")
 	if moreChocolate then
 		moreChocolate:SetBar(db)
@@ -163,6 +162,7 @@ function ChocolateBar:EnableDataObject(name, noupdate)
 end
 
 function ChocolateBar:DisableDataObject(name)
+	broker.UnregisterCallback(self,"LibDataBroker_AttributeChanged_"..name)
 	--get bar from setings
 	db.objSettings[name].enabled = false
 	local barName = db.objSettings[name].barName 
@@ -172,7 +172,7 @@ function ChocolateBar:DisableDataObject(name)
 end
 
 function ChocolateBar:AttributeChanged(event, name, key, value)
-	--Debug("ChocolateBar:AttributeChanged ",name," key: ", key, value)
+	Debug("ChocolateBar:AttributeChanged ",name," key: ", key, value)
 	local settings = db.objSettings[name]
 	if not settings.enabled then 
 		return 
