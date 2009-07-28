@@ -369,6 +369,7 @@ function Bar:UpdateBar(updateindex)
 		if relative then
 			relative:ClearAllPoints()
 			relative:SetPoint("CENTER",self, 0,yoff)
+			relative:SetPoint("BOTTOM",self,"BOTTOM", 0,0)
 			
 			local relativeL = relative
 			local relativeR = relative
