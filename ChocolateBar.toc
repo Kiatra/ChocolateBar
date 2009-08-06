@@ -1,8 +1,8 @@
-﻿## Interface: 30100
+﻿## Interface: 30200
 ## Title: ChocolateBar
 ## Notes: A display for LibDataBroker-1.1
 ## Author: yess
-## Version: 1.8
+## Version: 1.9
 ## X-Email: yessica@fantasymail.de
 ## OptionalDeps: Ace3, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets, LibJostle-3.0
 
