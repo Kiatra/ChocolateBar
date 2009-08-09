@@ -166,13 +166,13 @@ function ChocolateBar:DisableDataObject(name)
 	--get bar from setings
 	db.objSettings[name].enabled = false
 	local barName = db.objSettings[name].barName 
-	if(barName or chocolateBars[barName])then
+	if(barName and chocolateBars[barName])then
 		chocolateBars[barName]:EatChocolatePiece(name)
 	end
 end
 
 function ChocolateBar:AttributeChanged(event, name, key, value)
-	Debug("ChocolateBar:AttributeChanged ",name," key: ", key, value)
+	--Debug("ChocolateBar:AttributeChanged ",name," key: ", key, value)
 	local settings = db.objSettings[name]
 	if not settings.enabled then 
 		return 
