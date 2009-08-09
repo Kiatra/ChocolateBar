@@ -44,7 +44,6 @@ local function SettingsUpdater(self, value)
 			self.icon:Hide()
 			self.text:SetAllPoints(self);
 		else
-			ChocolateBar:Debug(self:GetHeight(),db.height)
 			self.icon:SetWidth(db.height-5)
 			self.icon:Show()
 			self.text:SetPoint("TOPLEFT", self.icon,"TOPRIGHT", 0, 4)
@@ -69,6 +68,19 @@ local function IconColorUpdater(frame, value, name)
 	end
 end
 
+local function CreateIcon(self, icon)
+	local iconTex = self:CreateTexture()
+	local obj = self.obj
+	iconTex:SetWidth(db.height - 5)
+	iconTex:SetPoint("TOPLEFT", self, 0, -2)
+	iconTex:SetPoint("BOTTOM", self, 0, 3)
+	iconTex:SetTexture(icon)
+	if obj.iconCoords then
+		iconTex:SetTexCoord(unpack(obj.iconCoords))
+	end
+	self.icon = iconTex
+end
+
 -- updaters code taken with permission from fortress 
 local updaters = {
 	text = TextUpdater,
@@ -79,10 +91,10 @@ local updaters = {
 		if value then
 			if frame.icon then
 				frame.icon:SetTexture(value)
+			else
+				CreateIcon(frame, value)
+				SettingsUpdater(frame)
 			end
-			--frame:ShowIcon()
-		else
-			--frame:HideIcon()
 		end
 	end,
 	
@@ -257,7 +269,8 @@ function ChocolatePiece:New(name, obj, settings, database)
 	local chocolate = CreateFrame("Button", "Chocolate" .. name)
 	--set update function
 	chocolate.Update = Update
-
+	chocolate.obj = obj
+	
 	chocolate:EnableMouse(true)
 	chocolate:RegisterForDrag("LeftButton")
 	chocolate:SetClampedToScreen(true)
@@ -267,17 +280,8 @@ function ChocolatePiece:New(name, obj, settings, database)
 	chocolate.text:SetJustifyH("LEFT")
 	--chocolate.text:SetJustifyV("CENTER")
 	
-	local iconTex
 	if icon then
-		iconTex = chocolate:CreateTexture()
-		iconTex:SetWidth(db.height - 5)
-		iconTex:SetPoint("TOPLEFT", chocolate, 0, -2)
-		iconTex:SetPoint("BOTTOM", chocolate, 0, 3)
-		iconTex:SetTexture(icon)
-		if obj.iconCoords then
-			iconTex:SetTexCoord(unpack(obj.iconCoords))
-		end
-		chocolate.icon = iconTex
+		CreateIcon(chocolate, icon)
 	end
 	
 	chocolate:SetScript("OnEnter", OnEnter)
@@ -300,8 +304,6 @@ function ChocolatePiece:New(name, obj, settings, database)
 	SettingsUpdater(chocolate, settings.showText )
 	
 	chocolate.name = name
-	chocolate.obj = obj
-	
 	chocolate:SetMovable(true)
 	chocolate:SetScript("OnDragStart", OnDragStart)
 	chocolate:SetScript("OnDragStop", OnDragStop)

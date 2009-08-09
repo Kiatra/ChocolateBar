@@ -680,6 +680,17 @@ local function GetIconImage(info, name)
 	return "Interface\\AddOns\\ChocolateBar\\pics\\ChocolatePiece"
 end
 
+local function HasIcon(info)
+	local cleanName = info[#info-2]
+	local name = chocolateOptions[cleanName].desc
+	local obj = ChocolateBar:GetDataObject(name)
+	if obj and obj.icon then	
+		return false
+	else
+		return true 
+	end
+end
+
 local function GetHeaderName(info)
 	local cleanName = info[#info-1]
 	local name = chocolateOptions[cleanName].desc
@@ -969,6 +980,7 @@ function ChocolateBar:AddObjectOptions(name,icon, t)
 						desc = L["Show Icon"],
 						get = GetIcon,
 						set = SetIcon,
+						disabled = HasIcon,
 					},
 					width = {
 						type = 'range',
