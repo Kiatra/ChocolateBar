@@ -39,18 +39,20 @@ local function SettingsUpdater(self, value)
 		end
 	end
 	
+	self.text:SetPoint("TOP", self, 0, 3)
+	self.text:SetPoint("BOTTOMRIGHT", self, 0, 0)
+	
 	if self.icon then 
-		if not settings.showIcon then -- hide icon
-			self.icon:Hide()
-			self.text:SetAllPoints(self);
-		else
+		if settings.showIcon then 
 			self.icon:SetWidth(db.height-5)
 			self.icon:Show()
-			self.text:SetPoint("TOPLEFT", self.icon,"TOPRIGHT", 0, 4)
-			self.text:SetPoint("BOTTOMRIGHT", self, 0, 0)
+			self.text:SetPoint("LEFT", self.icon,"RIGHT", 1, 0)
+		else -- hide icon
+			self.icon:Hide()
+			self.text:SetPoint("LEFT", self, 0, 0)
 		end
 	else -- no icon
-		self.text:SetAllPoints(self);
+		self.text:SetPoint("LEFT", self, 0, 0)
 	end
 	
 	resizeFrame(self)
@@ -71,9 +73,9 @@ end
 local function CreateIcon(self, icon)
 	local iconTex = self:CreateTexture()
 	local obj = self.obj
-	iconTex:SetWidth(db.height - 5)
+	iconTex:SetWidth(db.height - 4)
 	iconTex:SetPoint("TOPLEFT", self, 0, -2)
-	iconTex:SetPoint("BOTTOM", self, 0, 3)
+	iconTex:SetPoint("BOTTOM", self, 0, 4)
 	iconTex:SetTexture(icon)
 	if obj.iconCoords then
 		iconTex:SetTexCoord(unpack(obj.iconCoords))
