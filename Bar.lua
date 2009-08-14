@@ -340,13 +340,13 @@ function Bar:UpdateBar(updateindex)
 	local chocolates =  self.chocolist
 	templeft, tempcenter ,tempright = SortTab(chocolates)
 	
-	local yoff = 0
+	local yoff = -1
 	local relative = nil
 	for i, v in ipairs(templeft) do
 		local choco = v[1]
 		choco:ClearAllPoints()
 		if(relative)then
-			choco:SetPoint("TOPLEFT",relative,"TOPRIGHT", 0,1)
+			choco:SetPoint("TOPLEFT",relative,"TOPRIGHT", 0,0)
 			choco:SetPoint("BOTTOM",self,"BOTTOM", 0,0)
 		else
 			choco:SetPoint("TOPLEFT",self, 6,yoff)
@@ -376,12 +376,12 @@ function Bar:UpdateBar(updateindex)
 				local choco = v[1]
 				if i > centerIndex then
 					choco:ClearAllPoints()
-					choco:SetPoint("TOPRIGHT",relativeR,"TOPLEFT", 0,1)
+					choco:SetPoint("TOPRIGHT",relativeR,"TOPLEFT", 0,0)
 					choco:SetPoint("BOTTOM",self,"BOTTOM", 0,0)
 					relativeR = choco
 				elseif i < centerIndex then
 					choco:ClearAllPoints()
-					choco:SetPoint("TOPLEFT",relativeL,"TOPRIGHT", 0,1)
+					choco:SetPoint("TOPLEFT",relativeL,"TOPRIGHT", 0,0)
 					choco:SetPoint("BOTTOM",self,"BOTTOM", 0,0)
 					relativeL = choco
 				end
@@ -398,7 +398,7 @@ function Bar:UpdateBar(updateindex)
 		local choco = v[1]
 		choco:ClearAllPoints()
 		if(relative)then
-			choco:SetPoint("TOPRIGHT",relative,"TOPLEFT", 0,1)
+			choco:SetPoint("TOPRIGHT",relative,"TOPLEFT", 0,0)
 			choco:SetPoint("BOTTOM",self,"BOTTOM", 0,0)
 			--list them downwards
 			--choco:SetPoint("TOPLEFT",relative,"BOTTOMLEFT", 0,0)
