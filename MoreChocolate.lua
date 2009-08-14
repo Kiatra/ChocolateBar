@@ -9,7 +9,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale("ChocolateBar")
 
 local moreChocolate = LibStub("LibDataBroker-1.1"):NewDataObject("MoreChocolate", {
 	type = "launcher",
-	--icon = "Interface\\AddOns\\ChocolateBar\\pics\\ChocolatePiece",
+	icon = "Interface\\AddOns\\ChocolateBar\\pics\\ChocolatePiece",
 	label = "MoreChocolate",
 	text  = "MoreChocolate",
 	
