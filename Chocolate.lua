@@ -73,7 +73,7 @@ end
 local function CreateIcon(self, icon)
 	local iconTex = self:CreateTexture()
 	local obj = self.obj
-	iconTex:SetWidth(db.height - 4)
+	iconTex:SetWidth(db.height - 6)
 	iconTex:SetPoint("TOPLEFT", self, 0, -2)
 	iconTex:SetPoint("BOTTOM", self, 0, 4)
 	iconTex:SetTexture(icon)
