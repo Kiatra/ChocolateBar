@@ -340,7 +340,7 @@ function Bar:UpdateBar(updateindex)
 	local chocolates =  self.chocolist
 	templeft, tempcenter ,tempright = SortTab(chocolates)
 	
-	local yoff = -1
+	local yoff = 0
 	local relative = nil
 	for i, v in ipairs(templeft) do
 		local choco = v[1]
