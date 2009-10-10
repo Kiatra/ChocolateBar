@@ -796,7 +796,7 @@ function ChocolateBar:RegisterOptions()
 			gap = 7,
 			moreBar = "none",
 			moreBarDelay = 4,
-			fontPath = "",
+			fontPath = " ",
 			fontSize = 12,
 			textureName = "Tooltip",
 			background = {
