@@ -23,6 +23,7 @@ local function resizeFrame(self)
 end
 
 local function TextUpdater(frame, value)
+	--frame.text:SetText("("..frame.settings.index..") "..value)
 	frame.text:SetText(value)
 	resizeFrame(frame)
 end
@@ -148,16 +149,17 @@ end
 
 -- some code taken with permission from fortress 
 local function PrepareTooltip(frame, anchorFrame)
-	--Debug("PrepareTooltip")
-	frame:SetOwner(anchorFrame, "ANCHOR_NONE")
-	frame:ClearAllPoints()
-	local a1, a2 = GetAnchors(anchorFrame)
-	frame:SetPoint(a1, anchorFrame, a2)	
+	if frame and anchorFrame then
+		frame:SetOwner(anchorFrame, "ANCHOR_NONE")
+		frame:ClearAllPoints()
+		local a1, a2 = GetAnchors(anchorFrame)
+		frame:SetPoint(a1, anchorFrame, a2)
+	end
 end
 
 -- some code taken with permission from fortress 
 local function OnEnter(self)
-	if db.combathidebar and ChocolateBar.InCombat then return end
+	if db.combathidebar and ChocolateBar.InCombat or ChocolateBar.dragging then return end
 	
 	local obj  = self.obj
 	local name = self.name
@@ -246,7 +248,8 @@ local function OnDragStart(frame)
 		local bar = frame.bar
 		ChocolateBar:TempDisAutohide(true)
 		ChocolateBar.dragging = true
-		Drag:Start(bar, frame.name)
+		if frame.OnLeave then frame:OnLeave() end
+		Drag:Start(bar, frame.name, frame)
 		frame:StartMoving()
 		frame.isMoving = true
 		GameTooltip:Hide();
@@ -275,7 +278,7 @@ function ChocolatePiece:New(name, obj, settings, database)
 	
 	chocolate:EnableMouse(true)
 	chocolate:RegisterForDrag("LeftButton")
-	chocolate:SetClampedToScreen(true)
+	--chocolate:SetClampedToScreen(true)
 	
 	chocolate.text = chocolate:CreateFontString(nil, nil, "GameFontHighlight")
     chocolate.text:SetFont(db.fontPath, db.fontSize) --will onl be set when db.fontPath is vald 

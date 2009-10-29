@@ -259,6 +259,9 @@ function ChocolateBar:OnProfileChanged(event, database, newProfileKey)
 		end
 	end
 	self:UpdateBars() --update chocolateBars here
+	
+	moreChocolate = LibStub("LibDataBroker-1.1"):GetDataObjectByName("MoreChocolate")
+	if moreChocolate then moreChocolate:SetBar(db) end
 end
 
 -- find lowest free bar number

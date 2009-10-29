@@ -708,15 +708,15 @@ local function dropText(frame, choco)
 		local name = choco.name
 		db.objSettings[name].showText = not db.objSettings[name].showText
 		ChocolateBar:AttributeChanged(nil, name, "updateSettings", db.objSettings[name].showText)
-		choco.bar:AddChocolatePiece(choco, name,noupdate)
+		choco.bar:ResetDrag(choco, name)
 		frame:SetBackdropColor(0,0,0,1)
 end
 
 local function dropCenter(frame, choco)
 		local name = choco.name
 		db.objSettings[name].align = "center"
-		--ChocolateBar:AttributeChanged(nil, name, "updateSettings", db.objSettings[name].center)
-		choco.bar:AddChocolatePiece(choco, name,noupdate)
+		db.objSettings[name].stickcenter = true
+		choco.bar:ResetDrag(choco, name)
 		frame:SetBackdropColor(0,0,0,1)
 end
 
@@ -755,7 +755,7 @@ local function createDropPoint(name, dropfunc, offx, text, texture)
 	
 	frame:Hide()
 	frame.Drop = dropfunc
-	frame.GetFocus = function(frame) frame:SetBackdropColor(1,0,0,1) end
+	frame.GetFocus = function(frame, name) frame:SetBackdropColor(1,0,0,1) end
 		
 	frame.Drag = function(frame) end
 	frame.LoseFocus = function(frame) frame:SetBackdropColor(0,0,0,1) end
@@ -798,17 +798,27 @@ function ChocolateBar:RegisterOptions()
 			moreBarDelay = 4,
 			fontPath = " ",
 			fontSize = 12,
-			textureName = "Tooltip",
+			--textureName = "DarkBottom",
 			background = {
-				texture = "Interface/Tooltips/UI-Tooltip-Background",
+				textureName = "DarkBottom",
+				texture = "Interface\\AddOns\\ChocolateBar\\pics\\DarkBottom",
 				borderTexture = "Tooltip-Border",
-				color = {r = 0, g = 0, b = 0, a = .5,},
+				color = {r = 0.38, g = 0.36, b = 0.4, a = .94,},
 				borderColor = {r = 0, g = 0, b = 0, a = 0,},
 				tile = false,
 				tileSize = 32,
 				edgeSize = 8,
 				barInset = 3,
 			},
+			--[[
+			["color"] = {
+					["a"] = 0.9400000013411045,
+					["b"] = 0.4,
+					["g"] = 0.3647058823529412,
+					["r"] = 0.3882352941176471,
+				},
+				["textureName"] = "DarkBottom",
+			--]]
 			textColor = nil,
 			barSettings = {
 				['*'] = {
@@ -851,8 +861,9 @@ function ChocolateBar:RegisterOptions()
 	LSM:Register("statusbar", "Tooltip", "Interface\\Tooltips\\UI-Tooltip-Background")
 	LSM:Register("statusbar", "Solid", "Interface\\Buttons\\WHITE8X8")
 	LSM:Register("statusbar", "Blizzard Parchment","Interface\\AchievementFrame\\UI-Achievement-Parchment-Horizontal")
-	LSM:Register("statusbar", "Chocolate","Interface\\AddOns\\ChocolateBar\\pics\\ChocolateBar")
 	LSM:Register("statusbar", "Titan","Interface\\AddOns\\ChocolateBar\\pics\\Titan")
+	LSM:Register("statusbar", "Gloss","Interface\\AddOns\\ChocolateBar\\pics\\Gloss")
+	LSM:Register("statusbar", "DarkBottom","Interface\\AddOns\\ChocolateBar\\pics\\DarkBottom")
 
 	createDropPoint("ChocolateTextDrop", dropText, -150,L["Toggle Text"],"Interface/ICONS/INV_Inscription_Tradeskill01")
 	createDropPoint("ChocolateCenterDrop", dropCenter,0,L["Align Center"],"Interface/Icons/Spell_Holy_GreaterBlessingofSalvation") 

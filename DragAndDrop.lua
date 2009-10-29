@@ -49,7 +49,6 @@ local function OnDragUpdate(frame, elapsed)
 		counter = 0
 		focus:SetAlpha(1 )
 	end
-	
 end
 
 function Drag:RegisterFrame(frame)
@@ -65,11 +64,12 @@ function Drag:UnregisterFrame(frame)
 	frameslist[frame:GetName()] = nil
 end
 
-function Drag:Start(bar, name)
+function Drag:Start(bar, name, choco)
 	for k, v in pairs(frameslist) do
 		v.dragshow = v:IsVisible() 
 		v:Show()
 	end
+	
 	choconame = name
 	bar:Drag(name)
 	focus = bar
