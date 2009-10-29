@@ -4,6 +4,7 @@ local Bar = ChocolateBar.Bar
 local chocolate = ChocolateBar.ChocolatePiece
 local Debug = ChocolateBar.Debug
 local jostle = LibStub("LibJostle-3.0", true)
+local pairs = pairs
 
 function Bar:New(name, settings, db)
 	local frame = CreateFrame("Frame",name,UIParent)
@@ -40,13 +41,9 @@ function Bar:New(name, settings, db)
 	
 	frame.settings = settings
 	frame.autohide = settings.hideonleave
-
 	frame:UpdateTexture(db)
 	frame:UpdateColors(db)
-	--frame:UpdateScale(db)
-	--frame:UpdateAutoHide(db)
-	frame:UpdateStrata(db)
-	
+	frame:UpdateStrata(db)	
 	return frame
 end
 
@@ -118,41 +115,23 @@ function Bar:UpdateTexture(db)
 	self:UpdateColors(db)
 end
 
-local function updateDummy(self, choco, name)
-	local dummy = self.dummy
-	if not dummy then  
-		dummy = CreateFrame("Frame", "ChocolateDummy", self)
-		--dummy:SetAllPoints(chocolate.frame)
-		dummy.name = "dummy"
-		dummy:SetBackdrop({bgFile = "Interface/Tooltips/UI-Tooltip-Background", 
-		edgeFile = "Interface/Tooltips/UI-Tooltip-Border", 
-		tile = true, tileSize = 16, edgeSize = 6, 
-		insets = { left = 0, right = 0, top = 0, bottom = 0}})
-		dummy:SetBackdropColor(1,0,0,1)
-		dummy:SetBackdropBorderColor(1,0,0,0)
-		self.dummy = dummy
-	end
-	dummy:Show()
-	dummy:SetWidth(choco:GetWidth())
-	dummy:SetHeight(choco:GetHeight())
-	
-	local settings = {}
-	settings.index = choco.settings.index
-	dummy.settings = settings
-	dummy.settings.align = choco.settings.align
-	templeftchocolate = self.chocolist[name]
-	self.saved = choco
-	self.chocolist[name] = dummy
-end
-
 function GetTexture(frame)
 	regions = frame:GetRegions()
 end
 
+function Bar:ResetDrag(choco, name)
+	self.chocolist[name] = choco
+	self.dummy:Hide()
+	choco:SetAlpha(1)
+	self:UpdateBar()
+end
+
 -- add some chocolate to a bar
 function Bar:AddChocolatePiece(choco, name, noupdate)
+	
 	local chocolist = self.chocolist
 	if chocolist[name] then
+		Debug("AddChocolatePiece: ",name," already in list.")
 		return
 	end
 	
@@ -221,95 +200,9 @@ function Bar:Disable()
 	jostle:Unregister(self)
 end
 
-function Bar:Drop(choco, pos)
-	self.dummy:Hide()
-	self.chocolist[choco.obj.name] = choco
-	choco.settings.index = self.dummy.settings.index
-	choco.settings.align = self.dummy.settings.align
-	self:UpdateBar(true)
-end
-
-function Bar:LoseFocus(name)
-	self.dummy:Hide()
-	self.chocolist[name] = nil
-	self:UpdateBar(true)
-end
-
-function Bar:GetChocolateAtCursor()
-	local s = self:GetEffectiveScale()
-	local x, y = GetCursorPosition()
-	local align
-	if x < 50 then
-		align = "left"
-	end
-	if x > 850 then
-		align =  "right"
-	end
-	
-	x = x/s
-	for k, v in pairs(self.chocolist) do
-		if x > v:GetLeft() and x < v:GetRight() then
-			return v, align
-		end
-	end
-	return nil, align
-end
-
-function Bar:UpdateDragChocolate()
-	local choco, align = self:GetChocolateAtCursor()
-	if self.dummy.settings.align ~= align then
-		if align == "left"  then
-			self.dummy.settings.index = -1
-			self.dummy.settings.align = "left"
-		end
-		if align == "right" then
-			self.dummy.settings.index = -1
-			self.dummy.settings.align = "right"
-		end
-		if align == "center" then
-			self.dummy.settings.index = -1
-			self.dummy.settings.align = "center"
-		end
-	end
-	if not choco then 
-		self.dummy.settings.index = 500
-		self:UpdateBar()
-	else
-		if self.last ~= choco then
-			self.last = choco
-			self.dummy.settings.index = choco.settings.index - 0.5
-			self.dummy.settings.align = choco.settings.align
-			self:UpdateBar()
-		end
-	end
-end
-
-function Bar:GetFocus(name)
-	local choco = ChocolateBar:GetChocolate(name)
-	--choco.bar:EatChocolate()
-	--self:AddChocolatePiece(choco, name)
-	choco.bar = self
-	choco.settings.barName = self:GetName()
-	updateDummy(self, choco, name)
-	self:UpdateBar()
-end
-
-function Bar:Drag(name)
-	local choco = self.chocolist[name]
-	if not choco then 
-		if self.saved then
-			--if self.saved.name == name then
-				choco = self.saved	
-		end
-	end
-	updateDummy(self, choco, name)
-	self:UpdateBar()
-end
-
 local templeft = {}
 local tempright = {}
---todo
-tempcenter = {}
+local tempcenter = {}
 local function SortTab(tab)
 	templeft = {}
 	tempright = {}
@@ -334,23 +227,221 @@ local function SortTab(tab)
 	return templeft, tempcenter, tempright
 end
 
+local function SortList(list, side)
+	local temp = {}
+	for k,v in pairs(list) do
+		local index = v["settings"]["index"]
+		if not index then
+			index = 500
+		end
+		if v.settings.align == side then
+			table.insert(temp,{v,index})
+		end
+	end
+	table.sort(temp, function(a,b)return a[2] < b[2] end)
+	return temp
+end
+
+function Bar:GetChocolateAtCursor()
+	local s = self:GetEffectiveScale()
+	local x, y = GetCursorPosition()
+	
+	x = x/s
+	for k, v in pairs(self.chocolist) do
+		--if v:GetLeft() and v:GetRight() then
+			if x > v:GetLeft() and x < v:GetRight() then --plugin found
+				--check positon of cursor on the plugin
+				--Debug(x, v:GetLeft(),v:GetWidth(), v:GetLeft()+v:GetWidth()/2)
+				if x < v:GetLeft()+v:GetWidth()/2 then
+					return v,"left"
+				else
+					return v,"right"
+				end
+			end
+		--else
+		--	Debug("error:",v:GetName(), v:GetLeft(),v:GetRight())
+		--end
+	end
+	-- cursor over bar
+	local left = self.chocoMostLeft and self.chocoMostLeft:GetRight() or self:GetLeft()
+	local right = self.chocoMostRight and self.chocoMostRight:GetLeft() or self:GetRight()
+	local centerL = self.chocoCenterLeft and self.chocoCenterLeft:GetLeft() or self:GetWidth()/2
+	local centerR = self.chocoCenterRight and self.chocoCenterRight:GetRight() or self:GetWidth()/2
+	
+	
+	local nameCenterLeft = self.chocoCenterLeft and self.chocoCenterLeft:GetName()
+	local nameCenterRight = self.chocoCenterRight and self.chocoCenterRight:GetName()
+	--Debug("nameCenterLeft=",nameCenterLeft,"nameCenterRight=",nameCenterRight)
+	
+	if x < 8 then
+		return nil, "left" , "left" --left half on left side
+	end
+	Debug("left",math.ceil(left),"centerL",math.ceil(centerL),"centerR",math.ceil(centerR),"right",math.ceil(right),"x",x)
+	if x < centerL then
+		if x < centerL/2+left/2 then
+			--Debug("x < centerL-left/2",x < centerL/2+left/2,centerL/2+left/2,"left half on left side")
+			return self.chocoMostLeft, "right" , "left" --left half on left side
+		else
+			--Debug("x < centerL-left/2",x < centerL/2+left/2,centerL/2+left/2,"right half on left side")
+			return self.chocoCenterLeft, "left" , "center" --right half on left side
+		end
+	end
+	if x > centerR and x < right then
+		if x < right/2+centerR/2 then
+			--Debug("x < right-centerR/2",x < right/2+centerR/2,right/2+centerR/2,"left half on right side")
+			return self.chocoCenterRight, "right", "center" --left half on right side 
+		else
+			--Debug("x < right-centerR/2",x < right/2+centerR/2,right/2+centerR/2,"right half on right side")
+			return self.chocoMostRight, "left" , "right" --right half on right side,
+		end
+	end
+	
+	return nil, nil
+end
+
+--create a copy of the choco 
+local function createDummy(self, choco, name)
+	local dummy = self.dummy
+	if not dummy then  
+		--dummy = CreateFrame("Frame", "ChocolateDummy", self)
+		dummy = chocolate:New("dummy", choco.obj, choco.settings, ChocolateBar.db.profile)
+		dummy:SetParent(self)
+		--dummy:SetAllPoints(chocolate.frame)
+		dummy.name = "dummy"
+		dummy:SetAlpha(0.5)
+		dummy.bar = choco.bar
+		self.dummy = dummy
+	end
+	dummy:Show()
+	dummy:SetWidth(choco:GetWidth())
+	dummy:SetHeight(choco:GetHeight())
+	
+	dummy.settings.index = choco.settings.index
+	dummy.settings.align = choco.settings.align
+	self.chocolist[name] = dummy --replace original with dummy to free the original
+end
+
+local function createPointer(self, choco)
+	local pointer = self.pointer
+	if not pointer then
+		pointer = CreateFrame("Frame", "ChocolatePointer", self)
+		pointer:SetFrameStrata("DIALOG")
+		pointer:SetWidth(15)
+		pointer:SetHeight(choco:GetHeight())
+		pointer.index = choco.settings.index
+		pointer.align = choco.settings.align
+		self.pointer = pointer
+		
+		local arrow = pointer:CreateTexture(nil, "DIALOG")
+		arrow:SetWidth(choco:GetHeight()+30)
+		arrow:SetHeight(choco:GetHeight()+30)
+		arrow:SetPoint("CENTER",pointer,"LEFT", 0, 0)
+		arrow:SetTexture("Interface\\AddOns\\ChocolateBar\\pics\\pointer")
+	end
+end
+
+function Bar:UpdateDragChocolate()
+	local choco, side, align = self:GetChocolateAtCursor()
+	local pointer = self.pointer
+	
+	--self.last = choco
+	
+	if choco then
+		pointer.align = choco.settings.align --align
+		local offset = 0.5
+		if choco.settings.align == "right" then -- the right
+			offset = -0.5
+		end
+		if side == "left"  then
+			pointer.index = choco.settings.index - offset
+			pointer:SetPoint("TOPLEFT",choco,0,0)
+		else
+			pointer.index = choco.settings.index + offset
+			pointer:SetPoint("TOPLEFT",choco,"TOPRIGHT",0,0)
+			--pointer:SetPoint("TOPRIGHT",choco,-5,0)
+		end
+	else
+		if align == "left"  then
+			pointer.index = 1
+			pointer.align = "left"
+			pointer:SetPoint("TOPLEFT",self,6,-1)
+		elseif align == "right" then
+			pointer.index = 1
+			pointer.align = "right"
+			pointer:SetPoint("TOPLEFT",self,"TOPRIGHT",0,0)
+			--pointer:SetPoint("TOPRIGHT",choco,-5,0)
+		else
+			pointer.index = 1
+			pointer.align = "center"
+			--pointer:SetPoint("CENTER",self,"CENTER",0,0)
+			pointer:SetPoint("TOPLEFT",self,self:GetWidth()/2,0)
+		end
+	end
+	pointer:Show()
+end
+
+function Bar:Drag(name)
+	local choco = self.chocolist[name]
+	choco:SetAlpha(0.8)
+	--if choco.OnLeave then choco:OnLeave() end
+	createDummy(self, choco, name)
+	createPointer(self, choco)
+	self:UpdateBar()
+end
+
+function Bar:Drop(choco, pos)
+	local settings = choco.settings
+	settings.index = self.pointer.index
+	settings.align = self.pointer.align
+	choco:SetAlpha(1)
+	self.pointer:Hide()
+	
+	local oldbar = ChocolateBar:GetBar(settings.barName)
+	--check if droped from different bar
+	if oldbar == self then -- same bar
+		self.dummy:Hide()
+		self.dummy = nil
+		self.chocolist[choco.obj.name] = choco --replace dummy with original
+	else -- cross bars
+		oldbar.chocolist[choco.obj.name] = nil -- remove from oldbar
+		oldbar.dummy:Hide()
+		oldbar.dummy = nil
+		oldbar:UpdateBar(true)
+		self:AddChocolatePiece(choco, choco.obj.name)
+	end
+	self:UpdateBar(true)
+end
+
+function Bar:LoseFocus(name)
+	self.pointer:Hide()
+end
+
+function Bar:GetFocus(name)
+	local choco = ChocolateBar:GetChocolate(name)
+	createPointer(self, choco)
+end
+
 -- rearange all chocolate chocolist in a given bar
 -- called only when chocolates are added, removed or moved
 function Bar:UpdateBar(updateindex)
 	local chocolates =  self.chocolist
-	templeft, tempcenter ,tempright = SortTab(chocolates)
+	-- set left plugins
+	local tempList = SortList(chocolates, "left")
+	self.chocoMostLeft = tempList[#tempList] and tempList[#tempList][1]
 	
 	local yoff = 0
 	local relative = nil
-	for i, v in ipairs(templeft) do
+	for i, v in ipairs(tempList) do
 		local choco = v[1]
 		choco:ClearAllPoints()
 		if(relative)then
 			choco:SetPoint("TOPLEFT",relative,"TOPRIGHT", 0,0)
 			choco:SetPoint("BOTTOM",self,"BOTTOM", 0,0)
+			choco:SetPoint("TOP",self,0,0)
 		else
 			choco:SetPoint("TOPLEFT",self, 6,yoff)
 			choco:SetPoint("BOTTOM",self,"BOTTOM", 0,0)
+			choco:SetPoint("TOP",self,0,0)
 		end
 		if updateindex then
 			choco.settings.index = i
@@ -358,32 +449,46 @@ function Bar:UpdateBar(updateindex)
 		relative = choco
 	end
 	
-	local centerIndex = math.ceil(#tempcenter/2)
-	local v = tempcenter[centerIndex]
+	-- set center plugins
+	tempList = SortList(chocolates, "center")
+	local l = tempList[#tempList]
+	self.chocoCenterLeft = tempList[1] and tempList[1][1]
+	self.chocoCenterRight = tempList[#tempList] and tempList[#tempList][1]
+	
+	local centerIndex = math.ceil(#tempList/2)
+	local v = tempList[centerIndex]
 	local relative = nil
 	
 	if v then 
-		relative = v[1]
-		if relative then
-			relative:ClearAllPoints()
-			relative:SetPoint("CENTER",self, 0,yoff)
-			relative:SetPoint("BOTTOM",self,"BOTTOM", 0,0)
+		centerChoco = v[1]
+		last = nil
+		if centerChoco then
+			local r = mod(centerIndex,2)
+			if r > 0 and #tempList > 1 then --uneven
+				centerChoco:ClearAllPoints()
+				centerChoco:SetPoint("RIGHT",self,"CENTER", 0,yoff)
+				centerChoco:SetPoint("BOTTOM",self,"BOTTOM", 0,0)
+			else --even
+				centerChoco:ClearAllPoints()
+				centerChoco:SetPoint("CENTER",self, 0,yoff)
+				centerChoco:SetPoint("BOTTOM",self,"BOTTOM", 0,0)
+			end
+			local relativeR = centerChoco
 			
-			local relativeL = relative
-			local relativeR = relative
-			
-			for i, v in ipairs(tempcenter) do
+			for i, v in ipairs(tempList) do
 				local choco = v[1]
-				if i > centerIndex then
+				if i <= centerIndex then
+					if last then
+					last:ClearAllPoints()
+					last:SetPoint("TOPRIGHT",choco,"TOPLEFT", 0,0)
+					last:SetPoint("BOTTOM",self,"BOTTOM", 0,0)
+					end
+					last = choco
+				elseif i > centerIndex then
 					choco:ClearAllPoints()
-					choco:SetPoint("TOPRIGHT",relativeR,"TOPLEFT", 0,0)
+					choco:SetPoint("TOPLEFT",relativeR,"TOPRIGHT", 0,0)
 					choco:SetPoint("BOTTOM",self,"BOTTOM", 0,0)
 					relativeR = choco
-				elseif i < centerIndex then
-					choco:ClearAllPoints()
-					choco:SetPoint("TOPLEFT",relativeL,"TOPRIGHT", 0,0)
-					choco:SetPoint("BOTTOM",self,"BOTTOM", 0,0)
-					relativeL = choco
 				end
 				if updateindex then
 					choco.settings.index = i
@@ -393,8 +498,12 @@ function Bar:UpdateBar(updateindex)
 		end
 	end
 	
+	-- set right plugins
+	tempList = SortList(chocolates, "right")
+	self.chocoMostRight = tempList[#tempList] and tempList[#tempList][1]
+	
 	relative = nil
-	for i, v in ipairs(tempright) do
+	for i, v in ipairs(tempList) do
 		local choco = v[1]
 		choco:ClearAllPoints()
 		if(relative)then
