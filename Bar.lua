@@ -268,30 +268,42 @@ function Bar:GetChocolateAtCursor()
 	local centerL = self.chocoCenterLeft and self.chocoCenterLeft:GetLeft() or self:GetWidth()/2
 	local centerR = self.chocoCenterRight and self.chocoCenterRight:GetRight() or self:GetWidth()/2
 	
-	
 	local nameCenterLeft = self.chocoCenterLeft and self.chocoCenterLeft:GetName()
 	local nameCenterRight = self.chocoCenterRight and self.chocoCenterRight:GetName()
-	--Debug("nameCenterLeft=",nameCenterLeft,"nameCenterRight=",nameCenterRight)
 	
 	if x < 8 then
 		return nil, "left" , "left" --left half on left side
 	end
+	
 	Debug("left",math.ceil(left),"centerL",math.ceil(centerL),"centerR",math.ceil(centerR),"right",math.ceil(right),"x",x)
-	if x < centerL then
-		if x < centerL/2+left/2 then
-			--Debug("x < centerL-left/2",x < centerL/2+left/2,centerL/2+left/2,"left half on left side")
+	local centerPos = "center"
+	-- nocenter
+	if left > centerR then 
+		if x < right/2+left/2 then
+			return self.chocoMostLeft, "right", "left" --left half on right side 
+		else
+			return self.chocoMostRight, "left" , "right" --right half on right side,
+		end
+	end
+	if right < centerL then 
+		if x < right/2+left/2 then
 			return self.chocoMostLeft, "right" , "left" --left half on left side
 		else
-			--Debug("x < centerL-left/2",x < centerL/2+left/2,centerL/2+left/2,"right half on left side")
+			return self.chocoMostRight, "left" , "right" --right half on left side
+		end
+	end
+	-- with center
+	if x < centerL then
+		if x < centerL/2+left/2 then
+			return self.chocoMostLeft, "right" , "left" --left half on left side
+		else
 			return self.chocoCenterLeft, "left" , "center" --right half on left side
 		end
 	end
 	if x > centerR and x < right then
 		if x < right/2+centerR/2 then
-			--Debug("x < right-centerR/2",x < right/2+centerR/2,right/2+centerR/2,"left half on right side")
 			return self.chocoCenterRight, "right", "center" --left half on right side 
 		else
-			--Debug("x < right-centerR/2",x < right/2+centerR/2,right/2+centerR/2,"right half on right side")
 			return self.chocoMostRight, "left" , "right" --right half on right side,
 		end
 	end
