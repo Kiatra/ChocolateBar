@@ -248,19 +248,13 @@ function Bar:GetChocolateAtCursor()
 	
 	x = x/s
 	for k, v in pairs(self.chocolist) do
-		--if v:GetLeft() and v:GetRight() then
-			if x > v:GetLeft() and x < v:GetRight() then --plugin found
-				--check positon of cursor on the plugin
-				--Debug(x, v:GetLeft(),v:GetWidth(), v:GetLeft()+v:GetWidth()/2)
-				if x < v:GetLeft()+v:GetWidth()/2 then
-					return v,"left"
-				else
-					return v,"right"
-				end
+		if x > v:GetLeft() and x < v:GetRight() then --plugin found
+			if x < v:GetLeft()+v:GetWidth()/2 then
+				return v,"left"
+			else
+				return v,"right"
 			end
-		--else
-		--	Debug("error:",v:GetName(), v:GetLeft(),v:GetRight())
-		--end
+		end
 	end
 	-- cursor over bar
 	local left = self.chocoMostLeft and self.chocoMostLeft:GetRight() or self:GetLeft()
@@ -275,7 +269,7 @@ function Bar:GetChocolateAtCursor()
 		return nil, "left" , "left" --left half on left side
 	end
 	
-	Debug("left",math.ceil(left),"centerL",math.ceil(centerL),"centerR",math.ceil(centerR),"right",math.ceil(right),"x",x)
+	--Debug("left",math.ceil(left),"centerL",math.ceil(centerL),"centerR",math.ceil(centerR),"right",math.ceil(right),"x",x)
 	local centerPos = "center"
 	-- nocenter
 	if left > centerR then 
