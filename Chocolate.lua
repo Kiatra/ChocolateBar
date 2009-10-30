@@ -159,7 +159,7 @@ end
 
 -- some code taken with permission from fortress 
 local function OnEnter(self)
-	if db.combathidebar and ChocolateBar.InCombat or ChocolateBar.dragging then return end
+	if (db.combathidebar and ChocolateBar.InCombat) or ChocolateBar.dragging then return end
 	
 	local obj  = self.obj
 	local name = self.name
@@ -248,11 +248,25 @@ local function OnDragStart(frame)
 		local bar = frame.bar
 		ChocolateBar:TempDisAutohide(true)
 		ChocolateBar.dragging = true
-		if frame.OnLeave then frame:OnLeave() end
+		if GameTooltip:IsShown() then
+			GameTooltip:Hide()
+		else
+			-- hide libqtip and libtablet tooltips
+			local kids = {UIParent:GetChildren()}
+			for _, child in ipairs(kids) do
+				for i = 1, child:GetNumPoints() do
+					local _,relativeTo,_,_,_ = child:GetPoint(i)
+					if relativeTo == frame then
+						Debug(i,child:GetName())
+						child:Hide()
+					end
+				end
+			end
+		end
 		Drag:Start(bar, frame.name, frame)
 		frame:StartMoving()
 		frame.isMoving = true
-		GameTooltip:Hide();
+		
 	end
 end
 
@@ -261,6 +275,7 @@ local function OnDragStop(frame)
 		frame:StopMovingOrSizing()
 		frame.isMoving = false
 		Drag:Stop(frame)
+		
 		ChocolateBar.dragging = false
 		frame:SetParent(frame.bar)
 		ChocolateBar:TempDisAutohide()
