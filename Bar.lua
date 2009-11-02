@@ -518,7 +518,7 @@ function Bar:UpdateBar(updateindex)
 			--list them downwards
 			--choco:SetPoint("TOPLEFT",relative,"BOTTOMLEFT", 0,0)
 		else
-			choco:SetPoint("TOPRIGHT",self, 6,yoff)
+			choco:SetPoint("TOPRIGHT",self, 0,yoff)
 			choco:SetPoint("BOTTOM",self,"BOTTOM", 0,0)
 		end
 		if updateindex then

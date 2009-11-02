@@ -248,21 +248,19 @@ local function OnDragStart(frame)
 		local bar = frame.bar
 		ChocolateBar:TempDisAutohide(true)
 		ChocolateBar.dragging = true
-		if GameTooltip:IsShown() then
-			GameTooltip:Hide()
-		else
-			-- hide libqtip and libtablet tooltips
-			local kids = {UIParent:GetChildren()}
-			for _, child in ipairs(kids) do
-				for i = 1, child:GetNumPoints() do
-					local _,relativeTo,_,_,_ = child:GetPoint(i)
-					if relativeTo == frame then
-						Debug(i,child:GetName())
-						child:Hide()
-					end
+		GameTooltip:Hide()
+		-- hide libqtip and libtablet tooltips
+		local kids = {UIParent:GetChildren()}
+		for _, child in ipairs(kids) do
+			for i = 1, child:GetNumPoints() do
+				local _,relativeTo,_,_,_ = child:GetPoint(i)
+				if relativeTo == frame then
+					Debug(i,child:GetName())
+					child:Hide()
 				end
 			end
 		end
+		ChocolateBar:SetDropPoins(frame)
 		Drag:Start(bar, frame.name, frame)
 		frame:StartMoving()
 		frame.isMoving = true
@@ -275,7 +273,7 @@ local function OnDragStop(frame)
 		frame:StopMovingOrSizing()
 		frame.isMoving = false
 		Drag:Stop(frame)
-		
+		ChocolateBar.dropFrames:Hide()
 		ChocolateBar.dragging = false
 		frame:SetParent(frame.bar)
 		ChocolateBar:TempDisAutohide()
