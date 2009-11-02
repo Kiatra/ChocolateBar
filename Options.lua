@@ -10,9 +10,8 @@ local L = LibStub("AceLocale-3.0"):GetLocale("ChocolateBar")
 
 --local version = GetAddOnMetadata("ChocolateBar","Version") or ""
 local version = GetAddOnMetadata("ChocolateBar","X-Curse-Packaged-Version") or ""
-local db
+local db, moreChocolate
 local index = 0
-local moreChocolate
 local firstOpen = true
 
 
@@ -727,11 +726,17 @@ local function dropDisable(frame, choco)
 end
 
 local function createDropPoint(name, dropfunc, offx, text, texture)
-	local frame = CreateFrame("Frame", name, UIParent)
+	if not ChocolateBar.dropFrames then
+		dropFrames = CreateFrame("Frame", nil, UIParent)
+		dropFrames:SetWidth(400)
+		dropFrames:SetHeight(100)
+		ChocolateBar.dropFrames = dropFrames
+	end
+	local frame = CreateFrame("Frame", name, ChocolateBar.dropFrames)
 	frame:SetWidth(100)
 	frame:SetHeight(100)
 	frame:SetFrameStrata("DIALOG")
-	frame:SetPoint("TOPLEFT",(UIParent:GetWidth()/2)-100+offx,-100)
+	frame:SetPoint("TOPLEFT",offx,0)
 	--ChocolateBar:Debug(UIParent:GetScale())
 	--frame:SetPoint("CENTER",offx,250*UIParent:GetEffectiveScale() )
 	
@@ -760,6 +765,19 @@ local function createDropPoint(name, dropfunc, offx, text, texture)
 	frame.Drag = function(frame) end
 	frame.LoseFocus = function(frame) frame:SetBackdropColor(0,0,0,1) end
 	Drag:RegisterFrame(frame)
+	return frame
+end
+
+function ChocolateBar:SetDropPoins(parent)
+	local frame = ChocolateBar.dropFrames
+	frame:ClearAllPoints()
+	frame:SetClampedToScreen(true)
+	local x,y = parent:GetCenter()
+	local vhalf = (y > UIParent:GetHeight() / 2) and "TOP" or "BOTTOM"
+	local yoff = (y > UIParent:GetHeight() / 2) and -100 or 100
+	local xoff = frame:GetWidth() / 2
+	frame:SetPoint(vhalf.."LEFT","UIParent",x-xoff,yoff)
+	frame:Show()
 end
 
 function ChocolateBar:UpdateDB(data)
@@ -792,7 +810,7 @@ function ChocolateBar:RegisterOptions()
 			scale = 1,
 			height = 21,
 			moveFrames = true,
-			strata = "HIGH",
+			strata = "DIALOG",
 			gap = 7,
 			moreBar = "none",
 			moreBarDelay = 4,
@@ -865,9 +883,9 @@ function ChocolateBar:RegisterOptions()
 	LSM:Register("statusbar", "Gloss","Interface\\AddOns\\ChocolateBar\\pics\\Gloss")
 	LSM:Register("statusbar", "DarkBottom","Interface\\AddOns\\ChocolateBar\\pics\\DarkBottom")
 
-	createDropPoint("ChocolateTextDrop", dropText, -150,L["Toggle Text"],"Interface/ICONS/INV_Inscription_Tradeskill01")
-	createDropPoint("ChocolateCenterDrop", dropCenter,0,L["Align Center"],"Interface/Icons/Spell_Holy_GreaterBlessingofSalvation") 
-	createDropPoint("ChocolateDisableDrop", dropDisable, 150,L["Disable Plugin"], "Interface/ICONS/Spell_ChargeNEgative")
+	createDropPoint("ChocolateTextDrop", dropText, 0,L["Toggle Text"],"Interface/ICONS/INV_Inscription_Tradeskill01")
+	createDropPoint("ChocolateCenterDrop", dropCenter,150,L["Align Center"],"Interface/Icons/Spell_Holy_GreaterBlessingofSalvation") 
+	createDropPoint("ChocolateDisableDrop", dropDisable, 300,L["Disable Plugin"], "Interface/ICONS/Spell_ChargeNEgative")
 end
 
 function ChocolateBar:ChatCommand(input)
