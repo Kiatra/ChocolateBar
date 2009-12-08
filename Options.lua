@@ -796,7 +796,6 @@ function ChocolateBar:RegisterOptions()
 	aceoptions.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
     local optionsFrame = AceCfgDlg:AddToBlizOptions("ChocolateBar", "ChocolateBar")
 	AceCfgDlg:SetDefaultSize("ChocolateBar", 600, 600)
-	AceCfgDlg:SelectGroup("ChocolateBar", "chocolates")
 	
 	self:RegisterChatCommand("cb", "ChatCommand")
     self:RegisterChatCommand("chocolatebar", "ChatCommand")
@@ -890,6 +889,7 @@ end
 
 function ChocolateBar:ChatCommand(input)
 	if not input or input:trim() == "" then
+		AceCfgDlg:SelectGroup("ChocolateBar", "chocolates")
 		AceCfgDlg:Open("ChocolateBar")
     else
         LibStub("AceConfigCmd-3.0").HandleCommand(ChocolateBar, "cb", "ChocolateBar", input)
