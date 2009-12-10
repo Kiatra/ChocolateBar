@@ -149,7 +149,7 @@ end
 
 -- some code taken with permission from fortress 
 local function PrepareTooltip(frame, anchorFrame)
-	if frame and anchorFrame then
+	if frame and frame.SetOwner and anchorFrame then
 		frame:SetOwner(anchorFrame, "ANCHOR_NONE")
 		frame:ClearAllPoints()
 		local a1, a2 = GetAnchors(anchorFrame)

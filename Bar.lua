@@ -268,6 +268,9 @@ function Bar:GetChocolateAtCursor()
 	if x < 8 then
 		return nil, "left" , "left" --left half on left side
 	end
+	if x > UIParent:GetWidth()-8 then
+		return nil, "right", "right"
+	end
 	
 	--Debug("left",math.ceil(left),"centerL",math.ceil(centerL),"centerR",math.ceil(centerR),"right",math.ceil(right),"x",x)
 	local centerPos = "center"
@@ -368,11 +371,11 @@ function Bar:UpdateDragChocolate()
 		end
 	else
 		if align == "left"  then
-			pointer.index = 1
+			pointer.index = 0.5
 			pointer.align = "left"
 			pointer:SetPoint("TOPLEFT",self,6,-1)
 		elseif align == "right" then
-			pointer.index = 1
+			pointer.index = 0.5
 			pointer.align = "right"
 			pointer:SetPoint("TOPLEFT",self,"TOPRIGHT",0,0)
 			--pointer:SetPoint("TOPRIGHT",choco,-5,0)
