@@ -39,7 +39,6 @@ externals:
 		tag: latest
 	libs/LibJostle-3.0:
 		url: svn://svn.wowace.com/wow/libjostle-3-0/mainline/trunk
-		tag: latest
 		
 tools-used: 
 	- libdatabroker-1-1
