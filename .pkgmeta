@@ -35,7 +35,7 @@ externals:
 		url: svn://svn.wowace.com/wow/libsharedmedia-3-0/mainline/trunk/LibSharedMedia-3.0
 		tag: latest
 	libs/AceGUI-3.0-SharedMediaWidgets:
-		url: git://git.wowace.com/wow/ace-gui-3-0-shared-media-widgets/mainline.git
+		url: svn://svn.wowace.com/wow/ace-gui-3-0-shared-media-widgets/mainline/trunk/AceGUI-3.0-SharedMediaWidgets
 		tag: latest
 	libs/LibJostle-3.0:
 		url: svn://svn.wowace.com/wow/libjostle-3-0/mainline/trunk
