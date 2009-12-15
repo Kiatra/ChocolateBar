@@ -953,17 +953,22 @@ function ChocolateBar:RemoveBarOptions(name)
 	barOptions[name] = nil
 end
 
-function ChocolateBar:AddObjectOptions(name,icon, t)
+function ChocolateBar:AddObjectOptions(name,icon, t, label)
 	
 	--local curse = GetAddOnMetadata(name,"X-Curse-Packaged-Version") or ""
 	--local version = GetAddOnMetadata(name,"Version") or ""
 	
 	t = t or "not set"
-	local cleanName = string.gsub(name, "\|c........", "")
+	local cleanName
+	if label then 
+		cleanName = string.gsub(label, "\|c........", "")
+	else
+		cleanName = string.gsub(name, "\|c........", "")
+	end
 	cleanName = string.gsub(cleanName, "\|r", "")
 	cleanName = string.gsub(cleanName, "[%c \127]", "")
 
-	--use cleanName of name becaus aceconfig does not linke some characters in the plugin names
+	--use cleanName of name becaus aceconfig does not like some characters in the plugin names
 	chocolateOptions[cleanName] = {
 		name = GetName,
 		desc = name,

@@ -116,7 +116,7 @@ function ChocolateBar:LibDataBroker_DataObjectCreated(event, name, obj, noupdate
 	if db.objSettings[name].enabled then
 		self:EnableDataObject(name, noupdate)
 	end
-	self:AddObjectOptions(name, obj.icon, t)
+	self:AddObjectOptions(name, obj.icon, t,obj.label)
 end
 
 function ChocolateBar:EnableDataObject(name, noupdate)
