@@ -461,8 +461,10 @@ local function GetBarName(info)
 	bar = ChocolateBar:GetBar(name)
 	if bar and bar.settings.align == "top" then
 		name = name.." (top) "
-	else
+	elseif bar and bar.settings.align == "bottom" then
 		name = name.." (bottom) "
+	else
+		name = name.." (custom) "
 	end
 	return name
 end
@@ -511,8 +513,12 @@ local function MoveUp(info, value)
 				index = ChocolateBar:GetNumBars("top")+1
 				SetBarAlign(info, "top")
 			end
-		else --top bar
+		elseif db.barSettings[name].align == "top" then
 			index = index -1.5
+		else
+			db.barSettings[name].align = "top"
+			index = 0
+			SetBarAlign(info, "top")
 		end
 		bar.settings.index = index
 		ChocolateBar:AnchorBars()
@@ -526,38 +532,20 @@ local function MoveDown(info, value)
 	if bar then
 		if db.barSettings[name].align == "bottom" then
 			index = index -1.5
-		else --top bar
+		elseif db.barSettings[name].align == "top" then
 			index = index +1.5
 			if index > (ChocolateBar:GetNumBars("top")+1) then
 				index = ChocolateBar:GetNumBars("bottom")+1
 				SetBarAlign(info, "bottom")
 			end
+		else
+			db.barSettings[name].align = "top"
+			index = 0
+			SetBarAlign(info, "top")
 		end
 		bar.settings.index = index
 		ChocolateBar:AnchorBars()
 	end
-end
-
-local function isMoveDown(info)
-	local name = info[#info-2]
-	bar = ChocolateBar:GetBar(name)
-	if db.barSettings[name].align == "bottom" then
-		if bar.settings.index < 1.5 then
-			return true
-		end
-	end
-	return false
-end
-
-local function isMoveUp(info)
-	local name = info[#info-2]
-	bar = ChocolateBar:GetBar(name)
-	if db.barSettings[name].align == "top" then
-		if bar.settings.index < 1.5 then
-			return true
-		end
-	end
-	return false
 end
 	
 local function getAutoHide(info, value)
@@ -573,14 +561,162 @@ local function setAutoHide(info, value)
 	--ChocolateBar:UpdateBarOptions("UpdateAutoHide")
 end
 
---return true if RemoveBar is disabled
-function isRemoveBar(info)
+local function GetBarWidth(info)
+	Debug(GetScreenWidth(),UIParent:GetEffectiveScale(),UIParent:GetWidth(),math.floor(GetScreenWidth()))
 	local name = info[#info-2]
-	if name == "ChocolateBar1" then
-		return true
-	else
-		return false
+	local maxBarWidth = math.floor(GetScreenWidth())
+	
+	return db.barSettings[name].width
+end
+
+local function SetBarWidth(info, value)
+	Debug("SetBarWidht", value)
+	local name = info[#info-2]
+	local settings = db.barSettings[name]
+	settings.width = value
+	bar = ChocolateBar:GetBar(name)
+	if value > GetScreenWidth() or value == 0 then
+		bar:SetPoint("RIGHT", "UIParent" ,"RIGHT",0, 0);
+	else	
+		local relative, relativePoint
+		settings.barPoint ,relative ,relativePoint,settings.barOffx ,settings.barOffy = bar:GetPoint()
+		bar:ClearAllPoints()
+		bar:SetPoint(settings.barPoint, "UIParent",settings.barOffx ,settings.barOffy)	
+		bar:SetWidth(value)
 	end
+end
+
+local moveBarDummy
+function OnDragStart(self)
+	self:StartMoving()
+	self.isMoving = true
+end
+
+function OnDragStop(self)
+	self:StopMovingOrSizing()
+	self.isMoving = false
+end
+
+local function SetLockedBar(info, value)
+	Debug("SetLockedBar", value)
+	local name = info[#info-2]
+	local settings = db.barSettings[name]
+	bar = ChocolateBar:GetBar(name)
+	bar.locked = not value
+	if not value then
+		--unlock
+		if not moveBarDummy then
+			moveBarDummy = CreateFrame("Frame",bar)
+			moveBarDummy:SetBackdrop({bgFile = "Interface/Tooltips/UI-Tooltip-Background", 
+												nil, 
+												tile = true, tileSize = 16, edgeSize = 16, 
+												nil});
+			moveBarDummy:SetBackdropColor(1,0,0,1);
+			moveBarDummy:RegisterForDrag("LeftButton")
+			moveBarDummy:SetFrameStrata("FULLSCREEN_DIALOG")
+			moveBarDummy:SetFrameLevel(20)
+		end
+		moveBarDummy.bar = bar
+		moveBarDummy:SetAllPoints(bar)
+		moveBarDummy:Show()
+		
+		bar:RegisterForDrag("LeftButton")
+		bar:EnableMouse(true)
+		bar:SetMovable(true)
+		bar:SetScript("OnDragStart",OnDragStart)
+		bar:SetScript("OnDragStop",OnDragStop)
+		for k, v in pairs(bar.chocolist) do
+			v:Hide()
+		end
+	else
+		for k, v in pairs(bar.chocolist) do
+			v:Show()
+		end
+		bar:SetScript("OnDragStart", nil)
+		settings.barPoint ,relative ,relativePoint,settings.barOffx ,settings.barOffy = bar:GetPoint()
+		settings.align = "custom"
+		moveBarDummy:Hide()
+	end
+end
+
+local function GetFreeBar(info)
+	local name = info[#info-2]
+	Debug("GetManageBar", db.barSettings[name].align)
+	return db.barSettings[name].align == "custom"
+end
+
+local function SetFreeBar(info, value)
+	local name = info[#info-2]
+	db.barSettings[name].align = value and "custom" or "top"
+	bar = ChocolateBar:GetBar(name)
+	if not value then
+		bar:SetPoint("RIGHT", "UIParent" ,"RIGHT",0, 0);
+	end
+	bar:UpdateJostle(db)
+	ChocolateBar:AnchorBars()
+end
+
+local function GetBarOffX(info, value)
+	--Debug(info[#info-1],info[#info-2],info[#info-3],info[#info])
+	local name = info[#info-2]
+	return db.barSettings[name].barOffx
+end
+
+local function GetBarOffY(info, value)
+	local name = info[#info-2]
+	return db.barSettings[name].barOffy
+end
+
+local function SetBarOff(info, value)
+	local name = info[#info-2]
+	local offtype = info[#info]
+	bar = ChocolateBar:GetBar(name)
+	local settings = db.barSettings[name]
+	bar = ChocolateBar:GetBar(name)	
+	local relative, relativePoint
+	settings.barPoint ,relative ,relativePoint,settings.barOffx ,settings.barOffy = bar:GetPoint()
+	if offtype == "xoff" then
+		settings.barOffx = value
+	else
+		settings.barOffy = value
+	end
+	bar:ClearAllPoints()
+	bar:SetPoint(settings.barPoint, "UIParent",settings.barOffx ,settings.barOffy)	
+end
+
+local function GetLockedBar(info, value)
+	local name = info[#info-2]
+	bar = ChocolateBar:GetBar(name)
+	return not bar.locked
+end
+
+
+-------------
+-- bar options disabled/enabled
+--------------------
+local function IsDisabledFreeMove(info)
+	local name = info[#info-2]
+	return not (db.barSettings[name].align == "custom")
+end
+
+--return true if RemoveBar is disabled
+function IsDisabledRemoveBar(info)
+	local name = info[#info-2]
+	return name == "ChocolateBar1"
+end
+
+local function IsDisabledMoveDown(info)
+	local name = info[#info-2]
+	bar = ChocolateBar:GetBar(name)
+	local settings = db.barSettings[name]
+	return settings.align == "custom" or (settings.align == "bottom" and  bar.settings.index < 1.5)
+end
+
+local function IsDisabledMoveUp(info)
+	local name = info[#info-2]
+	bar = ChocolateBar:GetBar(name)
+	local settings = db.barSettings[name]
+	return settings.align == "custom" or (settings.align == "top" and  bar.settings.index < 1.5)
 end
 
 -----
@@ -605,11 +741,7 @@ end
 local function GetType(info)
 	local cleanName = info[#info-2]
 	local name = chocolateOptions[cleanName].desc
-	if db.objSettings[name].type == "data source" then
-		return L["Type"]..": "..L["Data Source"].."\n"
-	else
-		return L["Type"]..": "..L["Launcher"].."\n"
-	end
+	return db.objSettings[name].type == "data source" and L["Type"]..": "..L["Data Source"].."\n" or L["Type"]..": "..L["Launcher"].."\n"
 end
 
 local function SetEnabled(info, value)
@@ -679,15 +811,11 @@ local function GetIconImage(info, name)
 	return "Interface\\AddOns\\ChocolateBar\\pics\\ChocolatePiece"
 end
 
-local function HasIcon(info)
+local function IsDisabledIcon(info)
 	local cleanName = info[#info-2]
 	local name = chocolateOptions[cleanName].desc
 	local obj = ChocolateBar:GetDataObject(name)
-	if obj and obj.icon then	
-		return false
-	else
-		return true 
-	end
+	return not (obj and obj.icon) --return true if there is no icon
 end
 
 local function GetHeaderName(info)
@@ -776,7 +904,7 @@ function ChocolateBar:SetDropPoins(parent)
 	local vhalf = (y > UIParent:GetHeight() / 2) and "TOP" or "BOTTOM"
 	local yoff = (y > UIParent:GetHeight() / 2) and -100 or 100
 	local xoff = frame:GetWidth() / 2
-	frame:SetPoint(vhalf.."LEFT","UIParent",x-xoff,yoff)
+	frame:SetPoint(vhalf.."LEFT",parent.bar,x-xoff,yoff)
 	frame:Show()
 end
 
@@ -785,7 +913,7 @@ function ChocolateBar:UpdateDB(data)
 end
 
 function ChocolateBar:RegisterOptions()
-	self.db = LibStub("AceDB-3.0"):New("ChocolateBarDB", defaults)
+	self.db = LibStub("AceDB-3.0"):New("ChocolateBarDB", defaults, "Default")
 	
 	moreChocolate = LibStub("LibDataBroker-1.1"):GetDataObjectByName("MoreChocolate")
 	if moreChocolate then
@@ -815,7 +943,6 @@ function ChocolateBar:RegisterOptions()
 			moreBarDelay = 4,
 			fontPath = " ",
 			fontSize = 12,
-			--textureName = "DarkBottom",
 			background = {
 				textureName = "DarkBottom",
 				texture = "Interface\\AddOns\\ChocolateBar\\pics\\DarkBottom",
@@ -827,15 +954,6 @@ function ChocolateBar:RegisterOptions()
 				edgeSize = 8,
 				barInset = 3,
 			},
-			--[[
-			["color"] = {
-					["a"] = 0.9400000013411045,
-					["b"] = 0.4,
-					["g"] = 0.3647058823529412,
-					["r"] = 0.3882352941176471,
-				},
-				["textureName"] = "DarkBottom",
-			--]]
 			textColor = nil,
 			barSettings = {
 				['*'] = {
@@ -846,6 +964,7 @@ function ChocolateBar:RegisterOptions()
 					showText = true,
 					showIcon = true,
 					index = 10,
+					width = 0,
 				},
 				['ChocolateBar1'] = {
 					barName = "ChocolateBar1",
@@ -855,6 +974,7 @@ function ChocolateBar:RegisterOptions()
 					showText = true,
 					showIcon = true,
 					index = 1,
+					width = 0,
 				},
 			},
 			objSettings = {
@@ -904,28 +1024,12 @@ function ChocolateBar:AddBarOptions(name)
 		type = "group",
 		order = GetBarIndex,
 		args={
-			barSettings = {
+			general = {
 				inline = true,
 				name=name,
 				type="group",
-				order = 1,
+				order = 0,
 				args={
-					moveup = {
-						type = 'execute',
-						order = 3,
-						name = L["Move Up"],
-						desc = L["Move Up"],
-						func = MoveUp,
-						disabled = isMoveUp,
-					},
-					movedown = {
-						type = 'execute',
-						order = 4,
-						name = L["Move Down"],
-						desc = L["Move Down"],
-						func = MoveDown,
-						disabled = isMoveDown,
-					},
 					autohide = {
 						type = 'toggle',
 						order = 5,
@@ -940,8 +1044,94 @@ function ChocolateBar:AddBarOptions(name)
 						name = L["Remove Bar"],
 						desc = L["Eat a whole chocolate bar, oh my.."],
 						func = EatBar,
-						disabled = isRemoveBar,
+						disabled = IsDisabledRemoveBar,
 						confirm = true,
+					},
+					free = {
+						type = 'toggle',
+						order = -1,
+						name = L["Free Placement"],
+						desc = L["Enable free placement for this bar"],
+						get = GetFreeBar,
+						set = SetFreeBar,
+					},
+				},
+			},
+			move = {
+				inline = true,
+				name=L["Managed Placement"],
+				type="group",
+				order = 2,
+				args={
+					moveup = {
+						type = 'execute',
+						order = 3,
+						name = L["Move Up"],
+						desc = L["Move Up"],
+						func = MoveUp,
+						disabled = IsDisabledMoveUp,
+					},
+					movedown = {
+						type = 'execute',
+						order = 4,
+						name = L["Move Down"],
+						desc = L["Move Down"],
+						func = MoveDown,
+						disabled = IsDisabledMoveDown,
+					},
+				},
+			},
+			free = {
+				inline = true,
+				name=L["Free Placement"],
+				type="group",
+				order = -1,
+				args={
+					locked = {
+						type = 'toggle',
+						order = 7,
+						name = L["Locked"],
+						desc = L["Unlock to to move the bar anywhere you want."],
+						get = GetLockedBar,
+						set = SetLockedBar,
+						disabled = IsDisabledFreeMove,
+					},
+					width = {
+						type = 'range',
+						order = 8,
+						name = L["Bar Width"],
+						desc = L["Set a width for the bar."],
+						min = 0,
+						--max = maxBarWidth,
+						max = 3000,
+						step = 1,
+						get = GetBarWidth,
+						set = SetBarWidth,
+						disabled = IsDisabledFreeMove,
+					},
+					xoff = {
+						type = 'range',
+						order = 9,
+						name = L["Horizontal Offset"],
+						desc = L["Horizontal Offset"],
+						min = -2000,
+						max = 2000,
+						step = 1,
+						get = GetBarOffX,
+						set = SetBarOff,
+						disabled = IsDisabledFreeMove,
+					},
+					yoff = {
+						type = 'range',
+						order = 10,
+						name = L["Vertical Offset"],
+						desc = L["Vertical Offset"],
+						min = -2000,
+						max = 2000,
+						step = 1,
+						get = GetBarOffY,
+						set = SetBarOff,
+						disabled = IsDisabledFreeMove,
 					},
 				},
 			},
@@ -1014,7 +1204,7 @@ function ChocolateBar:AddObjectOptions(name,icon, t, label)
 						desc = L["Show Icon"],
 						get = GetIcon,
 						set = SetIcon,
-						disabled = HasIcon,
+						disabled = IsDisabledIcon,
 					},
 					width = {
 						type = 'range',

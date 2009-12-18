@@ -363,8 +363,18 @@ function ChocolateBar:AnchorBars()
 		end
 		if settings.align == "top" then
 			table.insert(temptop,{v,index})
-		else
+		elseif settings.align == "bottom" then
 			table.insert(tempbottom,{v,index})
+		else
+			v:ClearAllPoints()
+			if settings.barPoint and settings.barOffx and settings.barOffy then
+				Debug("ChocolateBar:AnchorBars() v:SetPoint",v:GetName())
+				v:SetPoint(settings.barPoint, "UIParent",settings.barOffx ,settings.barOffy)
+			else
+				Debug("ChocolateBar:AnchorBars() table.insert",v:GetName())
+				settings.align = "top"
+				table.insert(temptop,{v,index})
+			end
 		end
 	end
 	table.sort(temptop, function(a,b)return a[2] < b[2] end)
