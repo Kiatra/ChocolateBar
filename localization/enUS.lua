@@ -2,9 +2,20 @@ local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
 local L = AceLocale:NewLocale("ChocolateBar", "enUS", true)
 if not L then return end
 
+L["Bar Width"] = true
+L["Set a width for the bar."] = true
+L["Locked"] = true
+L["Unlock to to move the bar anywhere you want."] = true
+
+L["Manage this Bar"] = true
+L["Enable free placement for this bar"] = true
+L["Managed Placement"] = true
+L["Free Placement"] = true
+L["Vertical Offset"] = true
+L["Horizontal Offset"] = true
+
 L["Textures"] = true
 L["Fonts and Textures"] = true
-
 L["Some of the fonts may depend on other addons."] = true
 L["Some of the textures may depend on other addons."] = true
 L["Font Size"] = true

@@ -14,12 +14,27 @@ function Bar:New(name, settings, db)
 	for k, v in pairs(Bar) do
 		frame[k] = v
 	end
+	--settings.width = 1638
 	
-	frame:SetHeight(db.height)
 	frame:SetPoint("TOPLEFT",-1,1);
 	--frame:SetPoint("TOPLEFT", settings.xoff, settings.yoff);
-	frame:SetPoint("RIGHT", "UIParent" ,"RIGHT",0, 0);
+	frame:SetClampedToScreen(true)
 	
+	if settings.width == 0 then
+		Debug("settings.width == 0 ")
+		frame:ClearAllPoints()
+		frame:SetPoint("TOPLEFT","UIParent",-1,1);
+		--frame:SetWidth(500);
+		frame:SetPoint("RIGHT", "UIParent" ,"RIGHT",0, 0);
+	else
+		frame:SetPoint("RIGHT", "UIParent",0, 0);
+		--if settings.width < GetScreenWidth() then
+		--	settings.width = GetScreenWidth()
+		--end
+		frame:SetWidth(settings.width)
+	end
+	
+	frame:SetHeight(db.height)
 	frame:EnableMouse(true)
 	frame:SetScript("OnEnter", function(self) 
 		if db.combathidebar and ChocolateBar.InCombat then return end
@@ -69,7 +84,7 @@ function Bar:UpdateJostle(db)
 		if db.moveFrames then
 			if self.settings.align == "bottom" then
 				jostle:RegisterBottom(self)
-			else
+			elseif  self.settings.align == "top" then
 				jostle:RegisterTop(self)
 			end
 		end
@@ -180,7 +195,6 @@ end
 
 function Bar:ShowAll()
 	--Timer:SetScript("OnUpdate", nil)
-	
 	self:SetAlpha(1)
 	local settings
 	for k, v in pairs(self.chocolist) do
@@ -334,7 +348,8 @@ local function createPointer(self, choco)
 	local pointer = self.pointer
 	if not pointer then
 		pointer = CreateFrame("Frame", "ChocolatePointer", self)
-		pointer:SetFrameStrata("DIALOG")
+		pointer:SetFrameStrata("FULLSCREEN_DIALOG")
+		pointer:SetFrameLevel(20)
 		pointer:SetWidth(15)
 		pointer:SetHeight(choco:GetHeight())
 		pointer.index = choco.settings.index
