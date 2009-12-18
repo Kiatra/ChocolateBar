@@ -615,6 +615,11 @@ local function SetLockedBar(info, value)
 			moveBarDummy:RegisterForDrag("LeftButton")
 			moveBarDummy:SetFrameStrata("FULLSCREEN_DIALOG")
 			moveBarDummy:SetFrameLevel(20)
+			moveBarDummy:SetScript("OnMouseUp", function() 
+				if arg1 == "RightButton" then
+					ChocolateBar:ChatCommand()
+				end
+			end)
 		end
 		moveBarDummy.bar = bar
 		moveBarDummy:SetAllPoints(bar)
@@ -635,7 +640,7 @@ local function SetLockedBar(info, value)
 		bar:SetScript("OnDragStart", nil)
 		settings.barPoint ,relative ,relativePoint,settings.barOffx ,settings.barOffy = bar:GetPoint()
 		settings.align = "custom"
-		moveBarDummy:Hide()
+		if moveBarDummy then moveBarDummy:Hide() end 
 	end
 end
 
@@ -647,13 +652,19 @@ end
 
 local function SetFreeBar(info, value)
 	local name = info[#info-2]
-	db.barSettings[name].align = value and "custom" or "top"
+	--db.barSettings[name].align = value and "custom" or "top"
+	Debug("SetFreeBar", db.barSettings[name].align,value,name)
 	bar = ChocolateBar:GetBar(name)
 	if not value then
+		SetLockedBar(info, true)
+		db.barSettings[name].align = "top"
 		bar:SetPoint("RIGHT", "UIParent" ,"RIGHT",0, 0);
+		ChocolateBar:AnchorBars()
+	else
+		db.barSettings[name].align = "custom"
 	end
 	bar:UpdateJostle(db)
-	ChocolateBar:AnchorBars()
+	Debug("SetFreeBar", db.barSettings[name].align,value,name)
 end
 
 local function GetBarOffX(info, value)
@@ -696,6 +707,7 @@ end
 --------------------
 local function IsDisabledFreeMove(info)
 	local name = info[#info-2]
+	Debug("IsDisabledFreeMove", not (db.barSettings[name].align == "custom"),db.barSettings[name].align,name)
 	return not (db.barSettings[name].align == "custom")
 end
 
