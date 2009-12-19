@@ -580,8 +580,9 @@ local function SetBarWidth(info, value)
 	else	
 		local relative, relativePoint
 		settings.barPoint ,relative ,relativePoint,settings.barOffx ,settings.barOffy = bar:GetPoint()
+		if settings.barOffy == 0 then settings.barOffy = 1 end  
 		bar:ClearAllPoints()
-		bar:SetPoint(settings.barPoint, "UIParent",settings.barOffx ,settings.barOffy)	
+		bar:SetPoint(settings.barPoint, "UIParent",settings.barOffx,settings.barOffy)	
 		bar:SetWidth(value)
 	end
 end
@@ -630,15 +631,20 @@ local function SetLockedBar(info, value)
 		bar:SetMovable(true)
 		bar:SetScript("OnDragStart",OnDragStart)
 		bar:SetScript("OnDragStop",OnDragStop)
+		bar:SetClampedToScreen(true)
 		for k, v in pairs(bar.chocolist) do
 			v:Hide()
 		end
 	else
+		bar:SetClampedToScreen(false)
 		for k, v in pairs(bar.chocolist) do
 			v:Show()
 		end
 		bar:SetScript("OnDragStart", nil)
 		settings.barPoint ,relative ,relativePoint,settings.barOffx ,settings.barOffy = bar:GetPoint()
+		if settings.barOffy == 0 then settings.barOffy = 1 end
+		bar:SetPoint(settings.barPoint, "UIParent",settings.barOffx,settings.barOffy)
+		Debug("settings.barOffy",settings.barOffy)
 		settings.align = "custom"
 		if moveBarDummy then moveBarDummy:Hide() end 
 	end
@@ -670,12 +676,14 @@ end
 local function GetBarOffX(info, value)
 	--Debug(info[#info-1],info[#info-2],info[#info-3],info[#info])
 	local name = info[#info-2]
-	return db.barSettings[name].barOffx
+	--return db.barSettings[name].barOffx
+	return db.barSettings[name].fineX
 end
 
 local function GetBarOffY(info, value)
 	local name = info[#info-2]
-	return db.barSettings[name].barOffy
+	--return db.barSettings[name].barOffy
+	return db.barSettings[name].fineY
 end
 
 local function SetBarOff(info, value)
@@ -687,12 +695,12 @@ local function SetBarOff(info, value)
 	local relative, relativePoint
 	settings.barPoint ,relative ,relativePoint,settings.barOffx ,settings.barOffy = bar:GetPoint()
 	if offtype == "xoff" then
-		settings.barOffx = value
+		settings.fineX = value
 	else
-		settings.barOffy = value
+		settings.fineY = value
 	end
 	bar:ClearAllPoints()
-	bar:SetPoint(settings.barPoint, "UIParent",settings.barOffx ,settings.barOffy)	
+	bar:SetPoint(settings.barPoint, "UIParent",settings.barOffx + settings.fineX ,settings.barOffy + settings.fineY)	
 end
 
 local function GetLockedBar(info, value)
@@ -973,20 +981,20 @@ function ChocolateBar:RegisterOptions()
 					align = "top",
 					autohide = false,
 					enabled = true,
-					showText = true,
-					showIcon = true,
 					index = 10,
 					width = 0,
+					--fineX = 0,
+					--fineY = 0,
 				},
 				['ChocolateBar1'] = {
 					barName = "ChocolateBar1",
 					align = "top",
 					autohide = false,
 					enabled = true,
-					showText = true,
-					showIcon = true,
 					index = 1,
 					width = 0,
+					--fineX = 0,
+					--fineY = 0,
 				},
 			},
 			objSettings = {
@@ -1019,9 +1027,13 @@ function ChocolateBar:RegisterOptions()
 	createDropPoint("ChocolateDisableDrop", dropDisable, 300,L["Disable Plugin"], "Interface/ICONS/Spell_ChargeNEgative")
 end
 
+local firstOpen = true
 function ChocolateBar:ChatCommand(input)
 	if not input or input:trim() == "" then
-		AceCfgDlg:SelectGroup("ChocolateBar", "chocolates")
+		if firstOpen then 
+			AceCfgDlg:SelectGroup("ChocolateBar", "chocolates")
+			firstOpen = false
+		end
 		AceCfgDlg:Open("ChocolateBar")
     else
         LibStub("AceConfigCmd-3.0").HandleCommand(ChocolateBar, "cb", "ChocolateBar", input)
@@ -1121,13 +1133,14 @@ function ChocolateBar:AddBarOptions(name)
 						set = SetBarWidth,
 						disabled = IsDisabledFreeMove,
 					},
+					--[[
 					xoff = {
 						type = 'range',
 						order = 9,
 						name = L["Horizontal Offset"],
 						desc = L["Horizontal Offset"],
-						min = -2000,
-						max = 2000,
+						min = -5,
+						max = 5,
 						step = 1,
 						get = GetBarOffX,
 						set = SetBarOff,
@@ -1138,13 +1151,14 @@ function ChocolateBar:AddBarOptions(name)
 						order = 10,
 						name = L["Vertical Offset"],
 						desc = L["Vertical Offset"],
-						min = -2000,
-						max = 2000,
+						min = -5,
+						max = 5,
 						step = 1,
 						get = GetBarOffY,
 						set = SetBarOff,
 						disabled = IsDisabledFreeMove,
 					},
+					--]]
 				},
 			},
 		},
