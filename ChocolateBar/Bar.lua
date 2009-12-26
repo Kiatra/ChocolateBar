@@ -14,23 +14,15 @@ function Bar:New(name, settings, db)
 	for k, v in pairs(Bar) do
 		frame[k] = v
 	end
-	--settings.width = 1638
 	
-	frame:SetPoint("TOPLEFT",-1,1);
-	--frame:SetPoint("TOPLEFT", settings.xoff, settings.yoff);
-	--frame:SetClampedToScreen(true)
-	
+	frame:SetPoint("TOPLEFT",-1,1);	
 	if settings.width == 0 then
 		Debug("settings.width == 0 ")
 		frame:ClearAllPoints()
 		frame:SetPoint("TOPLEFT","UIParent",-1,1);
-		--frame:SetWidth(500);
 		frame:SetPoint("RIGHT", "UIParent" ,"RIGHT",0, 0);
 	else
 		frame:SetPoint("RIGHT", "UIParent",0, 0);
-		--if settings.width < GetScreenWidth() then
-		--	settings.width = GetScreenWidth()
-		--end
 		frame:SetWidth(settings.width)
 	end
 	
@@ -211,16 +203,13 @@ end
 
 function Bar:Disable()
 	self:Hide()
-	jostle:Unregister(self)
+	if jostle then jostle:Unregister(self) end
 end
 
-local templeft = {}
-local tempright = {}
-local tempcenter = {}
 local function SortTab(tab)
-	templeft = {}
-	tempright = {}
-	tempcenter = {}
+	local templeft = {}
+	local tempright = {}
+	local tempcenter = {}
 	
 	for k,v in pairs(tab) do
 		local index = v["settings"]["index"]

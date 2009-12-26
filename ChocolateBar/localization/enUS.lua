@@ -2,11 +2,13 @@ local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
 local L = AceLocale:NewLocale("ChocolateBar", "enUS", true)
 if not L then return end
 
+
+L["Could not load ChocolateBar_Options, make sure it's enabled."] = true
+
 L["Bar Width"] = true
 L["Set a width for the bar."] = true
 L["Locked"] = true
 L["Unlock to to move the bar anywhere you want."] = true
-
 L["Manage this Bar"] = true
 L["Enable free placement for this bar"] = true
 L["Managed Placement"] = true
