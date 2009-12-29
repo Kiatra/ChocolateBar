@@ -492,12 +492,13 @@ end
 -- option functions
 --------
 function ChocolateBar:ChatCommand(input)
+	EnableAddOn("ChocolateBar_Options")
 	loaded, reason = LoadAddOn("ChocolateBar_Options")
 	Debug(loaded, reason)
 	if loaded then
 		ChocolateBar:OpenOptions(chocolateBars, db)
 	else
-		DEFAULT_CHAT_FRAME:AddMessage(L["Could not load ChocolateBar_Options, make sure it's enabled."])
+		DEFAULT_CHAT_FRAME:AddMessage(L["Could not load ChocolateBar_Options, make sure it's installed."])
 	end
 end
 

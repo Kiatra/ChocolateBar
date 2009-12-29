@@ -3,7 +3,7 @@ local L = AceLocale:NewLocale("ChocolateBar", "enUS", true)
 if not L then return end
 
 
-L["Could not load ChocolateBar_Options, make sure it's enabled."] = true
+L["Could not load ChocolateBar_Options, make sure it's installed."] = true
 
 L["Bar Width"] = true
 L["Set a width for the bar."] = true
