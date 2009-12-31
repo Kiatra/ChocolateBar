@@ -1168,7 +1168,7 @@ function ChocolateBar:OnProfileChanged(event, database, newProfileKey)
 	for name, obj in broker:DataObjectIterator() do
 	--for name, obj in pairs(dataObjects) do
 		if db.objSettings[name].enabled then
-			local choco = chocolateObjects[name]
+			local choco = self:GetChocolate(name)
 			if choco then
 				choco.settings = db.objSettings[name]
 			end
