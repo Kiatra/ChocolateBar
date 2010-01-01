@@ -5,6 +5,7 @@ local AceCfgDlg = LibStub("AceConfigDialog-3.0")
 local Drag = ChocolateBar.Drag
 local broker = LibStub("LibDataBroker-1.1")
 local L = LibStub("AceLocale-3.0"):GetLocale("ChocolateBar")
+local LSM = LibStub("LibSharedMedia-3.0")
 
 local version = GetAddOnMetadata("ChocolateBar","X-Curse-Packaged-Version") or ""
 local db, moreChocolate
