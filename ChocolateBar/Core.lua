@@ -440,8 +440,9 @@ function ChocolateBar:AnchorBars()
 		else
 			v:ClearAllPoints()
 			if settings.barPoint and settings.barOffx and settings.barOffy then
-				Debug("ChocolateBar:AnchorBars() v:SetPoint",v:GetName())
+				Debug("ChocolateBar:AnchorBars() v:SetPoint",v:GetName(),settings.barPoint,settings.barOffx,settings.barOffy)
 				v:SetPoint(settings.barPoint, "UIParent",settings.barOffx ,settings.barOffy)
+				v:SetWidth(settings.width)
 			else
 				Debug("ChocolateBar:AnchorBars() table.insert",v:GetName())
 				settings.align = "top"
