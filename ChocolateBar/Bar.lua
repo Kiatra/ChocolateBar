@@ -16,6 +16,8 @@ function Bar:New(name, settings, db)
 	end
 	
 	frame:SetPoint("TOPLEFT",-1,1);	
+	--frame:SetPoint("TOPLEFT", settings.xoff, settings.yoff);
+	--frame:SetClampedToScreen(true)
 	if settings.width == 0 then
 		Debug("settings.width == 0 ")
 		frame:ClearAllPoints()

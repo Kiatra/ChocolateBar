@@ -572,7 +572,7 @@ local function setAutoHide(info, value)
 end
 
 local function GetBarWidth(info)
-	Debug(GetScreenWidth(),UIParent:GetEffectiveScale(),UIParent:GetWidth(),math.floor(GetScreenWidth()))
+	--Debug(GetScreenWidth(),UIParent:GetEffectiveScale(),UIParent:GetWidth(),math.floor(GetScreenWidth()))
 	local name = info[#info-2]
 	local maxBarWidth = math.floor(GetScreenWidth())
 	
@@ -580,7 +580,7 @@ local function GetBarWidth(info)
 end
 
 local function SetBarWidth(info, value)
-	Debug("SetBarWidht", value)
+	--Debug("SetBarWidht", value)
 	local name = info[#info-2]
 	local settings = db.barSettings[name]
 	settings.width = value
@@ -638,6 +638,8 @@ local function SetLockedBar(info, value)
 		
 		bar:RegisterForDrag("LeftButton")
 		bar:EnableMouse(true)
+		bar:SetFrameStrata("FULLSCREEN_DIALOG")
+		bar:SetFrameLevel(10)
 		bar:SetMovable(true)
 		bar:SetScript("OnDragStart",OnDragStart)
 		bar:SetScript("OnDragStop",OnDragStop)
@@ -652,17 +654,20 @@ local function SetLockedBar(info, value)
 		end
 		bar:SetScript("OnDragStart", nil)
 		settings.barPoint ,relative ,relativePoint,settings.barOffx ,settings.barOffy = bar:GetPoint()
+		Debug("bar:GetPoint()",settings.barPoint ,relative ,relativePoint,settings.barOffx ,settings.barOffy)
 		if settings.barOffy == 0 then settings.barOffy = 1 end
 		bar:SetPoint(settings.barPoint, "UIParent",settings.barOffx,settings.barOffy)
-		Debug("settings.barOffy",settings.barOffy)
 		settings.align = "custom"
+		settings.width = bar:GetWidth()
+		bar:SetFrameStrata(db.strata)
+		bar:SetFrameLevel(1)
 		if moveBarDummy then moveBarDummy:Hide() end 
 	end
 end
 
 local function GetFreeBar(info)
 	local name = info[#info-2]
-	Debug("GetManageBar", db.barSettings[name].align)
+	--Debug("GetManageBar", db.barSettings[name].align)
 	return db.barSettings[name].align == "custom"
 end
 
