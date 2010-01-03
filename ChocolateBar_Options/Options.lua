@@ -21,8 +21,8 @@ local function GetStats(info)
 		if obj.type == "data source" then
 			data = data + 1
 		end
-		choco = ChocolateBar:GetChocolate(name)
-		if choco and choco.settings.enabled then
+		local settings = db.objSettings[name]
+		if settings and settings.enabled then
 			enabled = enabled +1
 		end
 	end
@@ -762,13 +762,16 @@ local function GetName(info)
 	local cleanName = info[#info]
 	local name = chocolateOptions[cleanName].desc
 	--local icon = chocolateOptions[cleanName].icon
+	local dataobj = broker:GetDataObjectByName(name)
 	if(not db.objSettings[name].enabled)then
+		-- disabled
 		--cleanName = "|TZZ"..cleanName.."|t|T"..icon..":18|t |cFFFF0000"..cleanName.."|r"
 		cleanName = "|H"..cleanName.."|h|cFFFF0000"..cleanName.."|r"
-	elseif ChocolateBar:GetChocolate(name).obj.type == "data source" then
-	--else
+	elseif dataobj and dataobj.type == "data source" then
+		--enabled data scurce
 		cleanName = "|H"..cleanName.."|h"..cleanName
 	else
+		--enabled launcher
 		cleanName = "|H"..cleanName.."|h|cFFBBBBBB"..cleanName.."|r"
 	end
 	return cleanName
@@ -777,7 +780,7 @@ end
 local function GetType(info)
 	local cleanName = info[#info-2]
 	local name = chocolateOptions[cleanName].desc
-	return db.objSettings[name].type == "data source" and L["Type"]..": "..L["Data Source"].."\n" or L["Type"]..": "..L["Launcher"].."\n"
+	return (broker:GetDataObjectByName(name).type == "data source" and L["Type"]..": "..L["Data Source"].."\n") or L["Type"]..": "..L["Launcher"].."\n"
 end
 
 local function SetEnabled(info, value)
@@ -1152,7 +1155,7 @@ function ChocolateBar:UpdateBarOptions(updatekey, value)
 end
 
 function ChocolateBar:OnProfileChanged(event, database, newProfileKey)
-	--Debug("OnProfileChanged", event, database, newProfileKey)
+	Debug("OnProfileChanged", event, database, newProfileKey)
 	db = database.profile
 	self:UpdateDB(db)
 	
@@ -1184,8 +1187,8 @@ function ChocolateBar:OnProfileChanged(event, database, newProfileKey)
 			self:DisableDataObject(name)
 		end
 	end
-	self:UpdateBars() --update chocolateBars here
-	
-	moreChocolate = LibStub("LibDataBroker-1.1"):GetDataObjectByName("MoreChocolate")
+	self:UpdateBars(true) --update chocolateBars here
+	self:UpdateChoclates("resizeFrame")
+	moreChocolate = broker:GetDataObjectByName("MoreChocolate")
 	if moreChocolate then moreChocolate:SetBar(db) end
 end
