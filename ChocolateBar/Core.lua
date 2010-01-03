@@ -181,7 +181,7 @@ function ChocolateBar:OnInitialize()
 					enabled = true,
 					showText = true,
 					showIcon = true,
-					index = 1,
+					index = 500,
 					width = 0,
 				},
 			},
@@ -203,8 +203,9 @@ function ChocolateBar:OnInitialize()
 	createDropPoint("ChocolateCenterDrop", dropCenter,150,L["Align Center"],"Interface/Icons/Spell_Holy_GreaterBlessingofSalvation") 
 	createDropPoint("ChocolateDisableDrop", dropDisable, 300,L["Disable Plugin"], "Interface/ICONS/Spell_ChargeNEgative")
 	
-	self:RegisterEvent("PLAYER_REGEN_DISABLED",ChocolateBar.OnEnterCombat)
-	self:RegisterEvent("PLAYER_REGEN_ENABLED",ChocolateBar.OnLeaveCombat)
+	self:RegisterEvent("PLAYER_REGEN_DISABLED","OnEnterCombat")
+	self:RegisterEvent("PLAYER_REGEN_ENABLED","OnLeaveCombat")
+	self:RegisterEvent("PLAYER_ENTERING_WORLD","OnEnterWorld")
 	db = self.db.profile
 	
 	local barSettings = db.barSettings
@@ -238,8 +239,14 @@ function ChocolateBar:OnDisable()
 	broker.UnregisterCallback(self, "LibDataBroker_DataObjectCreated")
 end
 
-function ChocolateBar.OnEnterCombat()
-	ChocolateBar.InCombat = true
+--/run LibStub("AceAddon-3.0"):GetAddon("ChocolateBar"):UpdateChoclates("updateSettings")
+function ChocolateBar:OnEnterWorld()
+	self:UpdateChoclates("resizeFrame")
+	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+end
+
+function ChocolateBar:OnEnterCombat()
+	self.InCombat = true
 	if db.combathidebar then
 		for name,bar in pairs(chocolateBars) do
 			bar.tempHide = bar:IsShown()
@@ -248,8 +255,8 @@ function ChocolateBar.OnEnterCombat()
 	end
 end
 
-function ChocolateBar.OnLeaveCombat()
-	ChocolateBar.InCombat = false
+function ChocolateBar:OnLeaveCombat()
+	self.InCombat = false
 	if db.combathidebar then
 		for name,bar in pairs(chocolateBars) do
 			if bar.tempHide then
@@ -415,9 +422,9 @@ function ChocolateBar:AddBar(name, settings, noupdate)
 	return name, bar
 end
 
-function ChocolateBar:UpdateBars()
+function ChocolateBar:UpdateBars(updateindex)
 	for k,v in pairs(chocolateBars) do
-		v:UpdateBar()
+		v:UpdateBar(updateindex)
 		v:UpdateAutoHide(db) 
 	end
 end
@@ -429,10 +436,7 @@ function ChocolateBar:AnchorBars()
 	
 	for k,v in pairs(chocolateBars) do
 		local settings = v.settings
-		local index = settings.index
-		if not index then
-			index = 500
-		end
+		local index = settings.index or 500
 		if settings.align == "top" then
 			table.insert(temptop,{v,index})
 		elseif settings.align == "bottom" then

@@ -150,9 +150,9 @@ function Bar:AddChocolatePiece(choco, name, noupdate)
 	
 	local settings = choco.settings
 	settings.barName = self:GetName() 
-	if not settings.index then
-		settings.index = 1
-	end
+	--if not settings.index then
+	--	settings.index = 1
+	--end
 	if not noupdate then
 		self:UpdateBar()
 	end
@@ -214,10 +214,7 @@ local function SortTab(tab)
 	local tempcenter = {}
 	
 	for k,v in pairs(tab) do
-		local index = v["settings"]["index"]
-		if not index then
-			index = 500
-		end
+		local index = v.settings.index or 500
 		if v.settings.align == "left" then
 			table.insert(templeft,{v,index})
 		elseif v.settings.align == "center" then
@@ -235,10 +232,7 @@ end
 local function SortList(list, side)
 	local temp = {}
 	for k,v in pairs(list) do
-		local index = v["settings"]["index"]
-		if not index then
-			index = 500
-		end
+		local index = v.settings.index or 500
 		if v.settings.align == side then
 			table.insert(temp,{v,index})
 		end
@@ -401,7 +395,7 @@ function Bar:Drag(name)
 	--if choco.OnLeave then choco:OnLeave() end
 	createDummy(self, choco, name)
 	createPointer(self, choco)
-	self:UpdateBar()
+	self:UpdateBar(true)
 end
 
 function Bar:Drop(choco, pos)
