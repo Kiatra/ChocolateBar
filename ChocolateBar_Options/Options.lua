@@ -122,16 +122,21 @@ local aceoptions = {
 							type = 'range',
 							order = 3,
 							name = L["Icon Size"],
-							desc = L["Icon Size"],
-							min = 0.01,
+							desc = L["Icon size in relation to the bar height."],
+							min = 0,
 							max = 1,
-							step = 0.01,
+							step = 0.001,
 							bigStep = 0.05,
 							isPercent = true,
 							get = function(name)
 								return db.iconSize
 							end,
 							set = function(info, value)
+								if value > 1 then
+									value = 1
+								elseif value < 0.01 then
+									value = 0.001
+								end
 								db.iconSize = value
 								ChocolateBar:UpdateBarOptions("UpdateHeight")
 							end,
