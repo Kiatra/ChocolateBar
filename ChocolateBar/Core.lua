@@ -33,7 +33,6 @@ end
 function ChocolateBar:Debug(...)
 	Debug(self, ...)
 end
-local Debug = ChocolateBar.Debug
 
 --------
 -- drop points functions
@@ -133,6 +132,7 @@ function ChocolateBar:OnInitialize()
 			hideonleave = false,
 			scale = 1,
 			height = 21,
+			iconSize = 0.75,
 			moveFrames = true,
 			strata = "DIALOG",
 			gap = 7,

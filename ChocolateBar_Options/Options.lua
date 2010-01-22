@@ -56,7 +56,7 @@ local function DisableLauncher(info)
 	end
 end
 
-aceoptions = { 
+local aceoptions = { 
     name = "ChocolateBar".." "..version,
     handler = ChocolateBar,
 	type='group',
@@ -111,13 +111,28 @@ aceoptions = {
 							max = 30,
 							step = 1,
 							get = function(name)
-								--return db.scale
 								return db.height
 							end,
 							set = function(info, value)
-								--db.scale = value
-								--ChocolateBar:UpdateBarOptions("UpdateScale")
 								db.height = value
+								ChocolateBar:UpdateBarOptions("UpdateHeight")
+							end,
+						},
+						iconSize = {
+							type = 'range',
+							order = 3,
+							name = L["Icon Size"],
+							desc = L["Icon Size"],
+							min = 0.01,
+							max = 1,
+							step = 0.01,
+							bigStep = 0.05,
+							isPercent = true,
+							get = function(name)
+								return db.iconSize
+							end,
+							set = function(info, value)
+								db.iconSize = value
 								ChocolateBar:UpdateBarOptions("UpdateHeight")
 							end,
 						},
@@ -851,6 +866,17 @@ local function GetIconImage(info, name)
 	return "Interface\\AddOns\\ChocolateBar\\pics\\ChocolatePiece"
 end
 
+local function GetIconCoords(info)
+	--Debug(GetIconCoords(info),info)
+	local cleanName = info[#info]
+	name = chocolateOptions[cleanName].desc
+	local obj = broker:GetDataObjectByName(name)
+	if obj and obj.iconCoords then	
+		Debug("obj.iconCoords",obj.iconCoords)
+		return obj.iconCoords	
+	end
+end
+
 local function IsDisabledIcon(info)
 	local cleanName = info[#info-2]
 	local name = chocolateOptions[cleanName].desc
@@ -900,7 +926,7 @@ function ChocolateBar:OpenOptions(chocolateBars, data)
 		for name, obj in broker:DataObjectIterator() do
 			ChocolateBar:AddObjectOptions(name, obj)
 		end
-		AceCfgDlg:SelectGroup("ChocolateBar", "chocolates")
+		--AceCfgDlg:SelectGroup("ChocolateBar", "chocolates")
 		firstOpen = false
 	end
 	
@@ -915,7 +941,6 @@ function ChocolateBar:AddBarOptions(name)
 	barOptions[name] = {
 		name = GetBarName,
 		desc = name,
-		icon = icon,
 		type = "group",
 		order = GetBarIndex,
 		args={
@@ -1054,13 +1079,15 @@ function ChocolateBar:AddObjectOptions(name,obj)
 	end
 	cleanName = string.gsub(cleanName, "\|r", "")
 	cleanName = string.gsub(cleanName, "[%c \127]", "")
-
+	
+	
 	--use cleanName of name becaus aceconfig does not like some characters in the plugin names
 	chocolateOptions[cleanName] = {
 		name = GetName,
 		desc = name,
 		icon = GetIconImage,
-		--iconCoords = GetIconCoords,
+		--iconTexCoords = obj.iconCoords,
+		iconCoords = GetIconCoords,
 		type = "group",
 		args={
 			chocoSettings = {
