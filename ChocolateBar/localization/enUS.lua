@@ -3,8 +3,9 @@ local L = AceLocale:NewLocale("ChocolateBar", "enUS", true)
 if not L then return end
 
 L["Icon Size"] = true
-L["Could not load ChocolateBar_Options, make sure it's installed."] = true
+L["Icon size in relation to the bar height."] = true
 
+L["Could not load ChocolateBar_Options, make sure it's installed."] = true
 L["Bar Width"] = true
 L["Set a width for the bar."] = true
 L["Locked"] = true
