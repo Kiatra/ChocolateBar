@@ -2,7 +2,7 @@ local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
 local L = AceLocale:NewLocale("ChocolateBar", "enUS", true)
 if not L then return end
 
-
+L["Icon Size"] = true
 L["Could not load ChocolateBar_Options, make sure it's installed."] = true
 
 L["Bar Width"] = true

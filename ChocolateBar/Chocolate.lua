@@ -1,4 +1,5 @@
 ﻿local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("ChocolateBar")
+local LSM = LibStub("LibSharedMedia-3.0")
 local ChocolatePiece = ChocolateBar.ChocolatePiece
 local Drag = ChocolateBar.Drag
 local Debug = ChocolateBar.Debug
@@ -46,12 +47,16 @@ local function SettingsUpdater(self, value)
 		end
 	end
 	
-	self.text:SetPoint("TOP", self, 0, 3)
-	self.text:SetPoint("BOTTOMRIGHT", self, 0, 0)
+	--self.text:SetPoint("TOP", self, 0, 3)
+	--self.text:SetPoint("BOTTOMRIGHT", self, 0, 0)
+	self.text:SetPoint("CENTER", self, 0, 0)
+	self.text:SetPoint("RIGHT", self, 0, 0)
 	
 	if self.icon then 
 		if settings.showIcon then 
-			self.icon:SetWidth(db.height-5)
+			--self.icon:SetWidth(db.height-5)
+			self.icon:SetWidth(db.height * db.iconSize)
+			self.icon:SetHeight(db.height * db.iconSize)
 			self.icon:Show()
 			self.text:SetPoint("LEFT", self.icon,"RIGHT", 1, 0)
 		else -- hide icon
@@ -80,9 +85,12 @@ end
 local function CreateIcon(self, icon)
 	local iconTex = self:CreateTexture()
 	local obj = self.obj
-	iconTex:SetWidth(db.height - 6)
-	iconTex:SetPoint("TOPLEFT", self, 0, -2)
-	iconTex:SetPoint("BOTTOM", self, 0, 4)
+	--iconTex:SetWidth(db.height - 6)
+	--iconTex:SetPoint("TOPLEFT", self, 0, -2)
+	--iconTex:SetPoint("BOTTOM", self, 0, 4)
+	iconTex:SetPoint("CENTER", self, 0, 0)
+	iconTex:SetPoint("LEFT", self, 0, 0)
+	
 	iconTex:SetTexture(icon)
 	if obj.iconCoords then
 		iconTex:SetTexCoord(unpack(obj.iconCoords))
@@ -301,7 +309,11 @@ function ChocolatePiece:New(name, obj, settings, database)
 	--chocolate:SetClampedToScreen(true)
 	
 	chocolate.text = chocolate:CreateFontString(nil, nil, "GameFontHighlight")
-    chocolate.text:SetFont(db.fontPath, db.fontSize) --will onl be set when db.fontPath is vald 
+    if db.fontPath == " " then
+		chocolate.text:SetFont(LSM:GetDefault("font"), db.fontSize)
+	else
+		chocolate.text:SetFont(db.fontPath, db.fontSize) --will onl be set when db.fontPath is valid 
+	end
 	chocolate.text:SetJustifyH("LEFT")
 	--chocolate.text:SetJustifyV("CENTER")
 	
