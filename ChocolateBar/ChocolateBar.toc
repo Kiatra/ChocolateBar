@@ -32,7 +32,6 @@ localization\zhTW.lua
 
 Core.lua
 DragAndDrop.lua
-Options.lua
 Chocolate.lua
 Bar.lua
 MoreChocolate.lua
