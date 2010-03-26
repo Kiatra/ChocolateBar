@@ -257,6 +257,18 @@ local aceoptions = {
 											db.combatdisbar = value
 									end,
 								},
+								disableoptons = {
+									type = 'toggle',
+									order = 2,
+									name = L["Disable Options"],
+									desc = L["Disable options dialog on right click"],
+									get = function(info, value)
+											return db.disableoptons
+									end,
+									set = function(info, value)
+											db.disableoptons = value
+									end,
+								},
 							},
 						},
 					},
