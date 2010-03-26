@@ -44,6 +44,7 @@ function Bar:New(name, settings, db)
 	frame:SetScript("OnMouseUp", function() 
 		if db.combatdisbar and ChocolateBar.InCombat then return end
 		if arg1 == "RightButton" then
+			if db.disableoptons and ChocolateBar.InCombat then return end
 			ChocolateBar:ChatCommand()
 		end
 	end)
