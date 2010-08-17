@@ -269,6 +269,33 @@ local aceoptions = {
 											db.disableoptons = value
 									end,
 								},
+								combatopacity = {
+									type = 'range',
+									order = 3,
+									name = L["Opacity"],
+									desc = L["Set the opacity of the bars during combat."],
+									min = 0,
+									max = 1,
+									step = 0.001,
+									bigStep = 0.05,
+									isPercent = true,
+									get = function(name)
+										return db.combatopacity
+									end,
+									set = function(info, value)
+										if value > 1 then
+											value = 1
+										elseif value < 0.01 then
+											value = 0.001
+										end
+										db.combatopacity = value
+										--ChocolateBar:UpdateBarOptions("UpdateOpacity")
+										for name,bar in pairs(ChocolateBar:GetBars()) do
+											bar.tempHide = bar:GetAlpha()
+											bar:SetAlpha(db.combatopacity)
+										end
+									end,
+								},
 							},
 						},
 					},
@@ -923,7 +950,7 @@ function ChocolateBar:RegisterOptions(data)
 	
 	LibStub("AceConfig-3.0"):RegisterOptionsTable("ChocolateBar", aceoptions)
 	aceoptions.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
-	local optionsFrame = AceCfgDlg:AddToBlizOptions("ChocolateBar", "ChocolateBar")
+	--local optionsFrame = AceCfgDlg:AddToBlizOptions("ChocolateBar", "ChocolateBar")
 	AceCfgDlg:SetDefaultSize("ChocolateBar", 600, 600)
 	
 	self.db.RegisterCallback(self, "OnProfileChanged", "OnProfileChanged")
@@ -943,7 +970,8 @@ function ChocolateBar:OpenOptions(chocolateBars, data)
 		for name, obj in broker:DataObjectIterator() do
 			ChocolateBar:AddObjectOptions(name, obj)
 		end
-		--AceCfgDlg:SelectGroup("ChocolateBar", "chocolates")
+		AceCfgDlg:SelectGroup("ChocolateBar", "chocolates")
+		AceCfgDlg:SelectGroup("ChocolateBar", "general")
 		firstOpen = false
 	end
 	
