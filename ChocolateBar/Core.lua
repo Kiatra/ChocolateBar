@@ -129,6 +129,7 @@ function ChocolateBar:OnInitialize()
 			combathidetip = false,
 			combathidebar = false,
 			combatdisbar = false,
+			combatopacity = 1,
 			hideonleave = false,
 			scale = 1,
 			height = 21,
@@ -214,6 +215,24 @@ function ChocolateBar:OnInitialize()
 		self:AddBar(k, v, true) --force no anchor update
 	end
 	self:AnchorBars()
+	
+	local optionPanel = CreateFrame( "Frame", "TabardChampionPanel", UIParent );
+	optionPanel.name = "ChocolateBar";
+	local button = CreateFrame("Button",nil,optionPanel, "UIPanelButtonTemplate")
+	button:SetWidth(150)
+	button:SetHeight(22)
+	button:SetScript("OnClick", function()
+		local currentFrame = InterfaceOptionsFrame
+		while currentFrame do
+			local lastFrame = currentFrame.lastFrame
+			HideUIPanel(currentFrame)
+			currentFrame = lastFrame
+		end
+		ChocolateBar:ChatCommand()
+	end)
+	button:SetText("Configure")
+	button:SetPoint("TOPLEFT",20,-20)
+	InterfaceOptions_AddCategory(optionPanel);
 end
 
 function ChocolateBar:OnEnable()
@@ -252,6 +271,11 @@ function ChocolateBar:OnEnterCombat()
 			bar.tempHide = bar:IsShown()
 			bar:Hide()
 		end
+	elseif db.combatopacity < 1 then
+		for name,bar in pairs(chocolateBars) do
+			bar.tempHide = bar:GetAlpha()
+			bar:SetAlpha(db.combatopacity)
+		end
 	end
 end
 
@@ -261,6 +285,12 @@ function ChocolateBar:OnLeaveCombat()
 		for name,bar in pairs(chocolateBars) do
 			if bar.tempHide then
 				bar:Show()
+			end
+		end
+	elseif db.combatopacity < 1 then
+		for name,bar in pairs(chocolateBars) do
+			if bar.tempHide then
+				bar:SetAlpha(1)
 			end
 		end
 	end
