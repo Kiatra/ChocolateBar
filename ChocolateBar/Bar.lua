@@ -1,4 +1,4 @@
-﻿local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("ChocolateBar")
+local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("ChocolateBar")
 local LSM = LibStub("LibSharedMedia-3.0")
 local Bar = ChocolateBar.Bar
 local chocolate = ChocolateBar.ChocolatePiece
@@ -41,9 +41,9 @@ function Bar:New(name, settings, db)
 		end
 	end)
 	
-	frame:SetScript("OnMouseUp", function() 
+	frame:SetScript("OnMouseUp", function(self, button) 
 		if db.combatdisbar and ChocolateBar.InCombat then return end
-		if arg1 == "RightButton" then
+		if button == "RightButton" then
 			if db.disableoptons and ChocolateBar.InCombat then return end
 			ChocolateBar:ChatCommand()
 		end
