@@ -170,6 +170,20 @@ local aceoptions = {
 									ChocolateBar:UpdateBarOptions("UpdateAutoHide")
 							end,
 						},
+						barRightClick = {
+							type = 'select',
+							values = {NONE=L["none"],OPTIONS=L["ChocolateBar Options"], 
+										BLIZZ=L["Blizzard Options"]},
+							order = 8,
+							name = L["Bar Right Click"],
+							desc = L["Select the action when right clicking on a bar."],
+							get = function() 
+								return db.barRightClick
+							end,
+							set = function(info, value)
+								db.barRightClick = value
+							end,
+						},
 					},
 				},
 				defaults = {
