@@ -45,7 +45,11 @@ function Bar:New(name, settings, db)
 		if db.combatdisbar and ChocolateBar.InCombat then return end
 		if button == "RightButton" then
 			if db.disableoptons and ChocolateBar.InCombat then return end
-			ChocolateBar:ChatCommand()
+			if db.barRightClick == "OPTIONS" then
+				ChocolateBar:ChatCommand()
+			elseif db.barRightClick == "BLIZZ" then
+				InterfaceOptionsFrame_OpenToCategory("ChocolateBar");
+			end
 		end
 	end)
 	

@@ -2,6 +2,12 @@ local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
 local L = AceLocale:NewLocale("ChocolateBar", "enUS", true)
 if not L then return end
 
+L["none"] = true
+L["ChocolateBar Options"] = true
+L["Blizzard Options"] = true
+L["Bar Right Click"] = true
+L["Select the action when right clicking on a bar."] = true
+
 L["Opacity"] = true
 L["Set the opacity of the bars during combat."] = true
 
