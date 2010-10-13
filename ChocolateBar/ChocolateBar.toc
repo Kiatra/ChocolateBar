@@ -1,4 +1,4 @@
-﻿## Interface: 30300
+﻿## Interface: 40000
 ## Title: ChocolateBar
 ## Notes: A display for LibDataBroker-1.1
 ## Author: yess
