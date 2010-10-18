@@ -698,9 +698,9 @@ local function SetLockedBar(info, value)
 			moveBarDummy:SetBackdropColor(1,0,0,1);
 			moveBarDummy:RegisterForDrag("LeftButton")
 			moveBarDummy:SetFrameStrata("FULLSCREEN_DIALOG")
-			moveBarDummy:SetFrameLevel(20)
-			moveBarDummy:SetScript("OnMouseUp", function() 
-				if arg1 == "RightButton" then
+			moveBarDummy:SetFrameLevel(10)
+			moveBarDummy:SetScript("OnMouseUp", function(self, btn) 
+				if btn == "RightButton" then
 					ChocolateBar:ChatCommand()
 				end
 			end)
@@ -712,7 +712,7 @@ local function SetLockedBar(info, value)
 		bar:RegisterForDrag("LeftButton")
 		bar:EnableMouse(true)
 		bar:SetFrameStrata("FULLSCREEN_DIALOG")
-		bar:SetFrameLevel(10)
+		bar:SetFrameLevel(20)
 		bar:SetMovable(true)
 		bar:SetScript("OnDragStart",OnDragStart)
 		bar:SetScript("OnDragStop",OnDragStop)
