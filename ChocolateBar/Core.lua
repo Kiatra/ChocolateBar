@@ -118,13 +118,7 @@ end
 -- Ace3 callbacks
 --------
 function ChocolateBar:OnInitialize()
-	--self:RegisterOptions()
-	self.db = LibStub("AceDB-3.0"):New("ChocolateBarDB", defaults, "Default")
-	
-	self:RegisterChatCommand("cb", "ChatCommand")
-    self:RegisterChatCommand("chocolatebar", "ChatCommand")
-	
-	self.db:RegisterDefaults({
+	local defaults = {
 		profile = {
 			combathidetip = false,
 			combathidebar = false,
@@ -191,7 +185,12 @@ function ChocolateBar:OnInitialize()
 		char = {
 			debug = false,
 		}
-	})
+	}
+	
+	self.db = LibStub("AceDB-3.0"):New("ChocolateBarDB", defaults, "Default")
+	
+	self:RegisterChatCommand("cb", "ChatCommand")
+    self:RegisterChatCommand("chocolatebar", "ChatCommand")
 	
 	db = self.db.profile
 	LSM:Register("statusbar", "Tooltip", "Interface\\Tooltips\\UI-Tooltip-Background")
