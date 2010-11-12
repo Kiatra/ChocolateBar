@@ -856,6 +856,24 @@ local function GetType(info)
 	return (broker:GetDataObjectByName(name).type == "data source" and L["Type"]..": "..L["Data Source"].."\n") or L["Type"]..": "..L["Launcher"].."\n"
 end
 
+local function GetAlignment(info)
+	local cleanName = info[#info-2]
+	local name = chocolateOptions[cleanName].desc
+	return db.objSettings[name].align
+end
+
+local function SetAlignment(info, value)
+	local cleanName = info[#info-2]
+	local name = chocolateOptions[cleanName].desc
+	db.objSettings[name].align = value
+	choco = ChocolateBar:GetChocolate(name)
+    db.objSettings[name].index = 500
+	if choco and choco.bar then
+		choco.bar:UpdateBar(true)
+		--choco.bar:UpdateBar()
+	end
+end
+
 local function SetEnabled(info, value)
 	local cleanName = info[#info-2]
 	local name = chocolateOptions[cleanName].desc
@@ -973,7 +991,7 @@ function ChocolateBar:RegisterOptions(data)
 end
 
 local firstOpen = true
-function ChocolateBar:OpenOptions(chocolateBars, data)
+function ChocolateBar:OpenOptions(chocolateBars, data, pluginName)
 	local AceCfgDlg = LibStub("AceConfigDialog-3.0")
 	
 	if firstOpen then
@@ -987,6 +1005,10 @@ function ChocolateBar:OpenOptions(chocolateBars, data)
 		AceCfgDlg:SelectGroup("ChocolateBar", "chocolates")
 		AceCfgDlg:SelectGroup("ChocolateBar", "general")
 		firstOpen = false
+	end
+	if pluginName then
+		Debug("pluginName=",pluginName)
+		AceCfgDlg:SelectGroup("ChocolateBar", "chocolates",pluginName)
 	end
 	
 	if not input or input:trim() == "" then
@@ -1124,6 +1146,8 @@ function ChocolateBar:RemoveBarOptions(name)
 	barOptions[name] = nil
 end
 
+local alignments = {left=L["Left"],center=L["Center"], right=L["Right"]}
+
 function ChocolateBar:AddObjectOptions(name,obj)
 	--local curse = GetAddOnMetadata(name,"X-Curse-Packaged-Version") or ""
 	--local version = GetAddOnMetadata(name,"Version") or ""
@@ -1139,8 +1163,7 @@ function ChocolateBar:AddObjectOptions(name,obj)
 	cleanName = string.gsub(cleanName, "\|r", "")
 	cleanName = string.gsub(cleanName, "[%c \127]", "")
 	
-	
-	--use cleanName of name becaus aceconfig does not like some characters in the plugin names
+	--use cleanName of name because aceconfig does not like some characters in the plugin names
 	chocolateOptions[cleanName] = {
 		name = GetName,
 		desc = name,
@@ -1199,6 +1222,15 @@ function ChocolateBar:AddObjectOptions(name,obj)
 						step = 1,
 						get = GetWidth,
 						set = SetWidth,
+					},
+					alignment = {
+						type = 'select',
+						order = 6,
+						values = alignments,
+						name = L["Alignment"],
+						desc = L["Alignment"],
+						get = GetAlignment,
+						set = SetAlignment,
 					},
 				},
 			},

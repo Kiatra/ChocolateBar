@@ -45,11 +45,26 @@ local function dropText(frame, choco)
 		frame:SetBackdropColor(0,0,0,1)
 end
 
-local function dropCenter(frame, choco)
+local function dropOptions(frame, choco)
+		--[[
 		local name = choco.name
 		db.objSettings[name].align = "center"
 		db.objSettings[name].stickcenter = true
 		choco.bar:ResetDrag(choco, name)
+		frame:SetBackdropColor(0,0,0,1)
+		--]]
+		local obj = choco.obj
+		local name = obj.name
+		local label = obj.label
+		if label then 
+			cleanName = string.gsub(label, "\|c........", "")
+		else
+			cleanName = string.gsub(name, "\|c........", "")
+		end
+		cleanName = string.gsub(cleanName, "\|r", "")
+		cleanName = string.gsub(cleanName, "[%c \127]", "")
+		ChocolateBar:ChatCommand(cleanName)
+		choco.bar:ResetDrag(choco, choco.name)
 		frame:SetBackdropColor(0,0,0,1)
 end
 
@@ -201,7 +216,8 @@ function ChocolateBar:OnInitialize()
 	LSM:Register("statusbar", "DarkBottom","Interface\\AddOns\\ChocolateBar\\pics\\DarkBottom")
 
 	createDropPoint("ChocolateTextDrop", dropText, 0,L["Toggle Text"],"Interface/ICONS/INV_Inscription_Tradeskill01")
-	createDropPoint("ChocolateCenterDrop", dropCenter,150,L["Align Center"],"Interface/Icons/Spell_Holy_GreaterBlessingofSalvation") 
+	--createDropPoint("ChocolateCenterDrop", dropOptions,150,L["Options"],"Interface/Icons/Spell_Holy_GreaterBlessingofSalvation") 
+	createDropPoint("ChocolateCenterDrop", dropOptions,150,L["Options"],"Interface/Icons/INV_Gizmo_02") 
 	createDropPoint("ChocolateDisableDrop", dropDisable, 300,L["Disable Plugin"], "Interface/ICONS/Spell_ChargeNEgative")
 	
 	self:RegisterEvent("PLAYER_REGEN_DISABLED","OnEnterCombat")
@@ -526,12 +542,12 @@ end
 --------
 -- option functions
 --------
-function ChocolateBar:ChatCommand(input)
+function ChocolateBar:ChatCommand(name)
 	EnableAddOn("ChocolateBar_Options")
 	loaded, reason = LoadAddOn("ChocolateBar_Options")
 	Debug(loaded, reason)
 	if loaded then
-		ChocolateBar:OpenOptions(chocolateBars, db)
+		ChocolateBar:OpenOptions(chocolateBars, db, name)
 	else
 		DEFAULT_CHAT_FRAME:AddMessage(L["Could not load ChocolateBar_Options, make sure it's installed."])
 	end

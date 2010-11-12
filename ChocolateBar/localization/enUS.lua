@@ -2,6 +2,12 @@ local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
 local L = AceLocale:NewLocale("ChocolateBar", "enUS", true)
 if not L then return end
 
+L["Options"] = true
+L["Alignment"] = true
+L["Left"] = true
+L["Right"] = true
+L["Center"] = true
+
 L["none"] = true
 L["ChocolateBar Options"] = true
 L["Blizzard Options"] = true
@@ -34,7 +40,6 @@ L["Some of the textures may depend on other addons."] = true
 L["Font Size"] = true
 L["Font"] = true
 L["Toggle Text"] = true
-L["Align Center"] = true
 L["Disable Plugin"] = true
 L["Colors and Textures"] = true
 L["Look and Feel"] = true
