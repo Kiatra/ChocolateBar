@@ -136,6 +136,7 @@ end
 function Bar:ResetDrag(choco, name)
 	self.chocolist[name] = choco
 	self.dummy:Hide()
+	self.dummy = nil
 	choco:SetAlpha(1)
 	self:UpdateBar()
 end
