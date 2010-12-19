@@ -50,6 +50,10 @@ function Bar:New(name, settings, db)
 			elseif db.barRightClick == "BLIZZ" then
 				InterfaceOptionsFrame_OpenToCategory("ChocolateBar");
 			end
+		else
+			if db.moreBar == self:GetName() then
+				self:Hide()
+			end
 		end
 	end)
 	
@@ -116,11 +120,10 @@ end
 
 function Bar:UpdateTexture(db)
 	--local background = LSM:Fetch("statusbar", db.background.texture)
-	local background = db.background.texture
 	local bg = {
-		bgFile = background, 
+		bgFile = db.background.texture, 
 		edgeFile = "Interface/Tooltips/UI-Tooltip-Border", 
-		tile = false, tileSize = 16, edgeSize = 12, 
+		tile = db.background.tile, tileSize = db.background.tileSize, edgeSize = db.background.edgeSize, 
 		--insets = { left = 4, right = 4, top = 4, bottom = 4}
 		insets = { left = 0, right = 0, top = 0, bottom = 0}
 	}
