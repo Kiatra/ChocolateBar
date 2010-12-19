@@ -326,7 +326,7 @@ local aceoptions = {
 							type = "group",
 							order = 1,
 							args ={
-								texture = {
+								textureStatusbar = {
 									type = 'select',
 									dialogControl = 'LSM30_Statusbar', --Select your widget here
 									values = AceGUIWidgetLSMlists.statusbar,
@@ -342,6 +342,85 @@ local aceoptions = {
 										ChocolateBar:UpdateBarOptions("UpdateTexture")
 									end,
 								},
+								--[[
+								textureBackground = {
+									type = 'select',
+									dialogControl = 'LSM30_Background', --Select your widget here
+									values = AceGUIWidgetLSMlists.background,
+									order = 1,
+									name = L["Background Texture"],
+									desc = L["Some of the textures may depend on other addons."],
+									get = function() 
+										return db.background.textureName
+									end,
+									set = function(info, value)
+										db.background.texture = LSM:Fetch("background", value)
+										db.background.textureName = value
+										ChocolateBar:UpdateBarOptions("UpdateTexture")
+									end,
+								},
+								textureTile = {
+									type = 'toggle',
+									order = 1,
+									name = "Tile",
+									desc = "Tile",
+									get = function()
+											return db.background.tile
+									end,
+									set = function(info, value)
+											db.background.tile = value
+											ChocolateBar:UpdateBarOptions("UpdateTexture")
+									end,
+								},
+								textureTileSize = {
+									type = 'range',
+									order = 3,
+									name = "TileSize",
+									desc = "Tile",
+									min = 1,
+									max = 256,
+									step = 1,
+									bigStep = 5,
+									isPercent = false,
+									get = function(name)
+										return db.background.tileSize
+									end,
+									set = function(info, value)
+										if value > 256 then
+											value = 256
+										elseif value < 1 then
+											value = 1
+										end
+										db.background.tileSize = value
+										ChocolateBar:UpdateBarOptions("UpdateTexture")
+									end,
+								},
+								]]
+								--[[
+								textureEdgeSize = {
+									type = 'range',
+									order = 3,
+									name = "EdgeSize",
+									desc = "Tile",
+									min = 1,
+									max = 256,
+									step = 1,
+									bigStep = 5,
+									isPercent = false,
+									get = function(name)
+										return db.background.edgeSize
+									end,
+									set = function(info, value)
+										if value > 256 then
+											value = 256
+										elseif value < 1 then
+											value = 1
+										end
+										db.background.edgeSize = value
+										ChocolateBar:UpdateBarOptions("UpdateTexture")
+									end,
+								},
+								]]
 								colour = {
 									type = "color",
 									order = 1,
