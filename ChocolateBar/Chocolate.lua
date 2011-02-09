@@ -218,7 +218,11 @@ local function OnLeave(self)
 	if bar.autohide then
 		bar:HideAll()
 	end
-
+	
+	if obj.OnTooltipShow then
+		GameTooltip:Hide()
+	end
+	
 	if db.combathidetip and ChocolateBar.InCombat then return end
 	if obj.OnLeave then
 		obj.OnLeave(self)
