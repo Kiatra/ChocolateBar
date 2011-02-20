@@ -9,24 +9,19 @@ local db
 local function resizeFrame(self)
 	local settings = self.settings
 	local width = db.gap
-	if self.name == "QuickAddonList" then Debug("QuickAddonList gap",width) end
 	if self.icon and settings.showIcon then
-		if self.name == "QuickAddonList" then Debug("QuickAddonList has icon") end
 		width = width + self.icon:GetWidth()
 	end
 	if settings.showText then
-		if self.name == "QuickAddonList" then Debug("QuickAddonList has text") end
 		if settings.width == 0 then
-			if self.name == "QuickAddonList" then Debug("QuickAddonList self.text:GetStringWidth()",self.text:GetStringWidth()) end
 			local textWidth = self.text:GetStringWidth()
 			width = width + textWidth
 		else
 			width = width + settings.width
 		end
 	end
-	if self.name == "QuickAddonList" then Debug("QuickAddonList width",width) end
-	--Debug("width",width)
 	self:SetWidth(width)
+	if self.bar then self.bar:UpdateCenter() end
 end
 
 local function TextUpdater(frame, value)
@@ -178,9 +173,9 @@ local function OnEnter(self)
 	
 	local obj  = self.obj
 	local name = self.name
-	Debug(name,self.settings.index)	
-	if self.bar.autohide then
-		local bar = self.bar
+	--Debug(name,self.settings.index)	
+	local bar = self.bar
+	if bar.autohide then
 		bar:ShowAll()
 	end
 	
@@ -346,7 +341,7 @@ function ChocolatePiece:New(name, obj, settings, database)
 	chocolate:SetMovable(true)
 	chocolate:SetScript("OnDragStart", OnDragStart)
 	chocolate:SetScript("OnDragStop", OnDragStop)
-	SettingsUpdater(chocolate, settings.showText )
+	SettingsUpdater(chocolate, settings.showText)
 	return chocolate
 end
 
