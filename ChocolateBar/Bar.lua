@@ -6,6 +6,20 @@ local Debug = ChocolateBar.Debug
 local jostle = LibStub("LibJostle-3.0", true)
 local pairs = pairs
 
+local listCenter
+local counter = 0
+local delay = 1
+local wait = 0
+local updateframe = CreateFrame("Frame")
+local function OnUpdate(self, elapsed)
+	counter = counter + elapsed
+	if counter >= delay then
+		counter = 0
+		wait = 0
+		updateframe:SetScript("OnUpdate", nil) 
+	end
+end
+
 function Bar:New(name, settings, db)
 	local frame = CreateFrame("Frame",name,UIParent)
 	frame.chocolist = {} --create list of chocolate chocolist in the bar
@@ -468,21 +482,22 @@ function Bar:UpdateBar(updateindex)
 	end
 	
 	-- set center plugins
-	tempList = SortList(chocolates, "center")
-	local l = tempList[#tempList]
-	self.chocoCenterLeft = tempList[1] and tempList[1][1]
-	self.chocoCenterRight = tempList[#tempList] and tempList[#tempList][1]
+	listCenter = SortList(chocolates, "center")
+	local l = listCenter[#listCenter]
+	self.chocoCenterLeft = listCenter[1] and listCenter[1][1]
+	self.chocoCenterRight = listCenter[#listCenter] and listCenter[#listCenter][1]
 	
-	local centerIndex = math.ceil(#tempList/2)
-	local v = tempList[centerIndex]
+	local centerIndex = math.ceil(#listCenter/2)
+	local v = listCenter[centerIndex]
 	local relative = nil
 	
 	if v then 
-		centerChoco = v[1]
-		last = nil
+		local centerChoco = v[1]
+		self.centerChoco = centerChoco
+		local last = nil
 		if centerChoco then
 			local r = mod(centerIndex,2)
-			if r > 0 and #tempList > 1 then --uneven
+			if r > 0 and #listCenter > 1 then --uneven
 				centerChoco:ClearAllPoints()
 				centerChoco:SetPoint("RIGHT",self,"CENTER", 0,yoff)
 				centerChoco:SetPoint("BOTTOM",self,"BOTTOM", 0,0)
@@ -493,7 +508,7 @@ function Bar:UpdateBar(updateindex)
 			end
 			local relativeR = centerChoco
 			
-			for i, v in ipairs(tempList) do
+			for i, v in ipairs(listCenter) do
 				local choco = v[1]
 				if i <= centerIndex then
 					if last then
@@ -511,9 +526,10 @@ function Bar:UpdateBar(updateindex)
 				if updateindex then
 					choco.settings.index = i
 				end
-			end
-			
+			end	
 		end
+		wait = 0
+		self:UpdateCenter()
 	end
 	
 	-- set right plugins
@@ -538,4 +554,29 @@ function Bar:UpdateBar(updateindex)
 		end
 		relative = choco
 	end
+end
+
+function Bar:UpdateCenter()
+	local centerChoco = self.centerChoco --the chocolate the others are aligend to
+	if not centerChoco or wait > 0 then return end
+	
+	local totalwidth = 0
+	local centerChocoPosX = 0
+	--get the total width of all center chocolate's and the relative position of the chocolate they are aligend to
+	for i, v in ipairs(listCenter) do
+		local choco = v[1]
+		if choco.settings.index == math.ceil(#listCenter/2) then 
+			centerChocoPosX = totalwidth
+		end
+		totalwidth = totalwidth + choco:GetWidth()
+	end
+	
+	local deltaX = totalwidth/2 - centerChocoPosX
+	centerChoco:ClearAllPoints()
+	centerChoco:SetPoint("LEFT",self,"CENTER", -deltaX,0)
+	centerChoco:SetPoint("BOTTOM",self,"BOTTOM", -deltaX,0)
+	--Debug("Bar:UpdateCenter(): name=",centerChoco.name,"totalwidth=",totalwidth,"deltaX=",deltaX,"centerChocoPosX",centerChocoPosX)
+	--start delay
+	wait = 1
+	updateframe:SetScript("OnUpdate", OnUpdate) 
 end
