@@ -144,6 +144,7 @@ function ChocolateBar:OnInitialize()
 			height = 21,
 			iconSize = 0.75,
 			moveFrames = true,
+			adjustCenter = true,
 			strata = "DIALOG",
 			barRightClick = "OPTIONS",
 			gap = 7,
