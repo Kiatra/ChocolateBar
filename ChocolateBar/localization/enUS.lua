@@ -2,6 +2,9 @@ local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
 local L = AceLocale:NewLocale("ChocolateBar", "enUS", true)
 if not L then return end
 
+L["Update Center Position"] = true
+L["Always adjust the center group based on the current width of the plugins. Disable this to align the center group based only on the number of plugins."] = true
+
 L["Options"] = true
 L["Alignment"] = true
 L["Left"] = true

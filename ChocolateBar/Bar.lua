@@ -5,6 +5,7 @@ local chocolate = ChocolateBar.ChocolatePiece
 local Debug = ChocolateBar.Debug
 local jostle = LibStub("LibJostle-3.0", true)
 local pairs = pairs
+local db
 
 local listCenter
 local counter = 0
@@ -20,7 +21,8 @@ local function OnUpdate(self, elapsed)
 	end
 end
 
-function Bar:New(name, settings, db)
+function Bar:New(name, settings, database)
+	db = database
 	local frame = CreateFrame("Frame",name,UIParent)
 	frame.chocolist = {} --create list of chocolate chocolist in the bar
 	
@@ -483,7 +485,6 @@ function Bar:UpdateBar(updateindex)
 	
 	-- set center plugins
 	listCenter = SortList(chocolates, "center")
-	local l = listCenter[#listCenter]
 	self.chocoCenterLeft = listCenter[1] and listCenter[1][1]
 	self.chocoCenterRight = listCenter[#listCenter] and listCenter[#listCenter][1]
 	
@@ -496,14 +497,13 @@ function Bar:UpdateBar(updateindex)
 		self.centerChoco = centerChoco
 		local last = nil
 		if centerChoco then
-			local r = mod(centerIndex,2)
-			if r > 0 and #listCenter > 1 then --uneven
+			if mod(#listCenter,2) > 0 then --uneven	
 				centerChoco:ClearAllPoints()
-				centerChoco:SetPoint("RIGHT",self,"CENTER", 0,yoff)
+				centerChoco:SetPoint("CENTER",self, 0,yoff)
 				centerChoco:SetPoint("BOTTOM",self,"BOTTOM", 0,0)
 			else --even
 				centerChoco:ClearAllPoints()
-				centerChoco:SetPoint("CENTER",self, 0,yoff)
+				centerChoco:SetPoint("RIGHT",self,"CENTER", 0,yoff)
 				centerChoco:SetPoint("BOTTOM",self,"BOTTOM", 0,0)
 			end
 			local relativeR = centerChoco
@@ -558,7 +558,7 @@ end
 
 function Bar:UpdateCenter()
 	local centerChoco = self.centerChoco --the chocolate the others are aligend to
-	if not centerChoco or wait > 0 then return end
+	if not centerChoco or wait > 0 or not db.adjustCenter then return end
 	
 	local totalwidth = 0
 	local centerChocoPosX = 0

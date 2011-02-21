@@ -158,7 +158,7 @@ local aceoptions = {
 						},
 						moveFrames = {
 							type = 'toggle',
-							width = "double",
+							--width = "double",
 							order = 7,
 							name = L["Adjust Blizzard Frames"],
 							desc = L["Move Blizzard frames above/below bars"],
@@ -182,6 +182,20 @@ local aceoptions = {
 							end,
 							set = function(info, value)
 								db.barRightClick = value
+							end,
+						},
+						adjustCenter = {
+							type = 'toggle',
+							width = "double",
+							order = 9,
+							name = L["Update Center Position"],
+							desc = L["Always adjust the center group based on the current width of the plugins. Disable this to align the center group based only on the number of plugins."],
+							get = function(info, value)
+									return db.adjustCenter
+							end,
+							set = function(info, value)
+									db.adjustCenter = value
+									ChocolateBar:UpdateBarOptions("UpdateBar")
 							end,
 						},
 					},
