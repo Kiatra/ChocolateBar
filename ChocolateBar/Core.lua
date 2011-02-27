@@ -159,7 +159,7 @@ function ChocolateBar:OnInitialize()
 				color = {r = 0.38, g = 0.36, b = 0.4, a = .94,},
 				borderColor = {r = 0, g = 0, b = 0, a = 0,},
 				tile = false,
-				tileSize = 32,
+				tileSize = 130,
 				edgeSize = 8,
 				barInset = 3,
 			},
@@ -211,11 +211,14 @@ function ChocolateBar:OnInitialize()
 	db = self.db.profile
 	LSM:Register("statusbar", "Tooltip", "Interface\\Tooltips\\UI-Tooltip-Background")
 	LSM:Register("statusbar", "Solid", "Interface\\Buttons\\WHITE8X8")
-	LSM:Register("statusbar", "Blizzard Parchment","Interface\\AchievementFrame\\UI-Achievement-Parchment-Horizontal")
-	LSM:Register("statusbar", "Titan","Interface\\AddOns\\ChocolateBar\\pics\\Titan")
 	LSM:Register("statusbar", "Gloss","Interface\\AddOns\\ChocolateBar\\pics\\Gloss")
 	LSM:Register("statusbar", "DarkBottom","Interface\\AddOns\\ChocolateBar\\pics\\DarkBottom")
+	LSM:Register("statusbar", "X-Perl","Interface\\AddOns\\ChocolateBar\\pics\\X-Perl")
 
+	LSM:Register("background", "Titan","Interface\\AddOns\\ChocolateBar\\pics\\Titan")
+	LSM:Register("background", "Tribal","Interface\\AddOns\\ChocolateBar\\pics\\Tribal")
+	
+	
 	createDropPoint("ChocolateTextDrop", dropText, 0,L["Toggle Text"],"Interface/ICONS/INV_Inscription_Tradeskill01")
 	--createDropPoint("ChocolateCenterDrop", dropOptions,150,L["Options"],"Interface/Icons/Spell_Holy_GreaterBlessingofSalvation") 
 	createDropPoint("ChocolateCenterDrop", dropOptions,150,L["Options"],"Interface/Icons/INV_Gizmo_02") 

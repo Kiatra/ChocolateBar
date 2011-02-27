@@ -2,24 +2,28 @@ local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
 local L = AceLocale:NewLocale("ChocolateBar", "enUS", true)
 if not L then return end
 
+L["Adjust the size of the tiles."] = true
+L["Tile Size"] = true
+L["Tile"] = true
+L["Tile the Texture. Disable to stretch the Texture."] = true
+L["Advanced Textures"] = true
+L["Texture Color/Alpha"] = true
+L["Border Color/Alpha"] = true
+
 L["Update Center Position"] = true
 L["Always adjust the center group based on the current width of the plugins. Disable this to align the center group based only on the number of plugins."] = true
-
 L["Options"] = true
 L["Alignment"] = true
 L["Left"] = true
 L["Right"] = true
 L["Center"] = true
-
 L["none"] = true
 L["ChocolateBar Options"] = true
 L["Blizzard Options"] = true
 L["Bar Right Click"] = true
 L["Select the action when right clicking on a bar."] = true
-
 L["Opacity"] = true
 L["Set the opacity of the bars during combat."] = true
-
 L["Disable Options"] = true
 L["Disable options dialog on right click"] = true
 L["Icon Size"] = true
@@ -35,7 +39,6 @@ L["Managed Placement"] = true
 L["Free Placement"] = true
 L["Vertical Offset"] = true
 L["Horizontal Offset"] = true
-
 L["Textures"] = true
 L["Fonts and Textures"] = true
 L["Some of the fonts may depend on other addons."] = true
@@ -44,7 +47,6 @@ L["Font Size"] = true
 L["Font"] = true
 L["Toggle Text"] = true
 L["Disable Plugin"] = true
-L["Colors and Textures"] = true
 L["Look and Feel"] = true
 L["Defaults"] = true
 L["Launcher"] = true
@@ -65,8 +67,6 @@ L["Gap"] = true
 L["Set the gap between the plugins."] = true
 L["Bar Strata"] = true
 L["Background Texture"] = true
-L["Bar color"] = true
-L["Bar border color"] = true
 L["Debug"] = true
 L["Create Bar"] = true
 L["Create New Bar"] = true

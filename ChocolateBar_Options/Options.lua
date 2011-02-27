@@ -338,11 +338,11 @@ local aceoptions = {
 							inline = true,
 							name = L["Textures"],
 							type = "group",
-							order = 1,
+							order = 2,
 							args ={
 								textureStatusbar = {
 									type = 'select',
-									dialogControl = 'LSM30_Statusbar', --Select your widget here
+									dialogControl = 'LSM30_Statusbar',
 									values = AceGUIWidgetLSMlists.statusbar,
 									order = 1,
 									name = L["Background Texture"],
@@ -353,15 +353,55 @@ local aceoptions = {
 									set = function(info, value)
 										db.background.texture = LSM:Fetch("statusbar", value)
 										db.background.textureName = value
+										db.background.tile = false
 										ChocolateBar:UpdateBarOptions("UpdateTexture")
 									end,
 								},
-								--[[
+								colour = {
+									type = "color",
+									order = 5,
+									name = L["Texture Color/Alpha"],
+									desc = L["Texture Color/Alpha"],
+									hasAlpha = true,
+									get = function(info)
+										local t = db.background.color
+										return t.r, t.g, t.b, t.a
+									end,
+									set = function(info, r, g, b, a)
+										local t = db.background.color
+										t.r, t.g, t.b, t.a = r, g, b, a
+										ChocolateBar:UpdateBarOptions("UpdateColors")
+									end,
+								},
+								bordercolour = {
+									type = "color",
+									order = 6,
+									name = L["Border Color/Alpha"],
+									desc = L["Border Color/Alpha"],
+									hasAlpha = true,
+									get = function(info)
+										local t = db.background.borderColor
+										return t.r, t.g, t.b, t.a
+									end,
+									set = function(info, r, g, b, a)
+										local t = db.background.borderColor
+										t.r, t.g, t.b, t.a = r, g, b, a
+										ChocolateBar:UpdateBarOptions("UpdateColors")
+									end,
+								},
+							},
+						},
+						backbround1 = {
+							inline = true,
+							name = L["Advanced Textures"],
+							type = "group",
+							order = 3,
+							args ={
 								textureBackground = {
 									type = 'select',
-									dialogControl = 'LSM30_Background', --Select your widget here
+									dialogControl = 'LSM30_Background',
 									values = AceGUIWidgetLSMlists.background,
-									order = 1,
+									order = 2,
 									name = L["Background Texture"],
 									desc = L["Some of the textures may depend on other addons."],
 									get = function() 
@@ -370,14 +410,17 @@ local aceoptions = {
 									set = function(info, value)
 										db.background.texture = LSM:Fetch("background", value)
 										db.background.textureName = value
+										db.background.tile = true
+										local t = db.background.color
+										t.r, t.g, t.b, t.a = 1, 1, 1, 1
 										ChocolateBar:UpdateBarOptions("UpdateTexture")
 									end,
 								},
 								textureTile = {
 									type = 'toggle',
-									order = 1,
-									name = "Tile",
-									desc = "Tile",
+									order = 3,
+									name = L["Tile"],
+									desc = L["Tile the Texture. Disable to stretch the Texture."],
 									get = function()
 											return db.background.tile
 									end,
@@ -388,9 +431,9 @@ local aceoptions = {
 								},
 								textureTileSize = {
 									type = 'range',
-									order = 3,
-									name = "TileSize",
-									desc = "Tile",
+									order = 4,
+									name = L["Tile Size"],
+									desc = L["Adjust the size of the tiles."],
 									min = 1,
 									max = 256,
 									step = 1,
@@ -409,71 +452,13 @@ local aceoptions = {
 										ChocolateBar:UpdateBarOptions("UpdateTexture")
 									end,
 								},
-								]]
-								--[[
-								textureEdgeSize = {
-									type = 'range',
-									order = 3,
-									name = "EdgeSize",
-									desc = "Tile",
-									min = 1,
-									max = 256,
-									step = 1,
-									bigStep = 5,
-									isPercent = false,
-									get = function(name)
-										return db.background.edgeSize
-									end,
-									set = function(info, value)
-										if value > 256 then
-											value = 256
-										elseif value < 1 then
-											value = 1
-										end
-										db.background.edgeSize = value
-										ChocolateBar:UpdateBarOptions("UpdateTexture")
-									end,
-								},
-								]]
-								colour = {
-									type = "color",
-									order = 1,
-									name = L["Bar color"],
-									desc = L["Bar color"],
-									hasAlpha = true,
-									get = function(info)
-										local t = db.background.color
-										return t.r, t.g, t.b, t.a
-									end,
-									set = function(info, r, g, b, a)
-										local t = db.background.color
-										t.r, t.g, t.b, t.a = r, g, b, a
-										ChocolateBar:UpdateBarOptions("UpdateColors")
-									end,
-								},
-								bordercolour = {
-									type = "color",
-									order = 2,
-									name = L["Bar border color"],
-									desc = L["Bar border color"],
-									hasAlpha = true,
-									get = function(info)
-										local t = db.background.borderColor
-										return t.r, t.g, t.b, t.a
-									end,
-									set = function(info, r, g, b, a)
-										local t = db.background.borderColor
-										t.r, t.g, t.b, t.a = r, g, b, a
-										ChocolateBar:UpdateBarOptions("UpdateColors")
-									end,
-								},
 							},
 						},
 						fonts = {
 							inline = true,
 							name = L["Font"],
 							type = "group",
-							order = 2,
+							order = 1,
 							args ={
 								font = {
 								type = 'select',
