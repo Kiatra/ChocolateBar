@@ -3,6 +3,8 @@ local broker = LibStub("LibDataBroker-1.1")
 local LSM = LibStub("LibSharedMedia-3.0")
 local ChocolateBar = LibStub("AceAddon-3.0"):NewAddon("ChocolateBar", "AceConsole-3.0", "AceEvent-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("ChocolateBar")
+local _G, pairs, ipairs, table, string, tostring = _G, pairs, ipairs, table, string, tostring
+local select, strjoin, CreateFrame = select, strjoin, CreateFrame
 
 ChocolateBar.Bar = {}
 ChocolateBar.ChocolatePiece = {}
@@ -26,7 +28,7 @@ local function Debug(...)
 			local x = select(i, ...)
 			s = strjoin(" ",s,tostring(x))
 		end
-		DEFAULT_CHAT_FRAME:AddMessage(s)
+		_G.DEFAULT_CHAT_FRAME:AddMessage(s)
 	end
 end
 
@@ -56,6 +58,7 @@ local function dropOptions(frame, choco)
 		local obj = choco.obj
 		local name = obj.name
 		local label = obj.label
+		local cleanName
 		if label then 
 			cleanName = string.gsub(label, "\|c........", "")
 		else
@@ -76,7 +79,7 @@ end
 
 local function createDropPoint(name, dropfunc, offx, text, texture)
 	if not ChocolateBar.dropFrames then
-		dropFrames = CreateFrame("Frame", nil, UIParent)
+		local dropFrames = CreateFrame("Frame", nil, _G.UIParent)
 		dropFrames:SetWidth(400)
 		dropFrames:SetHeight(100)
 		ChocolateBar.dropFrames = dropFrames
@@ -122,8 +125,8 @@ function ChocolateBar:SetDropPoins(parent)
 	frame:ClearAllPoints()
 	frame:SetClampedToScreen(true)
 	local x,y = parent:GetCenter()
-	local vhalf = (y > UIParent:GetHeight() / 2) and "TOP" or "BOTTOM"
-	local yoff = (y > UIParent:GetHeight() / 2) and -100 or 100
+	local vhalf = (y > _G.UIParent:GetHeight() / 2) and "TOP" or "BOTTOM"
+	local yoff = (y > _G.UIParent:GetHeight() / 2) and -100 or 100
 	local xoff = frame:GetWidth() / 2
 	frame:SetPoint(vhalf.."LEFT",parent.bar,x-xoff,yoff)
 	frame:Show()
@@ -204,8 +207,6 @@ function ChocolateBar:OnInitialize()
 	}
 	
 	self.db = LibStub("AceDB-3.0"):New("ChocolateBarDB", defaults, "Default")
-	
-	self:RegisterChatCommand("cb", "ChatCommand")
     self:RegisterChatCommand("chocolatebar", "ChatCommand")
 	
 	db = self.db.profile
@@ -236,23 +237,19 @@ function ChocolateBar:OnInitialize()
 	end
 	self:AnchorBars()
 	
-	local optionPanel = CreateFrame( "Frame", "TabardChampionPanel", UIParent );
+	local optionPanel = CreateFrame( "Frame", "TabardChampionPanel", _G.UIParent );
 	optionPanel.name = "ChocolateBar";
 	local button = CreateFrame("Button",nil,optionPanel, "UIPanelButtonTemplate")
 	button:SetWidth(150)
 	button:SetHeight(22)
 	button:SetScript("OnClick", function()
-		local currentFrame = InterfaceOptionsFrame
-		while currentFrame do
-			local lastFrame = currentFrame.lastFrame
-			HideUIPanel(currentFrame)
-			currentFrame = lastFrame
-		end
+		_G.HideUIPanel(_G.InterfaceOptionsFrame)
+		_G.HideUIPanel(_G.GameMenuFrame)
 		ChocolateBar:ChatCommand()
 	end)
 	button:SetText("Configure")
 	button:SetPoint("TOPLEFT",20,-20)
-	InterfaceOptions_AddCategory(optionPanel);
+	_G.InterfaceOptions_AddCategory(optionPanel);
 end
 
 function ChocolateBar:OnEnable()
@@ -329,7 +326,6 @@ function ChocolateBar:LibDataBroker_DataObjectCreated(event, name, obj, noupdate
 	if db.objSettings[name].enabled then
 		self:EnableDataObject(name, obj, noupdate)
 	end
-	--self:AddObjectOptions(name, obj.icon, t,obj.label)
 end
 
 function ChocolateBar:EnableDataObject(name, obj, noupdate)
@@ -342,18 +338,19 @@ function ChocolateBar:EnableDataObject(name, obj, noupdate)
 	local t = obj.type
 	-- set default values depending on data source
 	if barName == "" then
-		barName = "ChocolateBar1"
+		--barName = "ChocolateBar1"
+		settings.barName = "ChocolateBar1"
 		if t and t == "data source" then
 			settings.align = "left"
 			settings.showText = true
-			if db.autodissource then 
+			if db.autodissource then
 				settings.enabled = false
 				return
 			end
 		else	
 			settings.align = "right"
 			settings.showText = false
-			if db.autodislauncher then 
+			if db.autodislauncher then
 				settings.enabled = false
 				return
 			end
@@ -390,7 +387,7 @@ function ChocolateBar:AttributeChanged(event, name, key, value)
 		return 
 	end
 	local choco = chocolateObjects[name]
-	choco:Update(choco, key, value)
+	choco:Update(choco, key, value, name)
 end
 
 -- disable autohide for all bars during drag and drop
@@ -547,13 +544,13 @@ end
 -- option functions
 --------
 function ChocolateBar:ChatCommand(name)
-	EnableAddOn("ChocolateBar_Options")
-	loaded, reason = LoadAddOn("ChocolateBar_Options")
+	_G.EnableAddOn("ChocolateBar_Options")
+	local loaded, reason = _G.LoadAddOn("ChocolateBar_Options")
 	Debug(loaded, reason)
 	if loaded then
 		ChocolateBar:OpenOptions(chocolateBars, db, name)
 	else
-		DEFAULT_CHAT_FRAME:AddMessage(L["Could not load ChocolateBar_Options, make sure it's installed."])
+		_G.DEFAULT_CHAT_FRAME:AddMessage(L["Could not load ChocolateBar_Options, make sure it's installed."])
 	end
 end
 

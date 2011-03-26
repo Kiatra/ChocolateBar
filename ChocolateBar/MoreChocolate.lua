@@ -6,6 +6,8 @@ local Timer = CreateFrame("Frame")
 local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("ChocolateBar")
 local bar
 local L = LibStub("AceLocale-3.0"):GetLocale("ChocolateBar")
+local wipe, pairs = wipe, pairs
+--GLOBALS: InterfaceOptionsFrame_OpenToCategory
 
 local moreChocolate = LibStub("LibDataBroker-1.1"):NewDataObject("MoreChocolate", {
 	type = "launcher",
@@ -34,11 +36,9 @@ local moreChocolate = LibStub("LibDataBroker-1.1"):NewDataObject("MoreChocolate"
 })
 moreChocolate.barNames = {none = "none"}
 
-function GetList()
+local function GetList()
 	wipe(moreChocolate.barNames)
-	
 	moreChocolate.barNames.none = L["None"]
-	
 	for k,v in pairs(ChocolateBar:GetBars()) do
 		moreChocolate.barNames[k] = k
 	end

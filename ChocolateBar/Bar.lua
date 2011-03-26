@@ -4,8 +4,10 @@ local Bar = ChocolateBar.Bar
 local chocolate = ChocolateBar.ChocolatePiece
 local Debug = ChocolateBar.Debug
 local jostle = LibStub("LibJostle-3.0", true)
-local pairs = pairs
+local pairs, ipairs, table, math, mod = pairs, ipairs, table, math, mod
+local CreateFrame, UIParent = CreateFrame, UIParent
 local db
+--GLOBALS: InterfaceOptionsFrame_OpenToCategory, GetCursorPosition
 
 local listCenter
 local counter = 0
@@ -146,10 +148,6 @@ function Bar:UpdateTexture(db)
 	--bg.bgFile = background
 	self:SetBackdrop(bg);
 	self:UpdateColors(db)
-end
-
-function GetTexture(frame)
-	regions = frame:GetRegions()
 end
 
 function Bar:ResetDrag(choco, name)
@@ -570,6 +568,8 @@ function Bar:UpdateCenter()
 		end
 		totalwidth = totalwidth + choco:GetWidth()
 	end
+	--Debug("center width=",totalwidth,"bar width=",self:GetWidth(),"most left=",(self:GetWidth()-totalwidth)/2)
+	--Debug("left should be=",(self:GetWidth()-totalwidth)/2,"right should be=",(self:GetWidth()-totalwidth)/2+totalwidth)
 	
 	local deltaX = totalwidth/2 - centerChocoPosX
 	centerChoco:ClearAllPoints()
