@@ -5,7 +5,7 @@ local Drag = ChocolateBar.Drag
 local frameslist = {}
 local Debug = ChocolateBar.Debug
 local DragUpdate = CreateFrame("Frame")
-
+local GetCursorPosition, pairs = GetCursorPosition, pairs
 local counter = 0
 local delay = .1
 local focus = nil
@@ -53,7 +53,7 @@ end
 
 function Drag:RegisterFrame(frame)
 	local name = frame:GetName()
-	if name and not frameslist[naem] then
+	if name and not frameslist[name] then
 		frameslist[name] = frame
 	else
 		Debug("Drag:RegisterFrame(frame) no name or already registred")

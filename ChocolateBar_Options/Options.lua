@@ -6,17 +6,16 @@ local Drag = ChocolateBar.Drag
 local broker = LibStub("LibDataBroker-1.1")
 local L = LibStub("AceLocale-3.0"):GetLocale("ChocolateBar")
 local LSM = LibStub("LibSharedMedia-3.0")
-
+local _G, pairs, string = _G, pairs, string
 local version = GetAddOnMetadata("ChocolateBar","X-Curse-Packaged-Version") or ""
 local db, moreChocolate
 local index = 0
-local firstOpen = true
 
 local function GetStats(info)
 	local total = 0
 	local enabled = 0
 	local data = 0
-	for name, obj in LibStub("LibDataBroker-1.1"):DataObjectIterator() do
+	for name, obj in broker:DataObjectIterator() do
 		total = total + 1
 		if obj.type == "data source" then
 			data = data + 1
@@ -27,7 +26,7 @@ local function GetStats(info)
 		end
 	end
 	
-	return strjoin("\n","|cffffd200"..L["Enabled"].."|r  "..enabled, 
+	return _G.strjoin("\n","|cffffd200"..L["Enabled"].."|r  "..enabled, 
 						"|cffffd200"..L["Disabled"].."|r  "..total-enabled,
 						"|cffffd200"..L["Total"].."|r  "..total,
 						"",
@@ -66,12 +65,13 @@ local aceoptions = {
 			name = L["Look and Feel"],
 			type="group",
 			order = 0,
+			
 			args={
 				general = {
 					inline = true,
 					name = L["General"],
 					type="group",
-					order = 0,
+					order = 3,
 					args={
 						locked = {
 							type = 'toggle',
@@ -204,7 +204,7 @@ local aceoptions = {
 					inline = true,
 					name= L["Defaults"],
 					type="group",
-					order = 2,
+					order = 4,
 					args={
 						label = {
 							order = 0,
@@ -542,7 +542,7 @@ local aceoptions = {
 					name = L["Create Bar"],
 		            desc = L["Create New Bar"],
 		            func = function()
-						name = ChocolateBar:AddBar()
+						local name = ChocolateBar:AddBar()
 						ChocolateBar:AddBarOptions(name)
 					end,
 				},
@@ -619,7 +619,7 @@ end
 
 local function GetBarName(info)
 	local name = info[#info]
-	bar = ChocolateBar:GetBar(name)
+	local bar = ChocolateBar:GetBar(name)
 	if bar and bar.settings.align == "top" then
 		name = name.." (top) "
 	elseif bar and bar.settings.align == "bottom" then
@@ -632,7 +632,7 @@ end
 
 local function GetBarIndex(info)
 	local name = info[#info]
-	bar = ChocolateBar:GetBar(name)
+	local bar = ChocolateBar:GetBar(name)
 	local index = bar.settings.index
 	if db.barSettings[name].align == "bottom" then
 		--reverse order and force below top bars
@@ -645,7 +645,7 @@ local function SetBarAlign(info, value)
 	local name = info[#info-2]
 	if value then
 		db.barSettings[name].align = value
-		bar = ChocolateBar:GetBar(name)
+		local bar = ChocolateBar:GetBar(name)
 		if bar then
 			bar:UpdateAutoHide(db)
 			ChocolateBar:AnchorBars()
@@ -665,7 +665,7 @@ end
 
 local function MoveUp(info, value)
 	local name = info[#info-2]
-	bar = ChocolateBar:GetBar(name)
+	local bar = ChocolateBar:GetBar(name)
 	local index = bar.settings.index
 	if bar then
 		if db.barSettings[name].align == "bottom" then
@@ -688,7 +688,7 @@ end
 
 local function MoveDown(info, value)
 	local name = info[#info-2]
-	bar = ChocolateBar:GetBar(name)
+	local bar = ChocolateBar:GetBar(name)
 	local index = bar.settings.index
 	if bar then
 		if db.barSettings[name].align == "bottom" then
@@ -717,7 +717,7 @@ end
 local function setAutoHide(info, value)
 	local name = info[#info-2]
 	db.barSettings[name].autohide = value
-	bar = ChocolateBar:GetBar(name)
+	local bar = ChocolateBar:GetBar(name)
 	bar:UpdateAutoHide(db)
 	--ChocolateBar:UpdateBarOptions("UpdateAutoHide")
 end
@@ -725,7 +725,7 @@ end
 local function GetBarWidth(info)
 	--Debug(GetScreenWidth(),UIParent:GetEffectiveScale(),UIParent:GetWidth(),math.floor(GetScreenWidth()))
 	local name = info[#info-2]
-	local maxBarWidth = math.floor(GetScreenWidth())
+	local maxBarWidth = _G.math.floor(_G.GetScreenWidth())
 	
 	return db.barSettings[name].width
 end
@@ -735,8 +735,8 @@ local function SetBarWidth(info, value)
 	local name = info[#info-2]
 	local settings = db.barSettings[name]
 	settings.width = value
-	bar = ChocolateBar:GetBar(name)
-	if value > GetScreenWidth() or value == 0 then
+	local bar = ChocolateBar:GetBar(name)
+	if value > _G.GetScreenWidth() or value == 0 then
 		bar:SetPoint("RIGHT", "UIParent" ,"RIGHT",0, 0);
 	else	
 		local relative, relativePoint
@@ -749,12 +749,12 @@ local function SetBarWidth(info, value)
 end
 
 local moveBarDummy
-function OnDragStart(self)
+local function OnDragStart(self)
 	self:StartMoving()
 	self.isMoving = true
 end
 
-function OnDragStop(self)
+local function OnDragStop(self)
 	self:StopMovingOrSizing()
 	self.isMoving = false
 end
@@ -763,12 +763,12 @@ local function SetLockedBar(info, value)
 	Debug("SetLockedBar", value)
 	local name = info[#info-2]
 	local settings = db.barSettings[name]
-	bar = ChocolateBar:GetBar(name)
+	local bar = ChocolateBar:GetBar(name)
 	bar.locked = not value
 	if not value then
 		--unlock
 		if not moveBarDummy then
-			moveBarDummy = CreateFrame("Frame",bar)
+			moveBarDummy = _G.CreateFrame("Frame",bar)
 			moveBarDummy:SetBackdrop({bgFile = "Interface/Tooltips/UI-Tooltip-Background", 
 												nil, 
 												tile = true, tileSize = 16, edgeSize = 16, 
@@ -804,8 +804,9 @@ local function SetLockedBar(info, value)
 			v:Show()
 		end
 		bar:SetScript("OnDragStart", nil)
-		settings.barPoint ,relative ,relativePoint,settings.barOffx ,settings.barOffy = bar:GetPoint()
-		Debug("bar:GetPoint()",settings.barPoint ,relative ,relativePoint,settings.barOffx ,settings.barOffy)
+		local relative, relativePoint
+		settings.barPoint, relative, relativePoint, settings.barOffx ,settings.barOffy = bar:GetPoint()
+		--Debug("bar:GetPoint()",settings.barPoint ,relative ,relativePoint,settings.barOffx ,settings.barOffy)
 		if settings.barOffy == 0 then settings.barOffy = 1 end
 		bar:SetPoint(settings.barPoint, "UIParent",settings.barOffx,settings.barOffy)
 		settings.align = "custom"
@@ -826,7 +827,7 @@ local function SetFreeBar(info, value)
 	local name = info[#info-2]
 	--db.barSettings[name].align = value and "custom" or "top"
 	Debug("SetFreeBar", db.barSettings[name].align,value,name)
-	bar = ChocolateBar:GetBar(name)
+	local bar = ChocolateBar:GetBar(name)
 	if not value then
 		SetLockedBar(info, true)
 		db.barSettings[name].align = "top"
@@ -855,7 +856,7 @@ end
 local function SetBarOff(info, value)
 	local name = info[#info-2]
 	local offtype = info[#info]
-	bar = ChocolateBar:GetBar(name)
+	local bar = ChocolateBar:GetBar(name)
 	local settings = db.barSettings[name]
 	bar = ChocolateBar:GetBar(name)	
 	local relative, relativePoint
@@ -871,7 +872,7 @@ end
 
 local function GetLockedBar(info, value)
 	local name = info[#info-2]
-	bar = ChocolateBar:GetBar(name)
+	local bar = ChocolateBar:GetBar(name)
 	return not bar.locked
 end
 
@@ -886,14 +887,14 @@ local function IsDisabledFreeMove(info)
 end
 
 --return true if RemoveBar is disabled
-function IsDisabledRemoveBar(info)
+local function IsDisabledRemoveBar(info)
 	local name = info[#info-2]
 	return name == "ChocolateBar1"
 end
 
 local function IsDisabledMoveDown(info)
 	local name = info[#info-2]
-	bar = ChocolateBar:GetBar(name)
+	local bar = ChocolateBar:GetBar(name)
 	--local settings = db.barSettings[name]
 	local settings = bar.settings
 	return settings.align == "custom" or (settings.align == "bottom" and  settings.index < 1.5)
@@ -901,7 +902,7 @@ end
 
 local function IsDisabledMoveUp(info)
 	local name = info[#info-2]
-	bar = ChocolateBar:GetBar(name)
+	local bar = ChocolateBar:GetBar(name)
 	local settings = db.barSettings[name]
 	return settings.align == "custom" or (settings.align == "top" and  bar.settings.index < 1.5)
 end
@@ -944,7 +945,7 @@ local function SetAlignment(info, value)
 	local cleanName = info[#info-2]
 	local name = chocolateOptions[cleanName].desc
 	db.objSettings[name].align = value
-	choco = ChocolateBar:GetChocolate(name)
+	local choco = ChocolateBar:GetChocolate(name)
     db.objSettings[name].index = 500
 	if choco and choco.bar then
 		choco.bar:UpdateBar(true)
@@ -956,7 +957,7 @@ local function SetEnabled(info, value)
 	local cleanName = info[#info-2]
 	local name = chocolateOptions[cleanName].desc
 	if value then
-		obj = broker:GetDataObjectByName(name)
+		local obj = broker:GetDataObjectByName(name)
 		ChocolateBar:EnableDataObject(name, obj)
 	else
 		ChocolateBar:DisableDataObject(name)
@@ -1021,9 +1022,8 @@ local function GetIconImage(info, name)
 end
 
 local function GetIconCoords(info)
-	--Debug(GetIconCoords(info),info)
 	local cleanName = info[#info]
-	name = chocolateOptions[cleanName].desc
+	local name = chocolateOptions[cleanName].desc
 	local obj = broker:GetDataObjectByName(name)
 	if obj and obj.iconCoords then	
 		Debug("obj.iconCoords",obj.iconCoords)
@@ -1069,7 +1069,7 @@ function ChocolateBar:RegisterOptions(data)
 end
 
 local firstOpen = true
-function ChocolateBar:OpenOptions(chocolateBars, data, pluginName)
+function ChocolateBar:OpenOptions(chocolateBars, data, input)
 	local AceCfgDlg = LibStub("AceConfigDialog-3.0")
 	
 	if firstOpen then
@@ -1077,22 +1077,21 @@ function ChocolateBar:OpenOptions(chocolateBars, data, pluginName)
 		for name,bar in pairs(chocolateBars) do
 			ChocolateBar:AddBarOptions(name)
 		end
-		for name, obj in broker:DataObjectIterator() do
-			ChocolateBar:AddObjectOptions(name, obj)
-		end
+		
 		AceCfgDlg:SelectGroup("ChocolateBar", "chocolates")
 		AceCfgDlg:SelectGroup("ChocolateBar", "general")
 		firstOpen = false
 	end
-	if pluginName then
-		Debug("pluginName=",pluginName)
-		AceCfgDlg:SelectGroup("ChocolateBar", "chocolates",pluginName)
+	
+	for name, obj in broker:DataObjectIterator() do
+		ChocolateBar:AddObjectOptions(name, obj)
 	end
 	
 	if not input or input:trim() == "" then
 		AceCfgDlg:Open("ChocolateBar")
 	else
-		LibStub("AceConfigCmd-3.0").HandleCommand(ChocolateBar, "cb", "ChocolateBar", input)
+		--AceCfgDlg:SelectGroup("ChocolateBar", "chocolates", input)
+		LibStub("AceConfigCmd-3.0").HandleCommand(ChocolateBar, "chocolatebar", "ChocolateBar", input)
 	end
 end
 

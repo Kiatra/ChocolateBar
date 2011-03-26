@@ -3,8 +3,9 @@ local LSM = LibStub("LibSharedMedia-3.0")
 local ChocolatePiece = ChocolateBar.ChocolatePiece
 local Drag = ChocolateBar.Drag
 local Debug = ChocolateBar.Debug
-local tempAutoHide
-local db
+local _G, unpack, ipairs = _G, unpack, ipairs
+local GameTooltip, CreateFrame = GameTooltip, CreateFrame
+local tempAutoHide, db
 
 local function resizeFrame(self)
 	local settings = self.settings
@@ -145,12 +146,12 @@ local updaters = {
 local function GetAnchors(frame)
 	local x, y = frame:GetCenter()
 	local leftRight
-	if x < GetScreenWidth() / 2 then
+	if x < _G.GetScreenWidth() / 2 then
 		leftRight = "LEFT"
 	else
 		leftRight = "RIGHT"
 	end
-	if y < GetScreenHeight() / 2 then
+	if y < _G.GetScreenHeight() / 2 then
 		return "BOTTOM", "TOP"
 	else
 		return "TOP", "BOTTOM"
@@ -173,7 +174,8 @@ local function OnEnter(self)
 	
 	local obj  = self.obj
 	local name = self.name
-	--Debug(name,self.settings.index)	
+	--Debug(name,self.settings.index,self:GetLeft())
+	--Debug(name,"left is=",self:GetLeft(),"right is=",self:GetRight())	
 	local bar = self.bar
 	if bar.autohide then
 		bar:ShowAll()
@@ -233,23 +235,23 @@ local function OnClick(self, ...)
 	end
 end
 
--- PrepareTooltip code taken with permission from fortress 
 local function PrepareTooltip(frame, anchorFrame)
+	--[[
 	if frame == GameTooltip then
 		frame.fortressOnLeave = frame:GetScript("OnLeave")
 		frame.fortressBlock = anchorFrame
 		frame.fortressName = anchorFrame.name
-		
 		frame:EnableMouse(true)
 		frame:SetScript("OnLeave", GT_OnLeave)
 	end
+	--]]
 	frame:SetOwner(anchorFrame, "ANCHOR_NONE")
 	frame:ClearAllPoints()
 	local a1, a2 = GetAnchors(anchorFrame)
 	frame:SetPoint(a1, anchorFrame, a2)	
 end
 
-local function Update(self, f,key, value)
+local function Update(self, f,key, value, name)
 	local update = updaters[key]
 	--local update = uniqueUpdaters[key]
 	if update then
@@ -258,13 +260,13 @@ local function Update(self, f,key, value)
 end
 
 local function OnDragStart(frame)
-	if not ChocolateBar.db.profile.locked or IsAltKeyDown() then 
+	if not ChocolateBar.db.profile.locked or _G.IsAltKeyDown() then 
 		local bar = frame.bar
 		ChocolateBar:TempDisAutohide(true)
 		ChocolateBar.dragging = true
 		GameTooltip:Hide()
 		-- hide libqtip and libtablet tooltips
-		local kids = {UIParent:GetChildren()}
+		local kids = {_G.UIParent:GetChildren()}
 		for _, child in ipairs(kids) do
 			for i = 1, child:GetNumPoints() do
 				local _,relativeTo,_,_,_ = child:GetPoint(i)
