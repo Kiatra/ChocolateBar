@@ -174,8 +174,7 @@ local function OnEnter(self)
 	
 	local obj  = self.obj
 	local name = self.name
-	--Debug(name,self.settings.index,self:GetLeft())
-	--Debug(name,"left is=",self:GetLeft(),"right is=",self:GetRight())	
+	--Debug(name,self.settings.index)
 	local bar = self.bar
 	if bar.autohide then
 		bar:ShowAll()
@@ -271,7 +270,7 @@ local function OnDragStart(frame)
 			for i = 1, child:GetNumPoints() do
 				local _,relativeTo,_,_,_ = child:GetPoint(i)
 				if relativeTo == frame then
-					Debug(i,child:GetName())
+					--Debug(i,child:GetName())
 					child:Hide()
 				end
 			end

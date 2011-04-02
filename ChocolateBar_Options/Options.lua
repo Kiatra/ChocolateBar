@@ -1069,7 +1069,7 @@ function ChocolateBar:RegisterOptions(data)
 end
 
 local firstOpen = true
-function ChocolateBar:OpenOptions(chocolateBars, data, input)
+function ChocolateBar:OpenOptions(chocolateBars, data, input, pluginName)
 	local AceCfgDlg = LibStub("AceConfigDialog-3.0")
 	
 	if firstOpen then
@@ -1081,6 +1081,10 @@ function ChocolateBar:OpenOptions(chocolateBars, data, input)
 		AceCfgDlg:SelectGroup("ChocolateBar", "chocolates")
 		AceCfgDlg:SelectGroup("ChocolateBar", "general")
 		firstOpen = false
+	end
+	if pluginName then
+		--Debug("pluginName=",pluginName)
+		AceCfgDlg:SelectGroup("ChocolateBar", "chocolates",pluginName)
 	end
 	
 	for name, obj in broker:DataObjectIterator() do

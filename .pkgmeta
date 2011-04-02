@@ -43,6 +43,7 @@ externals:
 		
 tools-used: 
 	- libdatabroker-1-1
+	- findglobals
 	
 move-folders:
     ChocolateBar/ChocolateBar: ChocolateBar

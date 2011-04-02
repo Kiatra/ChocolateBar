@@ -66,7 +66,7 @@ local function dropOptions(frame, choco)
 		end
 		cleanName = string.gsub(cleanName, "\|r", "")
 		cleanName = string.gsub(cleanName, "[%c \127]", "")
-		ChocolateBar:ChatCommand(cleanName)
+		ChocolateBar:LoadOptions(cleanName)
 		choco.bar:ResetDrag(choco, choco.name)
 		frame:SetBackdropColor(0,0,0,1)
 end
@@ -543,12 +543,16 @@ end
 --------
 -- option functions
 --------
-function ChocolateBar:ChatCommand(name)
+function ChocolateBar:ChatCommand(input)
+	ChocolateBar:LoadOptions(nil, input)
+end
+
+function ChocolateBar:LoadOptions(pluginName, input)
 	_G.EnableAddOn("ChocolateBar_Options")
 	local loaded, reason = _G.LoadAddOn("ChocolateBar_Options")
-	Debug(loaded, reason)
+	--Debug(loaded, reason)
 	if loaded then
-		ChocolateBar:OpenOptions(chocolateBars, db, name)
+		ChocolateBar:OpenOptions(chocolateBars, db, input, pluginName)
 	else
 		_G.DEFAULT_CHAT_FRAME:AddMessage(L["Could not load ChocolateBar_Options, make sure it's installed."])
 	end

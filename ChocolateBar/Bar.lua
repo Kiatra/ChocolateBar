@@ -64,7 +64,7 @@ function Bar:New(name, settings, database)
 		if button == "RightButton" then
 			if db.disableoptons and ChocolateBar.InCombat then return end
 			if db.barRightClick == "OPTIONS" then
-				ChocolateBar:ChatCommand()
+				ChocolateBar:LoadOptions()
 			elseif db.barRightClick == "BLIZZ" then
 				InterfaceOptionsFrame_OpenToCategory("ChocolateBar");
 			end
@@ -563,14 +563,11 @@ function Bar:UpdateCenter()
 	--get the total width of all center chocolate's and the relative position of the chocolate they are aligend to
 	for i, v in ipairs(listCenter) do
 		local choco = v[1]
-		if choco.settings.index == math.ceil(#listCenter/2) then 
+		if i == math.ceil(#listCenter/2) then 
 			centerChocoPosX = totalwidth
 		end
 		totalwidth = totalwidth + choco:GetWidth()
 	end
-	--Debug("center width=",totalwidth,"bar width=",self:GetWidth(),"most left=",(self:GetWidth()-totalwidth)/2)
-	--Debug("left should be=",(self:GetWidth()-totalwidth)/2,"right should be=",(self:GetWidth()-totalwidth)/2+totalwidth)
-	
 	local deltaX = totalwidth/2 - centerChocoPosX
 	centerChoco:ClearAllPoints()
 	centerChoco:SetPoint("LEFT",self,"CENTER", -deltaX,0)
