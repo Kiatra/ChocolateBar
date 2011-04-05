@@ -237,7 +237,7 @@ function ChocolateBar:OnInitialize()
 	end
 	self:AnchorBars()
 	
-	local optionPanel = CreateFrame( "Frame", "TabardChampionPanel", _G.UIParent );
+	local optionPanel = CreateFrame( "Frame", "ChocolateBarPanel", _G.UIParent );
 	optionPanel.name = "ChocolateBar";
 	local button = CreateFrame("Button",nil,optionPanel, "UIPanelButtonTemplate")
 	button:SetWidth(150)
