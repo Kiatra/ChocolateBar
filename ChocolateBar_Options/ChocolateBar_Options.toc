@@ -1,9 +1,9 @@
-﻿## Interface: 40000
+﻿## Interface: 40100
 ## Title: ChocolateBar [|cffeda55fOptions|r]
 ## Notes: Options module for ChocolateBar.
 ## Author: yess
 ## Version: @project-version@
-## X-Email: yessica@fantasymail.de
+## X-Email: starfire@fantasymail.de
 ## Dependencies: ChocolateBar
 ## LoadOnDemand: 1
 ## OptionalDeps: Ace3, AceGUI-3.0-SharedMediaWidgets,

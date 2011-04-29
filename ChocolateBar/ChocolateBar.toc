@@ -1,9 +1,9 @@
-﻿## Interface: 40000
+﻿## Interface: 40100
 ## Title: ChocolateBar
 ## Notes: A display for LibDataBroker-1.1
 ## Author: yess
 ## Version: @project-version@
-## X-Email: yessica@fantasymail.de
+## X-Email: starfire@fantasymail.de
 ## OptionalDeps: Ace3, LibSharedMedia-3.0, LibJostle-3.0
 
 ## SavedVariables: ChocolateBarDB

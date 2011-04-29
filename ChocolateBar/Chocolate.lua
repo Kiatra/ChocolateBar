@@ -263,7 +263,8 @@ local function OnDragStart(frame)
 		local bar = frame.bar
 		ChocolateBar:TempDisAutohide(true)
 		ChocolateBar.dragging = true
-		GameTooltip:Hide()
+		--GameTooltip:Hide()
+		OnLeave(frame)
 		-- hide libqtip and libtablet tooltips
 		local kids = {_G.UIParent:GetChildren()}
 		for _, child in ipairs(kids) do
@@ -275,6 +276,7 @@ local function OnDragStart(frame)
 				end
 			end
 		end
+		
 		ChocolateBar:SetDropPoins(frame)
 		Drag:Start(bar, frame.name, frame)
 		frame:StartMoving()
