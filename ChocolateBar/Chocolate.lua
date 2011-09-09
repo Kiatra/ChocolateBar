@@ -10,8 +10,9 @@ local tempAutoHide, db
 local function resizeFrame(self)
 	local settings = self.settings
 	local width = db.gap
+	local textOffset = settings.textOffset or db.textOffset
 	if self.icon and settings.showIcon then
-		width = width + self.icon:GetWidth()
+		width = width + self.icon:GetWidth() + textOffset
 	end
 	if settings.showText then
 		if settings.width == 0 then
@@ -51,10 +52,12 @@ local function SettingsUpdater(self, value)
 	if self.icon then 
 		if settings.showIcon then 
 			--self.icon:SetWidth(db.height-5)
-			self.icon:SetWidth(db.height * db.iconSize)
-			self.icon:SetHeight(db.height * db.iconSize)
+			local iconSize = settings.iconSize or db.iconSize
+			self.icon:SetWidth(db.height * iconSize)
+			self.icon:SetHeight(db.height * iconSize)
 			self.icon:Show()
-			self.text:SetPoint("LEFT", self.icon,"RIGHT", 1, 0)
+			local textOffset = settings.textOffset or db.textOffset
+			self.text:SetPoint("LEFT", self.icon,"RIGHT", textOffset, 0)
 		else -- hide icon
 			self.icon:Hide()
 			self.text:SetPoint("LEFT", self, 0, 0)
@@ -174,7 +177,6 @@ local function OnEnter(self)
 	
 	local obj  = self.obj
 	local name = self.name
-	--Debug(name,self.settings.index)
 	local bar = self.bar
 	if bar.autohide then
 		bar:ShowAll()

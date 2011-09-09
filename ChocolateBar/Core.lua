@@ -36,6 +36,12 @@ function ChocolateBar:Debug(...)
 	Debug(self, ...)
 end
 
+function debugbars()
+	for k,v in pairs(chocolateBars) do
+		Debug(k,v)
+	end
+end
+
 --------
 -- drop points functions
 --------
@@ -151,6 +157,7 @@ function ChocolateBar:OnInitialize()
 			strata = "DIALOG",
 			barRightClick = "OPTIONS",
 			gap = 7,
+			textOffset = 1,
 			moreBar = "none",
 			moreBarDelay = 4,
 			fontPath = " ",
@@ -267,7 +274,7 @@ end
 
 function ChocolateBar:OnDisable()
 	for name, obj in broker:DataObjectIterator() do
-		chocolateObjects[name]:Hide()
+		if chocolateObjects[name] then chocolateObjects[name]:Hide() end
 	end
 	for k,v in pairs(chocolateBars) do
 		v:Hide()
@@ -318,24 +325,27 @@ end
 --------
 function ChocolateBar:LibDataBroker_DataObjectCreated(event, name, obj, noupdate)
 	local t = obj.type
-	if t and (t ~= "data source" and t ~= "launcher") then
+	if t == "data source" or t == "launcher" then
+		if db.objSettings[name].enabled then
+			self:EnableDataObject(name, obj, noupdate)
+		end
+	else
 		Debug("Unknown type", t, name)
-		return
-	end
-	
-	if db.objSettings[name].enabled then
-		self:EnableDataObject(name, obj, noupdate)
 	end
 end
 
 function ChocolateBar:EnableDataObject(name, obj, noupdate)
+	local t = obj.type
+	if t ~= "data source" and t ~= "launcher" then
+		Debug("Unknown type", t, name)
+		return 0
+	end
 	local settings = db.objSettings[name]
 	settings.enabled = true
 	
 	--get bar from setings
 	local barName = settings.barName
 	
-	local t = obj.type
 	-- set default values depending on data source
 	if barName == "" then
 		--barName = "ChocolateBar1"
@@ -346,6 +356,10 @@ function ChocolateBar:EnableDataObject(name, obj, noupdate)
 			if db.autodissource then
 				settings.enabled = false
 				return
+			end
+			if name == "ChocolateClock" or "Broker_uClock" then
+				settings.align = "right"
+				settings.index = -1
 			end
 		else	
 			settings.align = "right"
@@ -373,10 +387,12 @@ end
 function ChocolateBar:DisableDataObject(name)
 	broker.UnregisterCallback(self,"LibDataBroker_AttributeChanged_"..name)
 	--get bar from setings
-	db.objSettings[name].enabled = false
-	local barName = db.objSettings[name].barName 
-	if(barName and chocolateBars[barName])then
-		chocolateBars[barName]:EatChocolatePiece(name)
+	if db.objSettings[name] then
+		db.objSettings[name].enabled = false
+		local barName = db.objSettings[name].barName 
+		if(barName and chocolateBars[barName])then
+			chocolateBars[barName]:EatChocolatePiece(name)
+		end
 	end
 end
 
@@ -491,11 +507,11 @@ function ChocolateBar:AnchorBars()
 		else
 			v:ClearAllPoints()
 			if settings.barPoint and settings.barOffx and settings.barOffy then
-				Debug("ChocolateBar:AnchorBars() v:SetPoint",v:GetName(),settings.barPoint,settings.barOffx,settings.barOffy)
+				--Debug("ChocolateBar:AnchorBars() v:SetPoint",v:GetName(),settings.barPoint,settings.barOffx,settings.barOffy)
 				v:SetPoint(settings.barPoint, "UIParent",settings.barOffx ,settings.barOffy)
 				v:SetWidth(settings.width)
 			else
-				Debug("ChocolateBar:AnchorBars() table.insert",v:GetName())
+				--Debug("ChocolateBar:AnchorBars() table.insert",v:GetName())
 				settings.align = "top"
 				table.insert(temptop,{v,index})
 			end
