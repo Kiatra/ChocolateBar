@@ -16,13 +16,16 @@ local function GetStats(info)
 	local enabled = 0
 	local data = 0
 	for name, obj in broker:DataObjectIterator() do
-		total = total + 1
-		if obj.type == "data source" then
-			data = data + 1
-		end
-		local settings = db.objSettings[name]
-		if settings and settings.enabled then
-			enabled = enabled +1
+		local t = obj.type
+		if t == "data source" or t == "launcher" then
+			total = total + 1
+			if t == "data source" then
+				data = data + 1
+			end
+			local settings = db.objSettings[name]
+			if settings and settings.enabled then
+				enabled = enabled +1
+			end
 		end
 	end
 	
@@ -91,7 +94,7 @@ local aceoptions = {
 							name = L["Gap"],
 							desc = L["Set the gap between the plugins."],
 							min = 0,
-							max = 15,
+							max = 50,
 							step = 1,
 							get = function(name)
 								return db.gap
@@ -99,6 +102,23 @@ local aceoptions = {
 							set = function(info, value)
 								db.gap = value
 								ChocolateBar.ChocolatePiece:UpdateGap(value)
+								ChocolateBar:UpdateChoclates("updateSettings")
+							end,
+						},
+						textOffset = {
+							type = 'range',
+							order = 2,
+							name = L["Text Offset"],
+							desc = L["Set the distance between the icon and the text."],
+							min = -5,
+							max = 15,
+							step = 1,
+							get = function(name)
+								return db.textOffset
+							end,
+							set = function(info, value)
+								db.textOffset = value
+								--ChocolateBar.ChocolatePiece:UpdateGap(value)
 								ChocolateBar:UpdateChoclates("updateSettings")
 							end,
 						},
@@ -328,7 +348,7 @@ local aceoptions = {
 						},
 					},
 				},
-				backbround = {
+				background = {
 					--inline = true,
 					name = L["Fonts and Textures"],
 					type = "group",
@@ -391,7 +411,7 @@ local aceoptions = {
 								},
 							},
 						},
-						backbround1 = {
+						background1 = {
 							inline = true,
 							name = L["Advanced Textures"],
 							type = "group",
@@ -760,7 +780,7 @@ local function OnDragStop(self)
 end
 
 local function SetLockedBar(info, value)
-	Debug("SetLockedBar", value)
+	--Debug("SetLockedBar", value)
 	local name = info[#info-2]
 	local settings = db.barSettings[name]
 	local bar = ChocolateBar:GetBar(name)
@@ -826,7 +846,7 @@ end
 local function SetFreeBar(info, value)
 	local name = info[#info-2]
 	--db.barSettings[name].align = value and "custom" or "top"
-	Debug("SetFreeBar", db.barSettings[name].align,value,name)
+	--Debug("SetFreeBar", db.barSettings[name].align,value,name)
 	local bar = ChocolateBar:GetBar(name)
 	if not value then
 		SetLockedBar(info, true)
@@ -837,7 +857,7 @@ local function SetFreeBar(info, value)
 		db.barSettings[name].align = "custom"
 	end
 	bar:UpdateJostle(db)
-	Debug("SetFreeBar", db.barSettings[name].align,value,name)
+	--Debug("SetFreeBar", db.barSettings[name].align,value,name)
 end
 
 local function GetBarOffX(info, value)
@@ -996,6 +1016,19 @@ local function SetText(info, value)
 	ChocolateBar:AttributeChanged(nil, name, "updateSettings", value)
 end
 
+local function GetTextOffset(info, value)
+	local cleanName = info[#info-2]
+	local name = chocolateOptions[cleanName].desc
+	return db.objSettings[name].textOffset or db.textOffset
+end
+
+local function SetTextOffset(info, value)
+	local cleanName = info[#info-2]
+	local name = chocolateOptions[cleanName].desc
+	db.objSettings[name].textOffset = value
+	ChocolateBar:AttributeChanged(nil, name, "updateSettings", value)
+end
+
 local function GetWidth(info)
 	local cleanName = info[#info-2]
 	local name = chocolateOptions[cleanName].desc
@@ -1026,7 +1059,6 @@ local function GetIconCoords(info)
 	local name = chocolateOptions[cleanName].desc
 	local obj = broker:GetDataObjectByName(name)
 	if obj and obj.iconCoords then	
-		Debug("obj.iconCoords",obj.iconCoords)
 		return obj.iconCoords	
 	end
 end
@@ -1037,6 +1069,73 @@ local function IsDisabledIcon(info)
 	local obj = broker:GetDataObjectByName(name)
 	return not (obj and obj.icon) --return true if there is no icon
 end
+
+local function IsDisabledSetTextOffset(info)
+	local cleanName = info[#info-2]
+	local name = chocolateOptions[cleanName].desc
+	return not db.objSettings[name].textOffset
+end
+
+local function IsEnabledSetTextOffset(info)
+	local cleanName = info[#info-2]
+	local name = chocolateOptions[cleanName].desc
+	return db.objSettings[name].textOffset
+end
+
+local function SetEnabledSetTextOffset(info)
+	local cleanName = info[#info-2]
+	local name = chocolateOptions[cleanName].desc
+	local settings =  db.objSettings[name]
+	if settings.textOffset then
+		settings.textOffset = nil
+	else
+		settings.textOffset = db.textOffset
+	end
+	ChocolateBar:AttributeChanged(nil, name, "updateSettings", value)
+end
+
+local function SetEnabledOverwriteIconSize(info)
+	local cleanName = info[#info-2]
+	local name = chocolateOptions[cleanName].desc
+	local settings =  db.objSettings[name]
+	if settings.iconSize then
+		settings.iconSize = nil
+	else
+		settings.iconSize = db.iconSize
+	end
+	ChocolateBar:AttributeChanged(nil, name, "updateSettings", value)
+end
+
+local function SetCustomIconSize(info, value)
+	local cleanName = info[#info-2]
+	local name = chocolateOptions[cleanName].desc
+	if value > 1 then
+		value = 1
+	elseif value < 0.01 then
+		value = 0.001
+	end
+	db.objSettings[name].iconSize = value
+	ChocolateBar:UpdateBarOptions("UpdateHeight")
+end
+
+local function GetCustomIconSize(info, value)
+	local cleanName = info[#info-2]
+	local name = chocolateOptions[cleanName].desc
+	return db.objSettings[name].iconSize or db.iconSize
+end
+
+local function IsEnabledOvwerwriteIconSize(info)
+	local cleanName = info[#info-2]
+	local name = chocolateOptions[cleanName].desc
+	return db.objSettings[name].iconSize
+end
+
+local function IsDisabledOvwerwriteIconSize(info)
+	local cleanName = info[#info-2]
+	local name = chocolateOptions[cleanName].desc
+	return not db.objSettings[name].iconSize
+end
+
 
 local function GetHeaderName(info)
 	local cleanName = info[#info-1]
@@ -1083,7 +1182,6 @@ function ChocolateBar:OpenOptions(chocolateBars, data, input, pluginName)
 		firstOpen = false
 	end
 	if pluginName then
-		--Debug("pluginName=",pluginName)
 		AceCfgDlg:SelectGroup("ChocolateBar", "chocolates",pluginName)
 	end
 	
@@ -1230,9 +1328,13 @@ end
 local alignments = {left=L["Left"],center=L["Center"], right=L["Right"]}
 
 function ChocolateBar:AddObjectOptions(name,obj)
+	local t = obj.type
+	if t ~= "data source" and t ~= "launcher" then
+		return
+	end
 	--local curse = GetAddOnMetadata(name,"X-Curse-Packaged-Version") or ""
 	--local version = GetAddOnMetadata(name,"Version") or ""
-	local t = obj.type
+	
 	t = t or "not set"
 	local cleanName
 	local label = obj.label
@@ -1245,6 +1347,7 @@ function ChocolateBar:AddObjectOptions(name,obj)
 	cleanName = string.gsub(cleanName, "[%c \127]", "")
 	
 	--use cleanName of name because aceconfig does not like some characters in the plugin names
+		
 	chocolateOptions[cleanName] = {
 		name = GetName,
 		desc = name,
@@ -1295,7 +1398,7 @@ function ChocolateBar:AddObjectOptions(name,obj)
 					},
 					width = {
 						type = 'range',
-						order = 6,
+						order = 7,
 						name = L["Fixed Text Width"],
 						desc = L["Set a width for the text. Set 0 to disable fixed text width."],
 						min = 0,
@@ -1306,12 +1409,70 @@ function ChocolateBar:AddObjectOptions(name,obj)
 					},
 					alignment = {
 						type = 'select',
-						order = 6,
+						order = 8,
 						values = alignments,
 						name = L["Alignment"],
 						desc = L["Alignment"],
 						get = GetAlignment,
 						set = SetAlignment,
+					},
+				},
+			},
+			textOffset = {	
+				inline = true,
+				name=L["Overwrite Text Offset"],
+				type="group",
+				order = 2,
+				args={
+					enabled = {
+						type = 'toggle',
+						order = 2,
+						name = L["Overwrite Text Offset"],
+						desc =  L["Overwrite Text Offset"],
+						get = IsEnabledSetTextOffset,
+						set = SetEnabledSetTextOffset,
+					},
+					textOffset = {
+						type = 'range',
+						order = 3,
+						name = L["Text Offset"],
+						desc = L["Set the distance between the icon and the text."],
+						min = -5,
+						max = 15,
+						step = 1,
+						get = GetTextOffset,
+						set = SetTextOffset,
+						disabled = IsDisabledSetTextOffset,
+					},
+				},
+			},
+			iconSize = {	
+				inline = true,
+				name=L["Overwrite Icon Size"],
+				type="group",
+				order = 2,
+				args={
+					enabled = {
+						type = 'toggle',
+						order = 2,
+						name = L["Overwrite Icon Size"],
+						desc =  L["Overwrite Icon Size"],
+						get = IsEnabledOvwerwriteIconSize,
+						set = SetEnabledOverwriteIconSize,
+					},
+					iconSize = {
+						type = 'range',
+						order = 3,
+						name = L["Icon Size"],
+						desc = L["Icon size in relation to the bar height."],
+						min = 0,
+						max = 1,
+						step = 0.001,
+						bigStep = 0.05,
+						isPercent = true,
+						get = GetCustomIconSize,
+						set = SetCustomIconSize,
+						disabled = IsDisabledOvwerwriteIconSize,
 					},
 				},
 			},
@@ -1361,9 +1522,10 @@ function ChocolateBar:OnProfileChanged(event, database, newProfileKey)
 	for k, v in pairs(self:GetBars()) do
 		ChocolateBar:RemoveBarOptions(k)
 		v:Hide()
+		Drag:UnregisterFrame(v)
 		v = nil
 	end
-	self:SetBars()
+	--self:SetBars()
 	local barSettings = db.barSettings
 	for k, v in pairs(barSettings) do
 		local name = v.barName
@@ -1374,16 +1536,19 @@ function ChocolateBar:OnProfileChanged(event, database, newProfileKey)
 	
 	self:UpdateBarOptions()
 	for name, obj in broker:DataObjectIterator() do
-	--for name, obj in pairs(dataObjects) do
-		if db.objSettings[name].enabled then
-			local choco = self:GetChocolate(name)
-			if choco then
-				choco.settings = db.objSettings[name]
+		local t = obj.type
+		if t == "data source" or t == "launcher" then
+			--for name, obj in pairs(dataObjects) do
+			if db.objSettings[name].enabled then
+				local choco = self:GetChocolate(name)
+				if choco then
+					choco.settings = db.objSettings[name]
+				end
+				self:DisableDataObject(name)
+				self:EnableDataObject(name,obj, true) --no bar update
+			else
+				self:DisableDataObject(name)
 			end
-			self:DisableDataObject(name)
-			self:EnableDataObject(name,obj, true) --no bar update
-		else
-			self:DisableDataObject(name)
 		end
 	end
 	self:UpdateBars(true) --update chocolateBars here

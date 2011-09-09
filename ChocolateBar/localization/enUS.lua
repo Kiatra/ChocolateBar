@@ -2,6 +2,11 @@ local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
 local L = AceLocale:NewLocale("ChocolateBar", "enUS", true)
 if not L then return end
 
+L["Overwrite Icon Size"] = true
+L["Overwrite Text Offset"] = true
+L["Text Offset"] = true
+L["Set the distance between the icon and the text."] = true
+
 L["Adjust the size of the tiles."] = true
 L["Tile Size"] = true
 L["Tile"] = true

@@ -37,7 +37,6 @@ function Bar:New(name, settings, database)
 	--frame:SetPoint("TOPLEFT", settings.xoff, settings.yoff);
 	--frame:SetClampedToScreen(true)
 	if settings.width == 0 then
-		Debug("settings.width == 0 ")
 		frame:ClearAllPoints()
 		frame:SetPoint("TOPLEFT","UIParent",-1,1);
 		frame:SetPoint("RIGHT", "UIParent" ,"RIGHT",0, 0);
@@ -429,13 +428,14 @@ function Bar:Drop(choco, pos)
 	self.pointer:Hide()
 	
 	local oldbar = ChocolateBar:GetBar(settings.barName)
+	--Debug("Bar:Drop oldbar=",oldbar,"  self=",self," settings.barName=",settings.barName)
 	--check if droped from different bar
 	if oldbar == self then -- same bar
 		self.dummy:Hide()
 		self.dummy = nil
 		self.chocolist[choco.obj.name] = choco --replace dummy with original
 	else -- cross bars
-		oldbar.chocolist[choco.obj.name] = nil -- remove from oldbar
+		oldbar.chocolist[choco.obj.name] = nil --remove from oldbar
 		oldbar.dummy:Hide()
 		oldbar.dummy = nil
 		oldbar:UpdateBar(true)
