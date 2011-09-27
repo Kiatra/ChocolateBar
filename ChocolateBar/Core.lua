@@ -357,7 +357,7 @@ function ChocolateBar:EnableDataObject(name, obj, noupdate)
 				settings.enabled = false
 				return
 			end
-			if name == "ChocolateClock" or "Broker_uClock" then
+			if name == "ChocolateClock" or name == "Broker_uClock" then
 				settings.align = "right"
 				settings.index = -1
 			end

@@ -9,20 +9,6 @@ local CreateFrame, UIParent = CreateFrame, UIParent
 local db
 --GLOBALS: InterfaceOptionsFrame_OpenToCategory, GetCursorPosition
 
-local listCenter
-local counter = 0
-local delay = 1
-local wait = 0
-local updateframe = CreateFrame("Frame")
-local function OnUpdate(self, elapsed)
-	counter = counter + elapsed
-	if counter >= delay then
-		counter = 0
-		wait = 0
-		updateframe:SetScript("OnUpdate", nil) 
-	end
-end
-
 function Bar:New(name, settings, database)
 	db = database
 	local frame = CreateFrame("Frame",name,UIParent)
@@ -482,7 +468,8 @@ function Bar:UpdateBar(updateindex)
 	end
 	
 	-- set center plugins
-	listCenter = SortList(chocolates, "center")
+	self.listCenter = SortList(chocolates, "center")
+	local listCenter = self.listCenter
 	self.chocoCenterLeft = listCenter[1] and listCenter[1][1]
 	self.chocoCenterRight = listCenter[#listCenter] and listCenter[#listCenter][1]
 	
@@ -526,7 +513,6 @@ function Bar:UpdateBar(updateindex)
 				end
 			end	
 		end
-		wait = 0
 		self:UpdateCenter()
 	end
 	
@@ -556,11 +542,12 @@ end
 
 function Bar:UpdateCenter()
 	local centerChoco = self.centerChoco --the chocolate the others are aligend to
-	if not centerChoco or wait > 0 or not db.adjustCenter then return end
+	if not centerChoco or not db.adjustCenter then return end
 	
 	local totalwidth = 0
 	local centerChocoPosX = 0
 	--get the total width of all center chocolate's and the relative position of the chocolate they are aligend to
+	local listCenter = self.listCenter
 	for i, v in ipairs(listCenter) do
 		local choco = v[1]
 		if i == math.ceil(#listCenter/2) then 
@@ -572,8 +559,4 @@ function Bar:UpdateCenter()
 	centerChoco:ClearAllPoints()
 	centerChoco:SetPoint("LEFT",self,"CENTER", -deltaX,0)
 	centerChoco:SetPoint("BOTTOM",self,"BOTTOM", -deltaX,0)
-	--Debug("Bar:UpdateCenter(): name=",centerChoco.name,"totalwidth=",totalwidth,"deltaX=",deltaX,"centerChocoPosX",centerChocoPosX)
-	--start delay
-	wait = 1
-	updateframe:SetScript("OnUpdate", OnUpdate) 
 end
