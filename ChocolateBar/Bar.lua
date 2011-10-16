@@ -34,18 +34,18 @@ function Bar:New(name, settings, database)
 	frame:SetHeight(db.height)
 	frame:EnableMouse(true)
 	frame:SetScript("OnEnter", function(self) 
-		if db.combathidebar and ChocolateBar.InCombat then return end
+		if (db.combathidebar or settings.hideBarInCombat) and ChocolateBar.InCombat then return end
 		self:ShowAll()
 	end)
 	frame:SetScript("OnLeave", function(self) 
-		if db.combathidebar and ChocolateBar.InCombat then return end
+		if (db.combathidebar or settings.hideBarInCombat) and ChocolateBar.InCombat then return end
 		if self.autohide then
 			self:HideAll()
 		end
 	end)
 	
 	frame:SetScript("OnMouseUp", function(self, button) 
-		if db.combatdisbar and ChocolateBar.InCombat then return end
+		if (db.combathidebar or settings.hideBarInCombat) and ChocolateBar.InCombat then return end
 		if button == "RightButton" then
 			if db.disableoptons and ChocolateBar.InCombat then return end
 			if db.barRightClick == "OPTIONS" then
@@ -60,7 +60,7 @@ function Bar:New(name, settings, database)
 		end
 	end)
 	
-	frame.settings = settings
+	frame.settings = settings	
 	frame.autohide = settings.hideonleave
 	frame:UpdateTexture(db)
 	frame:UpdateColors(db)

@@ -742,6 +742,17 @@ local function setAutoHide(info, value)
 	--ChocolateBar:UpdateBarOptions("UpdateAutoHide")
 end
 
+--hide bar during combat
+local function gethideBarInCombat(info, value)
+	local name = info[#info-2]
+	return db.barSettings[name].hideBarInCombat 
+end
+
+local function sethideBarInCombat(info, value)
+	local name = info[#info-2]
+	db.barSettings[name].hideBarInCombat = value
+end
+
 local function GetBarWidth(info)
 	--Debug(GetScreenWidth(),UIParent:GetEffectiveScale(),UIParent:GetWidth(),math.floor(GetScreenWidth()))
 	local name = info[#info-2]
@@ -1234,6 +1245,14 @@ function ChocolateBar:AddBarOptions(name)
 						desc = L["Enable free placement for this bar"],
 						get = GetFreeBar,
 						set = SetFreeBar,
+					},
+					hidebar = {
+						type = 'toggle',
+						order = 2,
+						name = L["Hide In Combat"],
+						desc = L["Hide this bar during combat."],
+						get = gethideBarInCombat,
+						set = sethideBarInCombat,
 					},
 				},
 			},
