@@ -290,13 +290,14 @@ end
 
 function ChocolateBar:OnEnterCombat()
 	self.InCombat = true
-	if db.combathidebar then
-		for name,bar in pairs(chocolateBars) do
+	local combatHideAllBars = db.combathidebar
+	local combatOpacityAllBars = db.combatopacity
+	for name,bar in pairs(chocolateBars) do
+		local settings = bar.settings
+		if combatHideAllBars or settings.hideBarInCombat then
 			bar.tempHide = bar:IsShown()
 			bar:Hide()
-		end
-	elseif db.combatopacity < 1 then
-		for name,bar in pairs(chocolateBars) do
+		elseif combatOpacityAllBars < 1 then
 			bar.tempHide = bar:GetAlpha()
 			bar:SetAlpha(db.combatopacity)
 		end
@@ -305,14 +306,15 @@ end
 
 function ChocolateBar:OnLeaveCombat()
 	self.InCombat = false
-	if db.combathidebar then
-		for name,bar in pairs(chocolateBars) do
+	local combatHideAllBars = db.combathidebar
+	local combatOpacityAllBars = db.combatopacity
+	for name,bar in pairs(chocolateBars) do
+		local settings = bar.settings
+		if combatHideAllBars or settings.hideBarInCombat then
 			if bar.tempHide then
 				bar:Show()
 			end
-		end
-	elseif db.combatopacity < 1 then
-		for name,bar in pairs(chocolateBars) do
+		elseif combatOpacityAllBars < 1 then
 			if bar.tempHide then
 				bar:SetAlpha(1)
 			end
