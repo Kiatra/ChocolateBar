@@ -26,8 +26,15 @@ local function resizeFrame(self)
 	if self.bar then self.bar:UpdateCenter() end
 end
 
+function findpattern(text, pattern, start)
+  return string.sub(text, string.find(text, pattern, start))
+end
+
 local function TextUpdater(frame, value)
-	--frame.text:SetText("("..frame.settings.index..") "..value)
+	if db.forceColor then
+		value = string.gsub(value, "|c........", "")
+		value = string.gsub(value, "|r", "")
+	end
 	frame.text:SetText(value)
 	resizeFrame(frame)
 end
