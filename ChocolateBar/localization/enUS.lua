@@ -2,6 +2,8 @@ local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
 local L = AceLocale:NewLocale("ChocolateBar", "enUS", true)
 if not L then return end
 
+L["Force Text Color"] = true
+L["Remove custom colors from plugins."] = true
 
 L["Hide In Combat"] = true
 L["Hide this bar during combat."] = true

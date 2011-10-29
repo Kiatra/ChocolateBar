@@ -29,6 +29,8 @@ localization\frFr.lua
 localization\koKR.lua
 localization\zhCN.lua
 localization\zhTW.lua
+localization\ptBR.lua
+localization\ruRU.lua
 
 Core.lua
 DragAndDrop.lua
