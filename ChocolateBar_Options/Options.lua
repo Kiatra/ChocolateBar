@@ -529,6 +529,29 @@ local aceoptions = {
 										ChocolateBar:UpdateChoclates("updateSettings")
 									end,
 								},
+								forceColor = {
+									type = 'toggle',
+									width = "double",
+									order = 9,
+									name = L["Force Text Color"],
+									desc = L["Remove custom colors from plugins."],
+									get = function(info, value)
+										return db.forceColor
+									end,
+									set = function(info, value)
+										db.forceColor = value
+										for name, obj in broker:DataObjectIterator() do
+											if db.objSettings[name] then
+												if db.objSettings[name].enabled then
+													local choco = ChocolateBar:GetChocolate(name)
+													if choco then
+														choco:Update(choco, "text", obj.text)
+													end
+												end
+											end
+										end
+									end,
+								},
 							},
 						},
 					},
