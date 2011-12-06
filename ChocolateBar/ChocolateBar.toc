@@ -37,4 +37,4 @@ DragAndDrop.lua
 Chocolate.lua
 Bar.lua
 MoreChocolate.lua
-Clock.lua
+#Clock.lua
