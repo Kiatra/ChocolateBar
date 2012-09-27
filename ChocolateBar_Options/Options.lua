@@ -218,6 +218,18 @@ local aceoptions = {
 									ChocolateBar:UpdateBarOptions("UpdateBar")
 							end,
 						},
+						hideBarsPetBattle = {
+							type = 'toggle',
+							order = 10,
+							name = L["Hide Bars in Pet Battle"],
+							desc = L["Hide Bars during a Pet Battle."],
+							get = function(info, value)
+									return db.petBattleHideBars
+							end,
+							set = function(info, value)
+									db.petBattleHideBars = value
+							end,
+						},
 					},
 				},
 				defaults = {
@@ -281,7 +293,7 @@ local aceoptions = {
 											db.combathidetip = value
 									end,
 								},
-								hidebar = {
+								hidebars = {
 									type = 'toggle',
 									order = 2,
 									name = L["Hide Bars"],

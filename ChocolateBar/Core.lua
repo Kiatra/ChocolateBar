@@ -147,6 +147,7 @@ function ChocolateBar:OnInitialize()
 			combathidetip = false,
 			combathidebar = false,
 			combatdisbar = false,
+			petBattleHideBars = true,
 			combatopacity = 1,
 			hideonleave = false,
 			scale = 1,
@@ -235,6 +236,10 @@ function ChocolateBar:OnInitialize()
 	self:RegisterEvent("PLAYER_REGEN_DISABLED","OnEnterCombat")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED","OnLeaveCombat")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD","OnEnterWorld")
+
+	self:RegisterEvent("PET_BATTLE_OPENING_START","OnPetBattleOpen")
+	self:RegisterEvent("PET_BATTLE_OVER","OnPetBattleOver")
+	
 	db = self.db.profile
 	
 	local barSettings = db.barSettings
@@ -286,6 +291,29 @@ end
 function ChocolateBar:OnEnterWorld()
 	self:UpdateChoclates("resizeFrame")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+end
+
+function ChocolateBar:OnPetBattleOpen(...)
+	Debug("OnPetBattleOpen", ...)
+	self.InCombat = true
+	if db.petBattleHideBars then
+		for name,bar in pairs(chocolateBars) do
+			bar.tempHide = bar:IsShown()
+			bar:Hide()
+		end
+	end
+end
+
+function ChocolateBar:OnPetBattleOver(...)
+	Debug("OnPetBattleClose", ...)
+	self.InCombat = false
+	if db.petBattleHideBars then
+		for name,bar in pairs(chocolateBars) do
+			if bar.tempHide then
+				bar:Show()
+			end
+		end
+	end
 end
 
 function ChocolateBar:OnEnterCombat()
@@ -441,7 +469,6 @@ function ChocolateBar:SetBars(tab)
 	chocolateBars = tab or {}
 end
 
--- find lowest free bar number
 local function getFreeBarName()
 	--local i = 1
 	local used = false
