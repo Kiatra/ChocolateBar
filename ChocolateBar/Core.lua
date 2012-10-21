@@ -298,7 +298,7 @@ function ChocolateBar:OnPetBattleOpen(...)
 	self.InCombat = true
 	if db.petBattleHideBars then
 		for name,bar in pairs(chocolateBars) do
-			bar.tempHide = bar:IsShown()
+			bar.petHide = bar:IsShown()
 			bar:Hide()
 		end
 	end
@@ -309,11 +309,13 @@ function ChocolateBar:OnPetBattleOver(...)
 	self.InCombat = false
 	if db.petBattleHideBars then
 		for name,bar in pairs(chocolateBars) do
-			if bar.tempHide then
+			if bar.petHide then
 				bar:Show()
+				bar:UpdateJostle(db)
 			end
 		end
 	end
+	
 end
 
 function ChocolateBar:OnEnterCombat()
