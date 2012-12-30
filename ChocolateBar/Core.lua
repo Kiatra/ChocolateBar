@@ -238,7 +238,7 @@ function ChocolateBar:OnInitialize()
 	self:RegisterEvent("PLAYER_ENTERING_WORLD","OnEnterWorld")
 
 	self:RegisterEvent("PET_BATTLE_OPENING_START","OnPetBattleOpen")
-	self:RegisterEvent("PET_BATTLE_OVER","OnPetBattleOver")
+	self:RegisterEvent("PET_BATTLE_CLOSE","OnPetBattleOver")
 	
 	db = self.db.profile
 	
