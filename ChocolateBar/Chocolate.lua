@@ -15,11 +15,14 @@ local function resizeFrame(self)
 		width = width + self.icon:GetWidth() + textOffset
 	end
 	if settings.showText then
-		if settings.width == 0 then
+		if settings.widthBehavior == "fixed" then
+			width = width + settings.width
+		elseif settings.widthBehavior == "max" then
+			local textWidth = self.text:GetStringWidth()
+			width = width + min(textWidth, settings.width)
+		else
 			local textWidth = self.text:GetStringWidth()
 			width = width + textWidth
-		else
-			width = width + settings.width
 		end
 	end
 	self:SetWidth(width)

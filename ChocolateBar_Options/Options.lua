@@ -1088,6 +1088,30 @@ local function SetWidth(info, value)
 	ChocolateBar:AttributeChanged(nil, name, "updateSettings", value)
 end
 
+local function GetWidthBehavior(info)
+	local cleanName = info[#info-2]
+	local name = chocolateOptions[cleanName].desc
+	--return db.objSettings[name].widthBehavior or "free" and db.objSettings[name].width == 0 or "fixed"
+	if not db.objSettings[name].widthBehavior and db.objSettings[name].width == 0 then
+		return "free"
+	else
+		return db.objSettings[name].widthBehavior or "fixed"
+	end
+end
+
+local function SetWidthBehavior(info, value)
+	local cleanName = info[#info-2]
+	local name = chocolateOptions[cleanName].desc
+	db.objSettings[name].widthBehavior = value
+	ChocolateBar:AttributeChanged(nil, name, "updateSettings", value)
+end
+
+local function IsDisabledTextWidth(info)
+	local cleanName = info[#info-2]
+	local name = chocolateOptions[cleanName].desc
+	return true and (db.objSettings[name].widthBehavior == "free" or not db.objSettings[name].widthBehavior) or false
+end
+
 local function GetIconImage(info, name)
 	if info then
 		local cleanName = info[#info]
@@ -1380,6 +1404,7 @@ function ChocolateBar:RemoveBarOptions(name)
 end
 
 local alignments = {left=L["Left"],center=L["Center"], right=L["Right"]}
+local widthBehaviorTypes  = {free=L["Free"],fixed=L["Fixed"], max=L["Max"]}
 
 function ChocolateBar:AddObjectOptions(name,obj)
 	local t = obj.type
@@ -1450,25 +1475,35 @@ function ChocolateBar:AddObjectOptions(name,obj)
 						set = SetIcon,
 						disabled = IsDisabledIcon,
 					},
-					width = {
-						type = 'range',
-						order = 7,
-						name = L["Fixed Text Width"],
-						desc = L["Set a width for the text. Set 0 to disable fixed text width."],
-						min = 0,
-						max = 500,
-						step = 1,
-						get = GetWidth,
-						set = SetWidth,
-					},
 					alignment = {
 						type = 'select',
-						order = 8,
+						order = 6,
 						values = alignments,
 						name = L["Alignment"],
 						desc = L["Alignment"],
 						get = GetAlignment,
 						set = SetAlignment,
+					},
+					widthBehavior = {
+						type = 'select',
+						order = 7,
+						values = widthBehaviorTypes,
+						name = L["Width Behavior"],
+						desc = L["How should the plugin width adapt to the text?"],
+						get = GetWidthBehavior,
+						set = SetWidthBehavior,
+					},
+					width = {
+						type = 'range',
+						order = 8,
+						name = L["Fixed/Max Text Width"],
+						desc = L["Set fixed or max width for the text."],
+						min = 0,
+						max = 500,
+						step = 1,
+						get = GetWidth,
+						set = SetWidth,
+						disabled = IsDisabledTextWidth,
 					},
 				},
 			},
