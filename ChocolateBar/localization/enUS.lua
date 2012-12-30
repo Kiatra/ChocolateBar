@@ -2,6 +2,16 @@ local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
 local L = AceLocale:NewLocale("ChocolateBar", "enUS", true)
 if not L then return end
 
+L["Free"] = true
+L["Fixed"] = true
+L["Max"] = true
+
+L["Fixed/Max Text Width"] = true
+L["Set fixed or max width for the text."] = true
+
+L["Width Behavior"] = true
+L["How should the plugin width adapt to the text?"] = true
+
 L["Hide Bars in Pet Battle"] = true
 L["Hide Bars during a Pet Battle."] = true
 
@@ -99,8 +109,6 @@ L["Type"] = true
 L["Enabled"] = true
 L["Show Text"] = true
 L["Show Icon"] = true
-L["Fixed Text Width"] = true
-L["Set a width for the text. Set 0 to disable fixed text width."] = true
 L["Quick Config"] = true
 L["Plugin Statistics"] = true
 L["Bars"] = true
