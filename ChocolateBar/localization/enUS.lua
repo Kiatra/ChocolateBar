@@ -2,6 +2,9 @@ local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
 local L = AceLocale:NewLocale("ChocolateBar", "enUS", true)
 if not L then return end
 
+L["Desaturated Icons"] = true
+L["Show icons in gray scale mode (This will not affect icons embedded in the text of a plugin)."] = true
+
 L["Free"] = true
 L["Fixed"] = true
 L["Max"] = true

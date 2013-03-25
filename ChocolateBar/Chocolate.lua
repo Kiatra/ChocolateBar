@@ -23,6 +23,7 @@ local function resizeFrame(self)
 		else
 			local textWidth = self.text:GetStringWidth()
 			width = width + textWidth
+			--self.text:SetAlphaGradient(1,textWidth)
 		end
 	end
 	self:SetWidth(width)
@@ -80,6 +81,7 @@ local function SettingsUpdater(self, value)
 end
 
 local function IconColorUpdater(frame, value, name)
+	frame.icon:SetDesaturated(db.desaturated);
 	if value then
 		local obj = frame.obj
 		local r = obj.iconR or 1
@@ -104,6 +106,7 @@ local function CreateIcon(self, icon)
 	if obj.iconCoords then
 		iconTex:SetTexCoord(unpack(obj.iconCoords))
 	end
+	iconTex:SetDesaturated(db.desaturated);
 	self.icon = iconTex
 end
 
@@ -171,11 +174,12 @@ local function GetAnchors(frame)
 	end
 end
 
--- some code taken with permission from fortress 
 local function PrepareTooltip(frame, anchorFrame)
-	if frame and frame.SetOwner and anchorFrame then
-		frame:SetOwner(anchorFrame, "ANCHOR_NONE")
+	if frame and anchorFrame then
 		frame:ClearAllPoints()
+		if frame.SetOwner then
+			frame:SetOwner(anchorFrame, "ANCHOR_NONE")
+		end	
 		local a1, a2 = GetAnchors(anchorFrame)
 		frame:SetPoint(a1, anchorFrame, a2)
 	end
@@ -234,6 +238,8 @@ local function OnLeave(self)
 	if db.combathidetip and ChocolateBar.InCombat then return end
 	if obj.OnLeave then
 		obj.OnLeave(self)
+	elseif obj.tooltip then
+		obj.tooltip:Hide()
 	else
 		GameTooltip:Hide()
 	end
