@@ -541,6 +541,28 @@ local aceoptions = {
 										ChocolateBar:UpdateChoclates("updateSettings")
 									end,
 								},
+								iconcolour = {
+									type = "toggle",
+									order = 4,
+									name = L["Desaturated Icons"],
+									desc = L["Show icons in gray scale mode (This will not affect icons embedded in the text of a plugin)."],
+									get = function(info)
+										return db.desaturated
+									end,
+									set = function(info, vale)
+										db.desaturated = vale
+										for name, obj in broker:DataObjectIterator() do
+											if db.objSettings[name] then
+												if db.objSettings[name].enabled then
+													local choco = ChocolateBar:GetChocolate(name)
+													if choco then
+														choco:Update(choco, "iconR", nil)
+													end
+												end
+											end
+										end
+									end,
+								},
 								forceColor = {
 									type = 'toggle',
 									width = "double",
