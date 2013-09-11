@@ -1,4 +1,4 @@
-﻿## Interface: 50300
+﻿## Interface: 50400
 ## Title: ChocolateBar [|cffeda55fOptions|r]
 ## Notes: Options module for ChocolateBar.
 ## Author: yess
