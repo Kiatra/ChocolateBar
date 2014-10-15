@@ -269,11 +269,13 @@ local function OnDragStart(frame)
 		-- hide libqtip and libtablet tooltips
 		local kids = {_G.UIParent:GetChildren()}
 		for _, child in ipairs(kids) do
-			for i = 1, child:GetNumPoints() do
-				local _,relativeTo,_,_,_ = child:GetPoint(i)
-				if relativeTo == frame then
-					--Debug(i,child:GetName())
-					child:Hide()
+			if not child:IsForbidden() then
+				for i = 1, child:GetNumPoints() do
+					local _,relativeTo,_,_,_ = child:GetPoint(i)
+					if relativeTo == frame then
+						--Debug(i,child:GetName())
+						child:Hide()
+					end
 				end
 			end
 		end
