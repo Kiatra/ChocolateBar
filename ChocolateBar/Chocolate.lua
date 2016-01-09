@@ -81,6 +81,8 @@ local function SettingsUpdater(self, value)
 end
 
 local function IconColorUpdater(frame, value, name)
+	if not frame.icon then return end 
+	
 	frame.icon:SetDesaturated(db.desaturated);
 	if value then
 		local obj = frame.obj
