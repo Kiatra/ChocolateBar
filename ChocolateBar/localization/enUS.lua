@@ -2,6 +2,7 @@ local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
 local L = AceLocale:NewLocale("ChocolateBar", "enUS", true)
 if not L then return end
 
+L["Tipp: Set the width behavior to fixed and adjust the the max text width to scale the placeholder."] = true
 L["Placeholder Options"] = true
 L["Highlight"] = true
 L["Temporarily highlights the position of the plugin on the bar."] = true
