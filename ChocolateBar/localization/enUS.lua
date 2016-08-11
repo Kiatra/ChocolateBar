@@ -2,6 +2,20 @@ local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
 local L = AceLocale:NewLocale("ChocolateBar", "enUS", true)
 if not L then return end
 
+L["Placeholder Options"] = true
+L["Highlight"] = true
+L["Temporarily highlights the position of the plugin on the bar."] = true
+L["Remove Placeholder"] = true
+L["Remove this Placeholder"] = true
+L["Placeholder"] = true
+
+L["Placeholders"] = true
+L["Create Placeholder"] = true
+L["Create New Placeholder"] = true
+
+L["Hide Orderhall Bar"] = true
+L["Hides the command bar displyed at the orderhall."] = true
+
 L["Desaturated Icons"] = true
 L["Show icons in gray scale mode (This will not affect icons embedded in the text of a plugin)."] = true
 
@@ -129,4 +143,3 @@ L["Select Bar"] = true
 L["Delay"] = true
 L["Set seconds until bar will hide."] = true
 L["None"] = true
-

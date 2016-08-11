@@ -28,14 +28,14 @@ local function GetStats(info)
 			end
 		end
 	end
-	
-	return _G.strjoin("\n","|cffffd200"..L["Enabled"].."|r  "..enabled, 
+
+	return _G.strjoin("\n","|cffffd200"..L["Enabled"].."|r  "..enabled,
 						"|cffffd200"..L["Disabled"].."|r  "..total-enabled,
 						"|cffffd200"..L["Total"].."|r  "..total,
 						"",
 						"|cffffd200"..L["Data Source"].."|r  "..data,
 						"|cffffd200"..L["Launcher"].."|r  "..total-data
-	) 
+	)
 end
 
 local function EnableAll(info)
@@ -58,7 +58,23 @@ local function DisableLauncher(info)
 	end
 end
 
-local aceoptions = { 
+
+function tablelength(T)
+  local count = 0
+  for _ in pairs(T) do count = count + 1 end
+  return count
+end
+
+local function createPlaceholder()
+	local placeholderNames = db.placeholderNames
+	local count = tablelength(placeholderNames) > 0 or 1
+	local name = L["Placeholder"]..tablelength(placeholderNames)
+	placeholderNames[name] = true
+	ChocolateBar:Debug("createPlaceholder", name, tablelength(placeholderNames))
+	ChocolateBar:AddObjectOptions(name, ChocolateBar:NewPlaceholder(name))
+end
+
+local aceoptions = {
     name = "ChocolateBar".." "..version,
     handler = ChocolateBar,
 	type='group',
@@ -68,7 +84,6 @@ local aceoptions = {
 			name = L["Look and Feel"],
 			type="group",
 			order = 0,
-			
 			args={
 				general = {
 					inline = true,
@@ -163,12 +178,12 @@ local aceoptions = {
 						},
 						strata = {
 							type = 'select',
-							values = {FULLSCREEN_DIALOG="Fullscreen_Dialog",FULLSCREEN="Fullscreen", 
+							values = {FULLSCREEN_DIALOG="Fullscreen_Dialog",FULLSCREEN="Fullscreen",
 										DIALOG="Dialog",HIGH="High",MEDIUM="Medium",LOW="Low",BACKGROUND="Background"},
 							order = 6,
 							name = L["Bar Strata"],
 							desc = L["Bar Strata"],
-							get = function() 
+							get = function()
 								return db.strata
 							end,
 							set = function(info, value)
@@ -192,12 +207,12 @@ local aceoptions = {
 						},
 						barRightClick = {
 							type = 'select',
-							values = {NONE=L["none"],OPTIONS=L["ChocolateBar Options"], 
+							values = {NONE=L["none"],OPTIONS=L["ChocolateBar Options"],
 										BLIZZ=L["Blizzard Options"]},
 							order = 8,
 							name = L["Bar Right Click"],
 							desc = L["Select the action when right clicking on a bar."],
-							get = function() 
+							get = function()
 								return db.barRightClick
 							end,
 							set = function(info, value)
@@ -228,6 +243,19 @@ local aceoptions = {
 							end,
 							set = function(info, value)
 									db.petBattleHideBars = value
+							end,
+						},
+						hideOrderHallCommandBar = {
+							type = 'toggle',
+							order = 11,
+							name = L["Hide Orderhall Bar"],
+							desc = L["Hides the command bar displyed at the orderhall."],
+							get = function(info, value)
+									return db.hideOrderHallCommandBar
+							end,
+							set = function(info, value)
+									db.hideOrderHallCommandBar = value
+									ChocolateBar:ToggleOrderHallCommandBar()
 							end,
 						},
 					},
@@ -379,7 +407,7 @@ local aceoptions = {
 									order = 1,
 									name = L["Background Texture"],
 									desc = L["Some of the textures may depend on other addons."],
-									get = function() 
+									get = function()
 										return db.background.textureName
 									end,
 									set = function(info, value)
@@ -436,7 +464,7 @@ local aceoptions = {
 									order = 2,
 									name = L["Background Texture"],
 									desc = L["Some of the textures may depend on other addons."],
-									get = function() 
+									get = function()
 										return db.background.textureName
 									end,
 									set = function(info, value)
@@ -499,7 +527,7 @@ local aceoptions = {
 								order = 1,
 								name = L["Font"],
 								desc = L["Some of the fonts may depend on other addons."],
-								get = function() 
+								get = function()
 									return db.fontName
 								end,
 								set = function(info, value)
@@ -623,6 +651,13 @@ local aceoptions = {
 						ChocolateBar:AddBarOptions(name)
 					end,
 				},
+				newPlaceholder = {
+					type = 'execute',
+					order = 0,
+					name = L["Create Placeholder"],
+					desc = L["Create New Placeholder"],
+					func = createPlaceholder,
+				},
 			},
 		},
 		chocolates={
@@ -678,6 +713,39 @@ local aceoptions = {
 }
 local chocolateOptions = aceoptions.args.chocolates.args
 local barOptions = aceoptions.args.bars.args
+
+local function removePlaceholder(info)
+	local cleanName = info[#info-2]
+	local name = chocolateOptions[cleanName].desc
+	db.placeholderNames[cleanName] = nil
+	ChocolateBar:DisableDataObject(name)
+	chocolateOptions[cleanName] = nil
+end
+
+placeholderOptions = {
+		inline = true,
+		name=L["Placeholder Options"],
+		type="group",
+		order = 1,
+		args={
+			disablePlaceholder = {
+				type = 'execute',
+				order = 5,
+				name = L["Remove Placeholder"],
+				desc = L["Remove this Placeholder"],
+				func = removePlaceholder,
+		  },
+	 },
+}
+
+local function addPlaceholderOption(cleanName)
+	for k, _ in pairs(db.placeholderNames) do
+			if cleanName == k then
+				Debug("addPlaceholderOption", k)
+				table.insert(chocolateOptions[cleanName].args, placeholderOptions)
+			end
+	end
+end
 
 -----
 -- bar option functions
@@ -785,7 +853,7 @@ local function MoveDown(info, value)
 		ChocolateBar:AnchorBars()
 	end
 end
-	
+
 local function getAutoHide(info, value)
 	local name = info[#info-2]
 	return db.barSettings[name].autohide
@@ -802,7 +870,7 @@ end
 --hide bar during combat
 local function gethideBarInCombat(info, value)
 	local name = info[#info-2]
-	return db.barSettings[name].hideBarInCombat 
+	return db.barSettings[name].hideBarInCombat
 end
 
 local function sethideBarInCombat(info, value)
@@ -814,7 +882,7 @@ local function GetBarWidth(info)
 	--Debug(GetScreenWidth(),UIParent:GetEffectiveScale(),UIParent:GetWidth(),math.floor(GetScreenWidth()))
 	local name = info[#info-2]
 	local maxBarWidth = _G.math.floor(_G.GetScreenWidth())
-	
+
 	return db.barSettings[name].width
 end
 
@@ -826,12 +894,12 @@ local function SetBarWidth(info, value)
 	local bar = ChocolateBar:GetBar(name)
 	if value > _G.GetScreenWidth() or value == 0 then
 		bar:SetPoint("RIGHT", "UIParent" ,"RIGHT",0, 0);
-	else	
+	else
 		local relative, relativePoint
 		settings.barPoint ,relative ,relativePoint,settings.barOffx ,settings.barOffy = bar:GetPoint()
-		if settings.barOffy == 0 then settings.barOffy = 1 end  
+		if settings.barOffy == 0 then settings.barOffy = 1 end
 		bar:ClearAllPoints()
-		bar:SetPoint(settings.barPoint, "UIParent",settings.barOffx,settings.barOffy)	
+		bar:SetPoint(settings.barPoint, "UIParent",settings.barOffx,settings.barOffy)
 		bar:SetWidth(value)
 	end
 end
@@ -857,15 +925,15 @@ local function SetLockedBar(info, value)
 		--unlock
 		if not moveBarDummy then
 			moveBarDummy = _G.CreateFrame("Frame",bar)
-			moveBarDummy:SetBackdrop({bgFile = "Interface/Tooltips/UI-Tooltip-Background", 
-												nil, 
-												tile = true, tileSize = 16, edgeSize = 16, 
+			moveBarDummy:SetBackdrop({bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+												nil,
+												tile = true, tileSize = 16, edgeSize = 16,
 												nil});
 			moveBarDummy:SetBackdropColor(1,0,0,1);
 			moveBarDummy:RegisterForDrag("LeftButton")
 			moveBarDummy:SetFrameStrata("FULLSCREEN_DIALOG")
 			moveBarDummy:SetFrameLevel(10)
-			moveBarDummy:SetScript("OnMouseUp", function(self, btn) 
+			moveBarDummy:SetScript("OnMouseUp", function(self, btn)
 				if btn == "RightButton" then
 					ChocolateBar:ChatCommand()
 				end
@@ -874,7 +942,7 @@ local function SetLockedBar(info, value)
 		moveBarDummy.bar = bar
 		moveBarDummy:SetAllPoints(bar)
 		moveBarDummy:Show()
-		
+
 		bar:RegisterForDrag("LeftButton")
 		bar:EnableMouse(true)
 		bar:SetFrameStrata("FULLSCREEN_DIALOG")
@@ -901,7 +969,7 @@ local function SetLockedBar(info, value)
 		settings.width = bar:GetWidth()
 		bar:SetFrameStrata(db.strata)
 		bar:SetFrameLevel(1)
-		if moveBarDummy then moveBarDummy:Hide() end 
+		if moveBarDummy then moveBarDummy:Hide() end
 	end
 end
 
@@ -946,7 +1014,7 @@ local function SetBarOff(info, value)
 	local offtype = info[#info]
 	local bar = ChocolateBar:GetBar(name)
 	local settings = db.barSettings[name]
-	bar = ChocolateBar:GetBar(name)	
+	bar = ChocolateBar:GetBar(name)
 	local relative, relativePoint
 	settings.barPoint ,relative ,relativePoint,settings.barOffx ,settings.barOffy = bar:GetPoint()
 	if offtype == "xoff" then
@@ -955,7 +1023,7 @@ local function SetBarOff(info, value)
 		settings.fineY = value
 	end
 	bar:ClearAllPoints()
-	bar:SetPoint(settings.barPoint, "UIParent",settings.barOffx + settings.fineX ,settings.barOffy + settings.fineY)	
+	bar:SetPoint(settings.barPoint, "UIParent",settings.barOffx + settings.fineX ,settings.barOffy + settings.fineY)
 end
 
 local function GetLockedBar(info, value)
@@ -1052,10 +1120,14 @@ local function SetEnabled(info, value)
 	end
 end
 
-local function GetEnabled(info, value)
+local function GetEnabled(info)
 	local cleanName = info[#info-2]
 	local name = chocolateOptions[cleanName].desc
 	return db.objSettings[name].enabled
+end
+
+local function GetDisabled(info)
+	return not GetEnabled(info)
 end
 
 local function GetIcon(info, value)
@@ -1140,8 +1212,8 @@ local function GetIconImage(info, name)
 		name = chocolateOptions[cleanName].desc
 	end
 	local obj = broker:GetDataObjectByName(name)
-	if obj and obj.icon then	
-		return obj.icon	
+	if obj and obj.icon then
+		return obj.icon
 	end
 	return "Interface\\AddOns\\ChocolateBar\\pics\\ChocolatePiece"
 end
@@ -1150,8 +1222,8 @@ local function GetIconCoords(info)
 	local cleanName = info[#info]
 	local name = chocolateOptions[cleanName].desc
 	local obj = broker:GetDataObjectByName(name)
-	if obj and obj.iconCoords then	
-		return obj.iconCoords	
+	if obj and obj.iconCoords then
+		return obj.iconCoords
 	end
 end
 
@@ -1241,19 +1313,58 @@ local function GetHeaderImage(info)
 	return GetIconImage(nil, name), 20 ,20
 end
 
+local function cancelTimer()
+		ChocolateBar:Debug("cancelTimer")
+		pointer:Hide()
+end
+
+local function ShowPluginOnBar(info)
+	local cleanName = info[#info-2]
+	local name = chocolateOptions[cleanName].desc
+	local choco = ChocolateBar:GetChocolate(name)
+	ChocolateBar:Debug("ShowPluginOnBar", choco, choco.frame)
+	if choco then
+		choco.blinkTimerCount = 0
+		choco:SetBackdrop({bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+		                                        edgeFile = nil,
+		                                       tile = true, tileSize = 16, edgeSize = 16,
+		                                        insets = { left = 0, right = 0, top = 0, bottom = 0 }})
+
+		local pointer = ChocolateBar:GetPointer(choco)
+		pointer:ClearAllPoints()
+		pointer:SetPoint("CENTER",choco,"CENTER", pointer:GetWidth()/2, 0)
+		pointer:SetAlpha(0)
+		pointer:Hide()
+		ChocolateBar:CancelTimer(choco.timer)
+		pointer:Show()
+		choco.timer = ChocolateBar:ScheduleRepeatingTimer(function(choco)
+			local c = choco.blinkTimerCount
+			c = c + 1
+			choco:SetBackdropColor(1,0,0,c%2)
+			pointer:SetAlpha(c%2)
+			if c >= 10 then
+    		ChocolateBar:CancelTimer(choco.timer)
+				choco:SetBackdropColor(1,0,0,0)
+				pointer:SetAlpha(0)
+				pointer:Hide()
+  		end
+			choco.blinkTimerCount = c
+		end, 0.1, choco, cancelTimer)
+	end
+end
+
+
 function ChocolateBar:RegisterOptions(data)
-	--self.db = LibStub("AceDB-3.0"):New("ChocolateBarDB", defaults, "Default")
 	db = data
 	moreChocolate = broker:GetDataObjectByName("MoreChocolate")
 	if moreChocolate then
 		aceoptions.args.morechocolate = moreChocolate:GetOptions()
 	end
-	
+
 	LibStub("AceConfig-3.0"):RegisterOptionsTable("ChocolateBar", aceoptions)
 	aceoptions.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
-	--local optionsFrame = AceCfgDlg:AddToBlizOptions("ChocolateBar", "ChocolateBar")
 	AceCfgDlg:SetDefaultSize("ChocolateBar", 600, 600)
-	
+
 	self.db.RegisterCallback(self, "OnProfileChanged", "OnProfileChanged")
 	self.db.RegisterCallback(self, "OnProfileCopied", "OnProfileChanged")
 	self.db.RegisterCallback(self, "OnProfileReset", "OnProfileChanged")
@@ -1262,13 +1373,13 @@ end
 local firstOpen = true
 function ChocolateBar:OpenOptions(chocolateBars, data, input, pluginName)
 	local AceCfgDlg = LibStub("AceConfigDialog-3.0")
-	
+
 	if firstOpen then
 		ChocolateBar:RegisterOptions(data)
 		for name,bar in pairs(chocolateBars) do
 			ChocolateBar:AddBarOptions(name)
 		end
-		
+
 		AceCfgDlg:SelectGroup("ChocolateBar", "chocolates")
 		AceCfgDlg:SelectGroup("ChocolateBar", "general")
 		firstOpen = false
@@ -1276,15 +1387,14 @@ function ChocolateBar:OpenOptions(chocolateBars, data, input, pluginName)
 	if pluginName then
 		AceCfgDlg:SelectGroup("ChocolateBar", "chocolates",pluginName)
 	end
-	
+
 	for name, obj in broker:DataObjectIterator() do
 		ChocolateBar:AddObjectOptions(name, obj)
 	end
-	
+
 	if not input or input:trim() == "" then
 		AceCfgDlg:Open("ChocolateBar")
 	else
-		--AceCfgDlg:SelectGroup("ChocolateBar", "chocolates", input)
 		LibStub("AceConfigCmd-3.0").HandleCommand(ChocolateBar, "chocolatebar", "ChocolateBar", input)
 	end
 end
@@ -1435,20 +1545,19 @@ function ChocolateBar:AddObjectOptions(name,obj)
 	end
 	--local curse = GetAddOnMetadata(name,"X-Curse-Packaged-Version") or ""
 	--local version = GetAddOnMetadata(name,"Version") or ""
-	
+
 	t = t or "not set"
 	local cleanName
 	local label = obj.label
-	if label then 
+	if label then
 		cleanName = string.gsub(label, "\|c........", "")
 	else
 		cleanName = string.gsub(name, "\|c........", "")
 	end
 	cleanName = string.gsub(cleanName, "\|r", "")
 	cleanName = string.gsub(cleanName, "[%c \127]", "")
-	
+
 	--use cleanName of name because aceconfig does not like some characters in the plugin names
-		
 	chocolateOptions[cleanName] = {
 		name = GetName,
 		desc = name,
@@ -1468,6 +1577,14 @@ function ChocolateBar:AddObjectOptions(name,obj)
 						type = "description",
 						name = GetType,
 						--image = GetHeaderImage,
+					},
+					showPluginOnBar = {
+						type = 'execute',
+						order = 3,
+						name = L["Highlight"],
+						desc = L["Temporarily highlights the position of the plugin on the bar."],
+						func = ShowPluginOnBar,
+						disabled = GetDisabled,
 					},
 					enabled = {
 						type = 'toggle',
@@ -1529,7 +1646,7 @@ function ChocolateBar:AddObjectOptions(name,obj)
 					},
 				},
 			},
-			textOffset = {	
+			textOffset = {
 				inline = true,
 				name=L["Overwrite Text Offset"],
 				type="group",
@@ -1557,7 +1674,7 @@ function ChocolateBar:AddObjectOptions(name,obj)
 					},
 				},
 			},
-			iconSize = {	
+			iconSize = {
 				inline = true,
 				name=L["Overwrite Icon Size"],
 				type="group",
@@ -1589,6 +1706,8 @@ function ChocolateBar:AddObjectOptions(name,obj)
 			},
 		},
 	}
+
+	addPlaceholderOption(cleanName)
 end
 
 -- remove a bar and disalbe all plugins in it
@@ -1629,14 +1748,14 @@ function ChocolateBar:OnProfileChanged(event, database, newProfileKey)
 	Debug("OnProfileChanged", event, database, newProfileKey)
 	db = database.profile
 	self:UpdateDB(db)
-	
+
 	for k, v in pairs(self:GetBars()) do
 		ChocolateBar:RemoveBarOptions(k)
 		v:Hide()
 		Drag:UnregisterFrame(v)
 		v = nil
 	end
-	--self:SetBars()
+
 	local barSettings = db.barSettings
 	for k, v in pairs(barSettings) do
 		local name = v.barName
@@ -1644,7 +1763,7 @@ function ChocolateBar:OnProfileChanged(event, database, newProfileKey)
 		self:AddBarOptions(name)
 	end
 	self:AnchorBars()
-	
+
 	self:UpdateBarOptions()
 	for name, obj in broker:DataObjectIterator() do
 		local t = obj.type

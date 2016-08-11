@@ -9,17 +9,33 @@ local CreateFrame, UIParent = CreateFrame, UIParent
 local db
 --GLOBALS: InterfaceOptionsFrame_OpenToCategory, GetCursorPosition
 
+function Bar:OnMouseUp(button)
+	if (db.combathidebar or self.settings.hideBarInCombat) and ChocolateBar.InCombat then return end
+	if button == "RightButton" then
+		if db.disableoptons and ChocolateBar.InCombat then return end
+		if db.barRightClick == "OPTIONS" then
+			ChocolateBar:LoadOptions()
+		elseif db.barRightClick == "BLIZZ" then
+			InterfaceOptionsFrame_OpenToCategory("ChocolateBar");
+		end
+	else
+		if db.moreBar == self:GetName() then
+			self:Hide()
+		end
+	end
+end
+
 function Bar:New(name, settings, database)
 	db = database
 	local frame = CreateFrame("Frame",name,UIParent)
 	frame.chocolist = {} --create list of chocolate chocolist in the bar
-	
+
 	-- add class methods to frame object
 	for k, v in pairs(Bar) do
 		frame[k] = v
 	end
-	
-	frame:SetPoint("TOPLEFT",-1,1);	
+
+	frame:SetPoint("TOPLEFT",-1,1);
 	--frame:SetPoint("TOPLEFT", settings.xoff, settings.yoff);
 	--frame:SetClampedToScreen(true)
 	if settings.width == 0 then
@@ -30,41 +46,30 @@ function Bar:New(name, settings, database)
 		frame:SetPoint("RIGHT", "UIParent",0, 0);
 		frame:SetWidth(settings.width)
 	end
-	
+
 	frame:SetHeight(db.height)
 	frame:EnableMouse(true)
-	frame:SetScript("OnEnter", function(self) 
+	frame:SetScript("OnEnter", function(self)
 		if (db.combathidebar or settings.hideBarInCombat) and ChocolateBar.InCombat then return end
 		self:ShowAll()
 	end)
-	frame:SetScript("OnLeave", function(self) 
+	frame:SetScript("OnLeave", function(self)
 		if (db.combathidebar or settings.hideBarInCombat) and ChocolateBar.InCombat then return end
 		if self.autohide then
 			self:HideAll()
 		end
 	end)
-	
-	frame:SetScript("OnMouseUp", function(self, button) 
-		if (db.combathidebar or settings.hideBarInCombat) and ChocolateBar.InCombat then return end
-		if button == "RightButton" then
-			if db.disableoptons and ChocolateBar.InCombat then return end
-			if db.barRightClick == "OPTIONS" then
-				ChocolateBar:LoadOptions()
-			elseif db.barRightClick == "BLIZZ" then
-				InterfaceOptionsFrame_OpenToCategory("ChocolateBar");
-			end
-		else
-			if db.moreBar == self:GetName() then
-				self:Hide()
-			end
-		end
-	end)
-	
-	frame.settings = settings	
+
+	--frame:SetScript("OnMouseUp", function(self, button)
+--
+	--end)
+	frame:SetScript("OnMouseUp", self.OnMouseUp)
+
+	frame.settings = settings
 	frame.autohide = settings.hideonleave
 	frame:UpdateTexture(db)
 	frame:UpdateColors(db)
-	frame:UpdateStrata(db)	
+	frame:UpdateStrata(db)
 	return frame
 end
 
@@ -85,7 +90,7 @@ function Bar:UpdateAutoHide(db)
 end
 
 function Bar:UpdateJostle(db)
-	if jostle then 
+	if jostle then
 		jostle:Unregister(self)
 		if db.moveFrames then
 			if self.settings.align == "bottom" then
@@ -108,7 +113,7 @@ function Bar:UpdateHeight(db)
 	self.height = height
 	self:SetHeight(height)
 	ChocolateBar:UpdateChoclates("updateSettings")
-	db.fontSize = height - 8 
+	db.fontSize = height - 8
 	ChocolateBar:UpdateChoclates("updatefont")
 	self:UpdateJostle(db)
 end
@@ -124,9 +129,9 @@ end
 function Bar:UpdateTexture(db)
 	--local background = LSM:Fetch("statusbar", db.background.texture)
 	local bg = {
-		bgFile = db.background.texture, 
-		edgeFile = "Interface/Tooltips/UI-Tooltip-Border", 
-		tile = db.background.tile, tileSize = db.background.tileSize, edgeSize = db.background.edgeSize, 
+		bgFile = db.background.texture,
+		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+		tile = db.background.tile, tileSize = db.background.tileSize, edgeSize = db.background.edgeSize,
 		--insets = { left = 4, right = 4, top = 4, bottom = 4}
 		insets = { left = 0, right = 0, top = 0, bottom = 0}
 	}
@@ -145,29 +150,29 @@ end
 
 -- add some chocolate to a bar
 function Bar:AddChocolatePiece(choco, name, noupdate)
-	
+
 	local chocolist = self.chocolist
 	if chocolist[name] then
 		Debug("AddChocolatePiece: ",name," already in list.")
 		return
 	end
-	
+
 	chocolist[name] = choco
 	choco:SetParent(self)
 	choco.bar = self
-	
+
 	local settings = choco.settings
-	settings.barName = self:GetName() 
+	settings.barName = self:GetName()
 	--if not settings.index then
 	--	settings.index = 1
 	--end
 	if not noupdate then
 		self:UpdateBar()
 	end
-	
+
 	if self:GetAlpha() < 1 then
 		choco.text:Hide()
-		if choco.icon then 
+		if choco.icon then
 			choco.icon:Hide()
 		end
 	end
@@ -177,7 +182,7 @@ end
 function Bar:EatChocolatePiece(name)
 	self.chocolist = self.chocolist or {}
 	local choco = self.chocolist[name]
-	
+
 	if choco then
 		choco:Hide()
 		self.chocolist[name] = nil
@@ -189,7 +194,7 @@ function Bar:HideAll()
 	self:SetAlpha(0)
 	for k, v in pairs(self.chocolist) do
 		v.text:Hide()
-		if v.icon then 
+		if v.icon then
 			v.icon:Hide()
 		end
 	end
@@ -200,7 +205,7 @@ function Bar:ShowAll()
 	self:SetAlpha(1)
 	local settings
 	for k, v in pairs(self.chocolist) do
-		settings = v.settings 
+		settings = v.settings
 		--v:Show()
 		if settings.showText then
 			v.text:Show()
@@ -220,7 +225,7 @@ local function SortTab(tab)
 	local templeft = {}
 	local tempright = {}
 	local tempcenter = {}
-	
+
 	for k,v in pairs(tab) do
 		local index = v.settings.index or 500
 		if v.settings.align == "left" then
@@ -252,7 +257,7 @@ end
 function Bar:GetChocolateAtCursor()
 	local s = self:GetEffectiveScale()
 	local x, y = GetCursorPosition()
-	
+
 	x = x/s
 	for k, v in pairs(self.chocolist) do
 		if x > v:GetLeft() and x < v:GetRight() then --plugin found
@@ -268,28 +273,27 @@ function Bar:GetChocolateAtCursor()
 	local right = self.chocoMostRight and self.chocoMostRight:GetLeft() or self:GetRight()
 	local centerL = self.chocoCenterLeft and self.chocoCenterLeft:GetLeft() or self:GetWidth()/2
 	local centerR = self.chocoCenterRight and self.chocoCenterRight:GetRight() or self:GetWidth()/2
-	
+
 	local nameCenterLeft = self.chocoCenterLeft and self.chocoCenterLeft:GetName()
 	local nameCenterRight = self.chocoCenterRight and self.chocoCenterRight:GetName()
-	
+
 	if x < 8 then
 		return nil, "left" , "left" --left half on left side
 	end
 	if x > UIParent:GetWidth()-8 then
 		return nil, "right", "right"
 	end
-	
-	--Debug("left",math.ceil(left),"centerL",math.ceil(centerL),"centerR",math.ceil(centerR),"right",math.ceil(right),"x",x)
+
 	local centerPos = "center"
 	-- nocenter
-	if left > centerR then 
+	if left > centerR then
 		if x < right/2+left/2 then
-			return self.chocoMostLeft, "right", "left" --left half on right side 
+			return self.chocoMostLeft, "right", "left" --left half on right side
 		else
 			return self.chocoMostRight, "left" , "right" --right half on right side,
 		end
 	end
-	if right < centerL then 
+	if right < centerL then
 		if x < right/2+left/2 then
 			return self.chocoMostLeft, "right" , "left" --left half on left side
 		else
@@ -306,19 +310,19 @@ function Bar:GetChocolateAtCursor()
 	end
 	if x > centerR and x < right then
 		if x < right/2+centerR/2 then
-			return self.chocoCenterRight, "right", "center" --left half on right side 
+			return self.chocoCenterRight, "right", "center" --left half on right side
 		else
 			return self.chocoMostRight, "left" , "right" --right half on right side,
 		end
 	end
-	
+
 	return nil, nil
 end
 
---create a copy of the choco 
+--create a copy of the choco
 local function createDummy(self, choco, name)
 	local dummy = self.dummy
-	if not dummy then  
+	if not dummy then
 		--dummy = CreateFrame("Frame", "ChocolateDummy", self)
 		dummy = chocolate:New("dummy", choco.obj, choco.settings, ChocolateBar.db.profile)
 		dummy:SetParent(self)
@@ -331,38 +335,18 @@ local function createDummy(self, choco, name)
 	dummy:Show()
 	dummy:SetWidth(choco:GetWidth())
 	dummy:SetHeight(choco:GetHeight())
-	
+
 	dummy.settings.index = choco.settings.index
 	dummy.settings.align = choco.settings.align
 	self.chocolist[name] = dummy --replace original with dummy to free the original
 end
 
-local function createPointer(self, choco)
-	local pointer = self.pointer
-	if not pointer then
-		pointer = CreateFrame("Frame", "ChocolatePointer", self)
-		pointer:SetFrameStrata("FULLSCREEN_DIALOG")
-		pointer:SetFrameLevel(20)
-		pointer:SetWidth(15)
-		pointer:SetHeight(choco:GetHeight())
-		pointer.index = choco.settings.index
-		pointer.align = choco.settings.align
-		self.pointer = pointer
-		
-		local arrow = pointer:CreateTexture(nil, "DIALOG")
-		arrow:SetWidth(choco:GetHeight()+30)
-		arrow:SetHeight(choco:GetHeight()+30)
-		arrow:SetPoint("CENTER",pointer,"LEFT", 0, 0)
-		arrow:SetTexture("Interface\\AddOns\\ChocolateBar\\pics\\pointer")
-	end
-end
-
 function Bar:UpdateDragChocolate()
 	local choco, side, align = self:GetChocolateAtCursor()
 	local pointer = self.pointer
-	
+
 	--self.last = choco
-	
+
 	if choco then
 		pointer.align = choco.settings.align --align
 		local offset = 0.5
@@ -402,7 +386,7 @@ function Bar:Drag(name)
 	choco:SetAlpha(0.8)
 	--if choco.OnLeave then choco:OnLeave() end
 	createDummy(self, choco, name)
-	createPointer(self, choco)
+	self.pointer = ChocolateBar:GetPointer(self)
 	self:UpdateBar(true)
 end
 
@@ -412,9 +396,8 @@ function Bar:Drop(choco, pos)
 	settings.align = self.pointer.align
 	choco:SetAlpha(1)
 	self.pointer:Hide()
-	
+
 	local oldbar = ChocolateBar:GetBar(settings.barName)
-	--Debug("Bar:Drop oldbar=",oldbar,"  self=",self," settings.barName=",settings.barName)
 	--check if droped from different bar
 	if oldbar == self then -- same bar
 		self.dummy:Hide()
@@ -436,7 +419,7 @@ end
 
 function Bar:GetFocus(name)
 	local choco = ChocolateBar:GetChocolate(name)
-	createPointer(self, choco)
+	ChocolateBar:GetPointer(self)
 end
 
 -- rearange all chocolate chocolist in a given bar
@@ -446,7 +429,7 @@ function Bar:UpdateBar(updateindex)
 	-- set left plugins
 	local tempList = SortList(chocolates, "left")
 	self.chocoMostLeft = tempList[#tempList] and tempList[#tempList][1]
-	
+
 	local yoff = 0
 	local relative = nil
 	for i, v in ipairs(tempList) do
@@ -466,23 +449,23 @@ function Bar:UpdateBar(updateindex)
 		end
 		relative = choco
 	end
-	
+
 	-- set center plugins
 	self.listCenter = SortList(chocolates, "center")
 	local listCenter = self.listCenter
 	self.chocoCenterLeft = listCenter[1] and listCenter[1][1]
 	self.chocoCenterRight = listCenter[#listCenter] and listCenter[#listCenter][1]
-	
+
 	local centerIndex = math.ceil(#listCenter/2)
 	local v = listCenter[centerIndex]
 	local relative = nil
-	
-	if v then 
+
+	if v then
 		local centerChoco = v[1]
 		self.centerChoco = centerChoco
 		local last = nil
 		if centerChoco then
-			if mod(#listCenter,2) > 0 then --uneven	
+			if mod(#listCenter,2) > 0 then --uneven
 				centerChoco:ClearAllPoints()
 				centerChoco:SetPoint("CENTER",self, 0,yoff)
 				centerChoco:SetPoint("BOTTOM",self,"BOTTOM", 0,0)
@@ -492,7 +475,7 @@ function Bar:UpdateBar(updateindex)
 				centerChoco:SetPoint("BOTTOM",self,"BOTTOM", 0,0)
 			end
 			local relativeR = centerChoco
-			
+
 			for i, v in ipairs(listCenter) do
 				local choco = v[1]
 				if i <= centerIndex then
@@ -511,15 +494,15 @@ function Bar:UpdateBar(updateindex)
 				if updateindex then
 					choco.settings.index = i
 				end
-			end	
+			end
 		end
 		self:UpdateCenter()
 	end
-	
+
 	-- set right plugins
 	tempList = SortList(chocolates, "right")
 	self.chocoMostRight = tempList[#tempList] and tempList[#tempList][1]
-	
+
 	relative = nil
 	for i, v in ipairs(tempList) do
 		local choco = v[1]
@@ -543,14 +526,14 @@ end
 function Bar:UpdateCenter()
 	local centerChoco = self.centerChoco --the chocolate the others are aligend to
 	if not centerChoco or not db.adjustCenter then return end
-	
+
 	local totalwidth = 0
 	local centerChocoPosX = 0
 	--get the total width of all center chocolate's and the relative position of the chocolate they are aligend to
 	local listCenter = self.listCenter
 	for i, v in ipairs(listCenter) do
 		local choco = v[1]
-		if i == math.ceil(#listCenter/2) then 
+		if i == math.ceil(#listCenter/2) then
 			centerChocoPosX = totalwidth
 		end
 		totalwidth = totalwidth + choco:GetWidth()
