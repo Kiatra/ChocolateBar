@@ -728,9 +728,14 @@ placeholderOptions = {
 		type="group",
 		order = 1,
 		args={
+			label = {
+				order = 1,
+				type = "description",
+				name = L["Tipp: Set the width behavior to fixed and adjust the the max text width to scale the placeholder."],
+			},
 			disablePlaceholder = {
 				type = 'execute',
-				order = 5,
+				order = 0,
 				name = L["Remove Placeholder"],
 				desc = L["Remove this Placeholder"],
 				func = removePlaceholder,
