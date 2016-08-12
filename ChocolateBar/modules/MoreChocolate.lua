@@ -14,9 +14,9 @@ local moreChocolate = LibStub("LibDataBroker-1.1"):NewDataObject("MoreChocolate"
 	icon = "Interface\\AddOns\\ChocolateBar\\pics\\ChocolatePiece",
 	label = "MoreChocolate",
 	text  = "MoreChocolate",
-	
+
 	OnClick = function(self, btn)
-		if btn == "LeftButton" then 
+		if btn == "LeftButton" then
 			if bar then
 				if bar:IsShown() then
 					bar:Hide()
@@ -73,66 +73,55 @@ function moreChocolate:SetBar(db)
 	delay = db.moreBarDelay
 end
 
-function moreChocolate:GetOptions()
-	local options ={
-			name="MoreChocolate",
-			type="group",
-			order = 9,
-			args={
-				--[[
-				header = {
-					order = 1,
-					type = "header",
-					name =  "MoreChocolate",
-				},
-				--]]
-				moreChocolate = {
-					inline = true,
-					name="MoreChocolate",
-					type="group",
-					order = 0,
-					args={
-						label = {
-							order = 2,
-							type = "description",
-							name = L["A broker plugin to toggle a bar."],
-						},
-						selectBar = {
-							type = 'select',
-							values = GetList,
-							order = 3,
-							name = L["Select Bar"],
-							desc = L["Select Bar"],
-							get = function() 
-								return ChocolateBar.db.profile.moreBar
-							end,
-							set = function(info, value)
-								if bar then
-									bar:Show()
-								end
-								ChocolateBar.db.profile.moreBar = value
-								moreChocolate:SetBar(ChocolateBar.db.profile)
-							end,
-						},
-						delay = {
-							type = 'range',
-							order = 4,
-							name = L["Delay"],
-							desc = L["Set seconds until bar will hide."],
-							min = 0,
-							max = 15,
-							step = 1,
-							get = function(name)
-								return ChocolateBar.db.profile.moreBarDelay
-							end,
-							set = function(info, value)
-								delay = value
-								ChocolateBar.db.profile.moreBarDelay = value
-							end,
-						},	
-					},
-				},
+local options ={
+		inline = true,
+		name="MoreChocolate",
+		type="group",
+		order = 0,
+		args={
+			label = {
+				order = 2,
+				type = "description",
+				name = L["A broker plugin to toggle a bar."],
 			},
-		}
+			selectBar = {
+				type = 'select',
+				values = GetList,
+				order = 3,
+				name = L["Select Bar"],
+				desc = L["Select Bar"],
+				get = function()
+					return ChocolateBar.db.profile.moreBar
+				end,
+				set = function(info, value)
+					if bar then
+						bar:Show()
+					end
+					ChocolateBar.db.profile.moreBar = value
+					moreChocolate:SetBar(ChocolateBar.db.profile)
+				end,
+			},
+			delay = {
+				type = 'range',
+				order = 4,
+				name = L["Delay"],
+				desc = L["Set seconds until bar will hide."],
+				min = 0,
+				max = 15,
+				step = 1,
+				get = function(name)
+					return ChocolateBar.db.profile.moreBarDelay
+				end,
+				set = function(info, value)
+					delay = value
+					ChocolateBar.db.profile.moreBarDelay = value
+				end,
+		},
+	},
+}
+
+local module = ChocolateBar:NewModule("MoreChocolate", defaults, options)
+
+function moreChocolate:GetOptions()
 	return options
 end

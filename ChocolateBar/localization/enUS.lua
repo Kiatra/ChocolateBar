@@ -2,6 +2,13 @@ local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
 local L = AceLocale:NewLocale("ChocolateBar", "enUS", true)
 if not L then return end
 
+L["Colorized Dragging"] = true
+L["Colorize frames during drag & drop."] = true
+
+L["Modules"] = true
+
+-- placeholder
+L["Creates a new plugin to use as a placeholder."] = true
 L["Tipp: Set the width behavior to fixed and adjust the the max text width to scale the placeholder."] = true
 L["Placeholder Options"] = true
 L["Highlight"] = true
@@ -9,13 +16,13 @@ L["Temporarily highlights the position of the plugin on the bar."] = true
 L["Remove Placeholder"] = true
 L["Remove this Placeholder"] = true
 L["Placeholder"] = true
-
 L["Placeholders"] = true
 L["Create Placeholder"] = true
 L["Create New Placeholder"] = true
 
-L["Hide Orderhall Bar"] = true
-L["Hides the command bar displyed at the orderhall."] = true
+
+L["Hide Order Hall Bar"] = true
+L["Hides the command bar displayed at the Class/Order Hall."] = true
 
 L["Desaturated Icons"] = true
 L["Show icons in gray scale mode (This will not affect icons embedded in the text of a plugin)."] = true
