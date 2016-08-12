@@ -245,7 +245,7 @@ local aceoptions = {
 						colorizedDragging = {
 							type = 'toggle',
 							order = 12,
-							name = L["Colorize Dragging"],
+							name = L["Colorized Dragging"],
 							desc = L["Colorize frames during drag & drop."],
 							get = function(info, value)
 									return db.colorizedDragging
