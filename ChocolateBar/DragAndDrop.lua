@@ -66,10 +66,10 @@ end
 
 function Drag:Start(bar, name, choco)
 	for k, v in pairs(frameslist) do
-		v.dragshow = v:IsVisible() 
+		v.dragshow = v:IsVisible()
 		v:Show()
 	end
-	
+
 	choconame = name
 	bar:Drag(name)
 	focus = bar
@@ -85,5 +85,3 @@ function Drag:Stop(frame)
 	DragUpdate:SetScript("OnUpdate", nil)
 	focus:Drop(frame)
 end
-
-

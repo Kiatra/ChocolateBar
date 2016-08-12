@@ -36,5 +36,7 @@ Core.lua
 DragAndDrop.lua
 Chocolate.lua
 Bar.lua
-MoreChocolate.lua
 #Clock.lua
+DropPoints.lua
+modules\Placeholder.lua
+modules\MoreChocolate.lua
