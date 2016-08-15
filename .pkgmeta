@@ -28,6 +28,9 @@ externals:
 	ChocolateBar/libs/AceLocale-3.0:
 		url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceLocale-3.0
 		tag: latest
+	ChocolateBar/libs/AceTimer-3.0:
+		url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceTimer-3.0
+		tag: latest
 	ChocolateBar_Options/libs/AceDBOptions-3.0:
 		url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceDBOptions-3.0
 		tag: latest
