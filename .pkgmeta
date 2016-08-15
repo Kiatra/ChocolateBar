@@ -28,6 +28,9 @@ externals:
 	ChocolateBar/libs/AceLocale-3.0:
 		url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceLocale-3.0
 		tag: latest
+  ChocolateBar/libs/AceTimer-3.0:
+  	url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceTimer-3.0
+  	tag: latest
 	ChocolateBar_Options/libs/AceDBOptions-3.0:
 		url: svn://svn.wowace.com/wow/ace3/mainline/trunk/AceDBOptions-3.0
 		tag: latest
@@ -37,13 +40,13 @@ externals:
 	ChocolateBar_Options/libs/AceGUI-3.0-SharedMediaWidgets:
 		url: svn://svn.wowace.com/wow/ace-gui-3-0-shared-media-widgets/mainline/trunk/AceGUI-3.0-SharedMediaWidgets
 		tag: latest
-	ChocolateBar/libs/LibJostle-3.0: 
+	ChocolateBar/libs/LibJostle-3.0:
 		url: svn://svn.wowace.com/wow/libjostle-3-0/mainline/trunk
-		
-tools-used: 
+
+tools-used:
 	- libdatabroker-1-1
 	- findglobals
-	
+
 move-folders:
     ChocolateBar/ChocolateBar: ChocolateBar
     ChocolateBar/ChocolateBar_Options: ChocolateBar_Options
