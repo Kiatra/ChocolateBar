@@ -343,9 +343,8 @@ end
 
 function Bar:UpdateDragChocolate()
 	local choco, side, align = self:GetChocolateAtCursor()
+	self.pointer = self.pointer or ChocolateBar:GetPointer(self)
 	local pointer = self.pointer
-
-	--self.last = choco
 
 	if choco then
 		pointer.align = choco.settings.align --align
