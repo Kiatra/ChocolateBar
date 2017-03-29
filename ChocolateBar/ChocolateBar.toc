@@ -1,4 +1,4 @@
-﻿## Interface: 70000
+﻿## Interface: 70200
 ## Title: ChocolateBar
 ## Notes: A display for LibDataBroker-1.1
 ## Author: yess
@@ -37,7 +37,11 @@ Core.lua
 DragAndDrop.lua
 Chocolate.lua
 Bar.lua
-#Clock.lua
 DropPoints.lua
 modules\Placeholder.lua
 modules\MoreChocolate.lua
+modules\Location.lua
+#@debug@
+modules\Bindings.xml
+modules\Stuff.lua
+#@end-debug@
