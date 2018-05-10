@@ -7,9 +7,9 @@ local broker = LibStub("LibDataBroker-1.1")
 local L = LibStub("AceLocale-3.0"):GetLocale("ChocolateBar")
 local LSM = LibStub("LibSharedMedia-3.0")
 local _G, pairs, string = _G, pairs, string
-local version = GetAddOnMetadata("ChocolateBar","X-Curse-Packaged-Version") or ""
 local db, moreChocolate
 local index = 0
+local version = GetAddOnMetadata("ChocolateBar","X-Curse-Packaged-Version") or ""
 
 local function GetStats(info)
 	local total = 0
@@ -717,7 +717,7 @@ local aceoptions = {
 local chocolateOptions = aceoptions.args.chocolates.args
 local barOptions = aceoptions.args.bars.args
 local moduleOptions = aceoptions.args.modules.args
-
+ChocolateBar.optionsTable = aceoptions
 -----
 -- bar option functions
 -----
@@ -1306,8 +1306,17 @@ local function ShowPluginOnBar(info)
 	end
 end
 
+function ChocolateBar:UpdateOptions(chocolateBars)
+	for name, obj in broker:DataObjectIterator() do
+		ChocolateBar:AddObjectOptions(name, obj)
+	end
 
-function ChocolateBar:RegisterOptions(data)
+	for name,bar in pairs(chocolateBars) do
+		ChocolateBar:AddBarOptions(name)
+	end
+end
+
+function ChocolateBar:RegisterOptions(data, chocolateBars, modules)
 	db = data
 
 	LibStub("AceConfig-3.0"):RegisterOptionsTable("ChocolateBar", aceoptions)
@@ -1317,22 +1326,22 @@ function ChocolateBar:RegisterOptions(data)
 	self.db.RegisterCallback(self, "OnProfileChanged", "OnProfileChanged")
 	self.db.RegisterCallback(self, "OnProfileCopied", "OnProfileChanged")
 	self.db.RegisterCallback(self, "OnProfileReset", "OnProfileChanged")
+
+	AceCfgDlg:SelectGroup("ChocolateBar", "chocolates")
+	AceCfgDlg:SelectGroup("ChocolateBar", "general")
+
+	for name, module in pairs(modules) do
+		self:AddModuleOptions(name ,module.options)
+		if module.OnOpenOptions then module:OnOpenOptions() end
+	end
 end
 
-local firstOpen = true
-function ChocolateBar:OpenOptions(chocolateBars, data, input, pluginName, modules)
+function ChocolateBar:OpenOptions(chocolateBars, data, input, pluginName, modules, blizzard)
+Debug("OpenOptions OPTIONS", blizzard)
 	local AceCfgDlg = LibStub("AceConfigDialog-3.0")
 
-	if firstOpen then
-		ChocolateBar:RegisterOptions(data)
-		for name,bar in pairs(chocolateBars) do
-			ChocolateBar:AddBarOptions(name)
-		end
+  ChocolateBar:UpdateOptions(chocolateBars)
 
-		AceCfgDlg:SelectGroup("ChocolateBar", "chocolates")
-		AceCfgDlg:SelectGroup("ChocolateBar", "general")
-		firstOpen = false
-	end
 	if pluginName then
 		AceCfgDlg:SelectGroup("ChocolateBar", "chocolates",pluginName)
 	end
@@ -1346,7 +1355,9 @@ function ChocolateBar:OpenOptions(chocolateBars, data, input, pluginName, module
 		if module.OnOpenOptions then module:OnOpenOptions() end
 	end
 
-	if not input or input:trim() == "" then
+	if blizzard then
+		InterfaceOptionsFrame_OpenToCategory("ChocolateBar");
+	elseif not input or input:trim() == "" then
 		AceCfgDlg:Open("ChocolateBar")
 	else
 		LibStub("AceConfigCmd-3.0").HandleCommand(ChocolateBar, "chocolatebar", "ChocolateBar", input)

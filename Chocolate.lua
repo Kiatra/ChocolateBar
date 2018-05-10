@@ -249,6 +249,13 @@ local function OnClick(self, ...)
 	end
 end
 
+local function OnMouseWheel(self, ...)
+	if self.obj.OnMouseWheel then
+	  self:EnableMouseWheel(1)
+		self.obj.OnMouseWheel(self, ...)
+	end
+end
+
 local function Update(self, f,key, value, name)
 	local update = updaters[key]
 	if update then
@@ -345,6 +352,7 @@ function ChocolatePiece:New(name, obj, settings, database)
 	chocolate:SetScript("OnLeave", OnLeave)
 	chocolate:RegisterForClicks("AnyUp")
 	chocolate:SetScript("OnClick", OnClick)
+	chocolate:SetScript("OnMouseWheel", OnMouseWheel)
 
 	chocolate:Show()
 	chocolate.settings = settings

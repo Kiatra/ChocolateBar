@@ -19,6 +19,10 @@ libs\AceLocale-3.0\AceLocale-3.0.xml
 libs\AceTimer-3.0\AceTimer-3.0.xml
 libs\LibSharedMedia-3.0\lib.xml
 libs\LibJostle-3.0\LibJostle-3.0.lua
+libs\AceGUI-3.0\AceGUI-3.0.xml
+libs\AceConfig-3.0\AceConfig-3.0.xml
+libs\AceDBOptions-3.0\AceDBOptions-3.0.xml
+libs\AceGUI-3.0-SharedMediaWidgets\widget.xml
 #@end-no-lib-strip@
 
 libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
@@ -41,6 +45,7 @@ DropPoints.lua
 modules\Placeholder.lua
 modules\MoreChocolate.lua
 modules\Location.lua
+Options.lua
 #@debug@
 modules\Bindings.xml
 modules\Stuff.lua

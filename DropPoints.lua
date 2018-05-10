@@ -6,21 +6,32 @@ local Drag = ChocolateBar.Drag
 local function createDropPoint(name, dropfunc, offx, text, texture)
 	if not ChocolateBar.dropFrames then
 		local dropFrames = CreateFrame("Frame", nil, _G.UIParent)
-		dropFrames:SetWidth(400)
-		dropFrames:SetHeight(100)
+		dropFrames:SetWidth(420)
+		dropFrames:SetHeight(200)
 		ChocolateBar.dropFrames = dropFrames
+		dropFrames:SetBackdrop({bgFile = "Interface\\ACHIEVEMENTFRAME\\UI-Achievement-Parchment-Horizontal-Desaturated",
+				edgeFile = "Interface\\LFGFrame\\LFGBorder",
+				tile = false, tileSize = 4, edgeSize = 4,
+				insets = { left = 4, right = 4, top = 4, bottom = 4 }});
+		--dropFrames:SetBackdropColor(0,0,0,1)
+		dropFrames.text = dropFrames:CreateFontString(nil, nil, "GameFontHighlight")
+		dropFrames.text:SetPoint("CENTER",0, -40)
+    --infotitle:SetFormattedText("|T%s:%d|t%s", "Interface\\FriendsFrame\\InformationIcon", 16, L["Notes"])
+		dropFrames.text:SetFormattedText("|T%s:%d|t%s", "Interface\\FriendsFrame\\InformationIcon", 16, " " .. L["Drop a Plugin onto any of the icons above."])
 	end
 	local frame = CreateFrame("Frame", name, ChocolateBar.dropFrames)
 	frame:SetWidth(100)
 	frame:SetHeight(100)
 	frame:SetFrameStrata("DIALOG")
-	frame:SetPoint("TOPLEFT",offx,0)
+	frame:SetPoint("TOPLEFT",offx+10,-10)
 
 	frame:SetBackdrop({bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-			edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
-			tile = false, tileSize = 16, edgeSize = 16,
+			edgeFile = "Interface\\LFGFrame\\LFGBorder",
+			tile = false, tileSize = 4, edgeSize = 4,
 			insets = { left = 4, right = 4, top = 4, bottom = 4 }});
-	frame:SetBackdropColor(0,0,0,1)
+
+	frame:SetBackdropBorderColor(0.4,0.4,0.4)
+	frame:SetBackdropColor(0,0,0,0.5)
 
 	local tex = frame:CreateTexture()
 	tex:SetWidth(50)
@@ -31,12 +42,14 @@ local function createDropPoint(name, dropfunc, offx, text, texture)
 	frame.text = frame:CreateFontString(nil, nil, "GameFontHighlight")
 	frame.text:SetPoint("CENTER",0, 30)
 	frame.text:SetText(text)
+
+
 	frame:Hide()
 	frame.Drop = dropfunc
-	frame.GetFocus = function(frame, name) frame:SetBackdropColor(1,0,0,1) end
+	frame.GetFocus = function(frame, name) frame:SetBackdropColor(0.5,0,0,0.5) end
 
 	frame.Drag = function(frame) end
-	frame.LoseFocus = function(frame) frame:SetBackdropColor(0,0,0,1) end
+	frame.LoseFocus = function(frame) frame:SetBackdropColor(0,0,0,0.5) end
 	Drag:RegisterFrame(frame)
 	return frame
 end
@@ -50,7 +63,7 @@ local function dropText(frame, choco)
 		db.objSettings[name].showText = not db.objSettings[name].showText
 		ChocolateBar:AttributeChanged(nil, name, "updateSettings", db.objSettings[name].showText)
 		choco.bar:ResetDrag(choco, name)
-		frame:SetBackdropColor(0,0,0,1)
+		--frame:SetBackdropColor(0,0,0,1)
 end
 
 local function dropOptions(frame, choco)
@@ -67,13 +80,13 @@ local function dropOptions(frame, choco)
 		cleanName = string.gsub(cleanName, "[%c \127]", "")
 		ChocolateBar:LoadOptions(cleanName)
 		choco.bar:ResetDrag(choco, choco.name)
-		frame:SetBackdropColor(0,0,0,1)
+		frame:SetBackdropColor(0.5,0,0,0.5)
 end
 
 local function dropDisable(frame, choco)
 		choco:Hide()
 		ChocolateBar:DisableDataObject(choco.name)
-		frame:SetBackdropColor(0,0,0,1)
+		frame:SetBackdropColor(0,0,0,0,5)
 end
 
 
@@ -90,7 +103,7 @@ function ChocolateBar:SetDropPoins(parent)
 	frame:SetClampedToScreen(true)
 	local x,y = parent:GetCenter()
 	local vhalf = (y > _G.UIParent:GetHeight() / 2) and "TOP" or "BOTTOM"
-	local yoff = (y > _G.UIParent:GetHeight() / 2) and -100 or 100
+	local yoff = (y > _G.UIParent:GetHeight() / 2) and -70 or 70
 	local xoff = frame:GetWidth() / 2
 	frame:SetPoint(vhalf.."LEFT",parent.bar,x-xoff,yoff)
 	frame:Show()
