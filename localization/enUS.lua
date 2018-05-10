@@ -7,6 +7,9 @@ L["Colorize frames during drag & drop."] = true
 
 L["Modules"] = true
 
+--dropPoints
+L["Drop a Plugin onto any of the icons above."] = true
+
 -- placeholder
 L["Creates a new plugin to use as a placeholder."] = true
 L["Tipp: Set the width behavior to fixed and adjust the the max text width to scale the placeholder."] = true

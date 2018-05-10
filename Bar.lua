@@ -1,4 +1,5 @@
 local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("ChocolateBar")
+
 local LSM = LibStub("LibSharedMedia-3.0")
 local Bar = ChocolateBar.Bar
 local chocolate = ChocolateBar.ChocolatePiece
@@ -7,7 +8,6 @@ local jostle = LibStub("LibJostle-3.0", true)
 local pairs, ipairs, table, math, mod = pairs, ipairs, table, math, mod
 local CreateFrame, UIParent = CreateFrame, UIParent
 local db
---GLOBALS: InterfaceOptionsFrame_OpenToCategory, GetCursorPosition
 
 function Bar:OnMouseUp(button)
 	if (db.combathidebar or self.settings.hideBarInCombat) and ChocolateBar.InCombat then return end
@@ -16,7 +16,7 @@ function Bar:OnMouseUp(button)
 		if db.barRightClick == "OPTIONS" then
 			ChocolateBar:LoadOptions()
 		elseif db.barRightClick == "BLIZZ" then
-			InterfaceOptionsFrame_OpenToCategory("ChocolateBar");
+		  ChocolateBar:LoadOptions(nil, nil, true)
 		end
 	else
 		if db.moreBar == self:GetName() then

@@ -21,14 +21,14 @@ local db --reference to ChocolateBar.db.profile
 -- utility functions
 --------
 local function Debug(...)
-	if ChocolateBar.db.char.debug then
+	--if ChocolateBar.db.char.debug then
 	 	local s = "ChocolateBar Debug:"
 		for i=1,select("#", ...) do
 			local x = select(i, ...)
 			s = strjoin(" ",s,tostring(x))
 		end
 		_G.DEFAULT_CHAT_FRAME:AddMessage(s)
-	end
+	--end
 end
 
 function ChocolateBar:Debug(...)
@@ -87,6 +87,9 @@ function ChocolateBar:OnInitialize()
   self:RegisterChatCommand("chocolatebar", "ChatCommand")
 	db = self.db.profile
 
+	local AceCfgDlg = LibStub("AceConfigDialog-3.0")
+	AceCfgDlg:AddToBlizOptions("ChocolateBar", "ChocolateBar")
+
 	LSM:Register("statusbar", "Tooltip", "Interface\\Tooltips\\UI-Tooltip-Background")
 	LSM:Register("statusbar", "Solid", "Interface\\Buttons\\WHITE8X8")
 	LSM:Register("statusbar", "Gloss","Interface\\AddOns\\ChocolateBar\\pics\\Gloss")
@@ -117,7 +120,8 @@ function ChocolateBar:OnInitialize()
 		if module.OnInitialize then module:OnInitialize(moduleDB) end
 	end
 
-	_G.InterfaceOptions_AddCategory(self:CreateOptionPanel());
+  ChocolateBar:RegisterOptions(db, chocolateBars, modules)
+	--_G.InterfaceOptions_AddCategory(self:CreateOptionPanel());
 end
 
 function ChocolateBar:OnEnable()
@@ -188,6 +192,7 @@ end
 function ChocolateBar:OnEnterWorld()
 	self:UpdateChoclates("resizeFrame")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+	ChocolateBar:UpdateOptions(chocolateBars)
 end
 
 function ChocolateBar:OnPetBattleOpen(...)
@@ -526,31 +531,9 @@ function ChocolateBar:ChatCommand(input)
 	ChocolateBar:LoadOptions(nil, input)
 end
 
-function ChocolateBar:LoadOptions(pluginName, input)
-	_G.EnableAddOn("ChocolateBar_Options")
-	local loaded, reason = _G.LoadAddOn("ChocolateBar_Options")
-	--Debug(loaded, reason)
-	if loaded then
-		ChocolateBar:OpenOptions(chocolateBars, db, input, pluginName, modules)
-	else
-		_G.DEFAULT_CHAT_FRAME:AddMessage(L["Could not load ChocolateBar_Options, make sure it's installed."])
-	end
-end
-
-function ChocolateBar:CreateOptionPanel()
-	local optionPanel = CreateFrame( "Frame", "ChocolateBarPanel", _G.UIParent );
-	optionPanel.name = "ChocolateBar";
-	local button = CreateFrame("Button",nil,optionPanel, "UIPanelButtonTemplate")
-	button:SetWidth(150)
-	button:SetHeight(22)
-	button:SetScript("OnClick", function()
-		_G.HideUIPanel(_G.InterfaceOptionsFrame)
-		_G.HideUIPanel(_G.GameMenuFrame)
-		ChocolateBar:ChatCommand()
-	end)
-	button:SetText("Configure")
-	button:SetPoint("TOPLEFT",20,-20)
-	return optionPanel
+function ChocolateBar:LoadOptions(pluginName, input, blizzard)
+	Debug("OpenOptions", input, blizzard)
+	ChocolateBar:OpenOptions(chocolateBars, db, input, pluginName, modules, blizzard)
 end
 
 function ChocolateBar:UpdateDB(data)
