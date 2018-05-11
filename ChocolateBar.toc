@@ -5,6 +5,7 @@
 ## Version: @project-version@
 ## X-Email: starfire@fantasymail.de
 ## OptionalDeps: Ace3, LibSharedMedia-3.0, LibJostle-3.0
+## X-WoWI-ID: 12326
 
 ## SavedVariables: ChocolateBarDB
 
