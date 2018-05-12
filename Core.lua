@@ -21,14 +21,14 @@ local db --reference to ChocolateBar.db.profile
 -- utility functions
 --------
 local function Debug(...)
-	--if ChocolateBar.db.char.debug then
+	if ChocolateBar.db.char.debug then
 	 	local s = "ChocolateBar Debug:"
 		for i=1,select("#", ...) do
 			local x = select(i, ...)
 			s = strjoin(" ",s,tostring(x))
 		end
 		_G.DEFAULT_CHAT_FRAME:AddMessage(s)
-	--end
+	end
 end
 
 function ChocolateBar:Debug(...)

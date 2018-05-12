@@ -1337,7 +1337,7 @@ function ChocolateBar:RegisterOptions(data, chocolateBars, modules)
 end
 
 function ChocolateBar:OpenOptions(chocolateBars, data, input, pluginName, modules, blizzard)
-Debug("OpenOptions OPTIONS", blizzard)
+
 	local AceCfgDlg = LibStub("AceConfigDialog-3.0")
 
   ChocolateBar:UpdateOptions(chocolateBars)
