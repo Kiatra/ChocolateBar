@@ -45,7 +45,6 @@ Bar.lua
 DropPoints.lua
 modules\Placeholder.lua
 modules\MoreChocolate.lua
-modules\Location.lua
 Options.lua
 #@debug@
 modules\Bindings.xml
