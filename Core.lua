@@ -45,7 +45,7 @@ local defaults = {
 	profile = {
 		petBattleHideBars = true, combatopacity = 1, scale = 1,
 		height = 21, iconSize = 0.75, moveFrames = true, adjustCenter = true,
-		strata = "DIALOG", barRightClick = "OPTIONS",
+		strata = "BACKGROUND", barRightClick = "OPTIONS",
 		gap = 7, textOffset = 1, moreBar = "none", moreBarDelay = 4,
 		fontPath = " ", fontSize = 12,
 		background = {
@@ -106,6 +106,12 @@ function ChocolateBar:OnInitialize()
 	self:RegisterEvent("ADDON_LOADED",function(event, addonName)
 		if self[addonName] then self[addonName](self) end
 	end)
+
+	--fix frame strata for 8.0
+  if not self.db.profile.fixedStrata then
+		self.db.profile.strata = "BACKGROUND"
+		self.db.profile.fixedStrata = true
+	end
 
 	local barSettings = db.barSettings
 	for k, v in pairs(barSettings) do
@@ -357,6 +363,10 @@ end
 -- returns nil if the plugin is disabled
 function ChocolateBar:GetChocolate(name)
 	return chocolateObjects[name]
+end
+
+function ChocolateBar:GetChocolates()
+	return chocolateObjects
 end
 
 function ChocolateBar:GetBar(name)
