@@ -13,7 +13,6 @@
   <Include file="AceTimer-3.0\AceTimer-3.0.xml" />
   <Include file="LibSharedMedia-3.0\lib.xml" />
   <Include file="AceGUI-3.0-SharedMediaWidgets\widget.xml" />
-  <Script file="LibJostle-3.0\LibJostle-3.0.lua" />
   <Include file="AceDBOptions-3.0\AceDBOptions-3.0.xml" />
   @end-non-debug@-->
 </Ui>

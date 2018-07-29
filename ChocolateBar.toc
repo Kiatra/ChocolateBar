@@ -26,6 +26,7 @@ localization\ptBR.lua
 localization\ruRU.lua
 
 Core.lua
+Jostle.lua
 DragAndDrop.lua
 Chocolate.lua
 Bar.lua
