@@ -35,6 +35,5 @@ modules\Placeholder.lua
 modules\MoreChocolate.lua
 Options.lua
 #@debug@
-#modules\Bindings.xml
-#modules\Stuff.lua
+modules\MicroMenu\embedded.xml
 #@end-debug@

@@ -265,6 +265,7 @@ end
 --------
 function ChocolateBar:LibDataBroker_DataObjectCreated(event, name, obj, noupdate)
 	local t = obj.type
+
 	if t == "data source" or t == "launcher" then
 		if db.objSettings[name].enabled then
 			self:EnableDataObject(name, obj, noupdate)
@@ -280,6 +281,7 @@ function ChocolateBar:EnableDataObject(name, obj, noupdate)
 		Debug("Unknown type", t, name)
 		return 0
 	end
+	
 	local settings = db.objSettings[name]
 	settings.enabled = true
 
@@ -321,6 +323,8 @@ function ChocolateBar:EnableDataObject(name, obj, noupdate)
 		chocolateBars["ChocolateBar1"]:AddChocolatePiece(choco, name,noupdate)
 	end
 	broker.RegisterCallback(self, "LibDataBroker_AttributeChanged_"..name, "AttributeChanged")
+	
+	ChocolateBar:AddObjectOptions(name, obj)
 end
 
 function ChocolateBar:DisableDataObject(name)
