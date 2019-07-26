@@ -18,6 +18,8 @@ local chocolateBars = {}
 local chocolateObjects = {}
 local db --reference to ChocolateBar.db.profile
 
+_G.DEFAULT_CHAT_FRAME:AddMessage("ChocolateBar loading file core.lua")
+
 --------
 -- utility functions
 --------
@@ -87,6 +89,7 @@ function ChocolateBar:OnInitialize()
 	self.db = LibStub("AceDB-3.0"):New("ChocolateBarDB", defaults, "Default")
   self:RegisterChatCommand("chocolatebar", "ChatCommand")
 	db = self.db.profile
+	Debug("ChocolateBar:OnInitialize() core.lua")
 
 	local AceCfgDlg = LibStub("AceConfigDialog-3.0")
 	AceCfgDlg:AddToBlizOptions("ChocolateBar", "ChocolateBar")
@@ -281,7 +284,7 @@ function ChocolateBar:EnableDataObject(name, obj, noupdate)
 		Debug("Unknown type", t, name)
 		return 0
 	end
-	
+
 	local settings = db.objSettings[name]
 	settings.enabled = true
 
@@ -323,7 +326,7 @@ function ChocolateBar:EnableDataObject(name, obj, noupdate)
 		chocolateBars["ChocolateBar1"]:AddChocolatePiece(choco, name,noupdate)
 	end
 	broker.RegisterCallback(self, "LibDataBroker_AttributeChanged_"..name, "AttributeChanged")
-	
+
 	ChocolateBar:AddObjectOptions(name, obj)
 end
 
