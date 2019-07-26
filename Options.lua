@@ -11,6 +11,8 @@ local db, moreChocolate
 local index = 0
 local version = GetAddOnMetadata("ChocolateBar","X-Curse-Packaged-Version") or ""
 
+_G.DEFAULT_CHAT_FRAME:AddMessage("ChocolateBar loading file options.lua")
+
 local function GetStats(info)
 	local total = 0
 	local enabled = 0
@@ -61,32 +63,32 @@ end
 local aceoptions = {
     name = "ChocolateBar".." "..version,
     handler = ChocolateBar,
-	type='group',
-	desc = "ChocolateBar",
+		type='group',
+		desc = "ChocolateBar",
     args = {
-		general={
-			name = L["Look and Feel"],
-			type="group",
-			order = 0,
-			args={
-				general = {
-					inline = true,
-					name = L["General"],
-					type="group",
-					order = 3,
-					args={
-						locked = {
-							type = 'toggle',
-							order = 1,
-							name = L["Lock Plugins"],
-							desc = L["Hold alt key to drag a plugin."],
-							get = function(info, value)
-									return db.locked
-							end,
-							set = function(info, value)
-									db.locked = value
-							end,
-						},
+			lookAndFeel = {
+				name = L["Look and Feel"],
+				type="group",
+				order = 0,
+				args={
+					general = {
+						inline = true,
+						name = L["General"],
+						type="group",
+						order = 3,
+						args={
+							locked = {
+								type = 'toggle',
+								order = 1,
+								name = L["Lock Plugins"],
+								desc = L["Hold alt key to drag a plugin."],
+								get = function(info, value)
+										return db.locked
+								end,
+								set = function(info, value)
+										db.locked = value
+								end,
+							},
 						gap = {
 							type = 'range',
 							order = 2,
@@ -384,35 +386,18 @@ local aceoptions = {
 						},
 					},
 				},
-				background = {
+				fontAndTextures = {
 					--inline = true,
 					name = L["Fonts and Textures"],
 					type = "group",
 					order = 4,
-					args ={
-						backbround = {
-							inline = true,
-							name = L["Textures"],
-							type = "group",
-							order = 2,
-							args ={
-								textureStatusbar = {
-									type = 'select',
-									dialogControl = 'LSM30_Statusbar',
-									values = AceGUIWidgetLSMlists.statusbar,
-									order = 1,
-									name = L["Background Texture"],
-									desc = L["Some of the textures may depend on other addons."],
-									get = function()
-										return db.background.textureName
-									end,
-									set = function(info, value)
-										db.background.texture = LSM:Fetch("statusbar", value)
-										db.background.textureName = value
-										db.background.tile = false
-										ChocolateBar:UpdateBarOptions("UpdateTexture")
-									end,
-								},
+					args = {
+						textures = {
+						inline = true,
+						name = L["Textures"],
+						type = "group",
+						order = 2,
+						args = {
 								colour = {
 									type = "color",
 									order = 5,
@@ -447,32 +432,7 @@ local aceoptions = {
 								},
 							},
 						},
-						background1 = {
-							inline = true,
-							name = L["Advanced Textures"],
-							type = "group",
-							order = 3,
-							args ={
-								textureBackground = {
-									type = 'select',
-									dialogControl = 'LSM30_Background',
-									values = AceGUIWidgetLSMlists.background,
-									order = 2,
-									name = L["Background Texture"],
-									desc = L["Some of the textures may depend on other addons."],
-									get = function()
-										return db.background.textureName
-									end,
-									set = function(info, value)
-										db.background.texture = LSM:Fetch("background", value)
-										db.background.textureName = value
-										db.background.tile = true
-										local t = db.background.color
-										t.r, t.g, t.b, t.a = 1, 1, 1, 1
-										ChocolateBar:UpdateBarOptions("UpdateTexture")
-									end,
-								},
-								textureTile = {
+						textureTile = {
 									type = 'toggle',
 									order = 3,
 									name = L["Tile"],
@@ -510,28 +470,12 @@ local aceoptions = {
 								},
 							},
 						},
-						fonts = {
+						font = {
 							inline = true,
 							name = L["Font"],
 							type = "group",
 							order = 1,
 							args ={
-								font = {
-								type = 'select',
-								dialogControl = 'LSM30_Font',
-								values = AceGUIWidgetLSMlists.font,
-								order = 1,
-								name = L["Font"],
-								desc = L["Some of the fonts may depend on other addons."],
-								get = function()
-									return db.fontName
-								end,
-								set = function(info, value)
-									db.fontPath = LSM:Fetch("font", value)
-									db.fontName = value
-									ChocolateBar:UpdateChoclates("updatefont")
-								end,
-								},
 								fontSize = {
 									type = 'range',
 									order = 2,
@@ -714,6 +658,70 @@ local aceoptions = {
 		},
 	},
 }
+
+aceoptions.args.lookAndFeel.args.general.fontsAndTextures.args.textures.args.
+		textureStatusbar = {
+			type = 'select',
+			dialogControl = 'LSM30_Statusbar',
+			values = AceGUIWidgetLSMlists and AceGUIWidgetLSMlists.statusbar or {},
+			order = 1,
+			name = L["Background Texture"],
+			desc = L["Some of the textures may depend on other addons."],
+			get = function()
+				return db.background.textureName
+			end,
+			set = function(info, value)
+				db.background.texture = LSM:Fetch("statusbar", value)
+				db.background.textureName = value
+				db.background.tile = false
+				ChocolateBar:UpdateBarOptions("UpdateTexture")
+			end,
+		}
+
+aceoptions.args.lookAndFeel.args.general.fontsAndTextures.args.textures.args.background1 = {
+			inline = true,
+			name = L["Advanced Textures"],
+			type = "group",
+			order = 3,
+			args ={
+				textureBackground = {
+					type = 'select',
+					dialogControl = 'LSM30_Background',
+					values = AceGUIWidgetLSMlists and AceGUIWidgetLSMlists.background or {},
+					order = 2,
+					name = L["Background Texture"],
+					desc = L["Some of the textures may depend on other addons."],
+					get = function()
+						return db.background.textureName
+					end,
+					set = function(info, value)
+						db.background.texture = LSM:Fetch("background", value)
+						db.background.textureName = value
+						db.background.tile = true
+						local t = db.background.color
+						t.r, t.g, t.b, t.a = 1, 1, 1, 1
+						ChocolateBar:UpdateBarOptions("UpdateTexture")
+					end,
+				}
+
+aceoptions.args.lookAndFeel.args.general.fontsAndTextures.args.font.args
+				font = {
+				type = 'select',
+				dialogControl = 'LSM30_Font',
+				values = AceGUIWidgetLSMlists and AceGUIWidgetLSMlists.font or {},
+				order = 1,
+				name = L["Font"],
+				desc = L["Some of the fonts may depend on other addons."],
+				get = function()
+					return db.fontName
+				end,
+				set = function(info, value)
+					db.fontPath = LSM:Fetch("font", value)
+					db.fontName = value
+					ChocolateBar:UpdateChoclates("updatefont")
+				end,
+				}
+
 local chocolateOptions = aceoptions.args.chocolates.args
 local barOptions = aceoptions.args.bars.args
 local moduleOptions = aceoptions.args.modules.args

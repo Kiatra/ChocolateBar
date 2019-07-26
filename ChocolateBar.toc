@@ -6,7 +6,6 @@
 ## X-Email: starfire@fantasymail.de
 ## OptionalDeps: Ace3, LibSharedMedia-3.0, LibJostle-3.0
 ## X-WoWI-ID: 12326
-
 ## SavedVariables: ChocolateBarDB
 
 #@no-lib-strip@
@@ -35,5 +34,7 @@ modules\Placeholder.lua
 modules\MoreChocolate.lua
 Options.lua
 #@debug@
-modules\MicroMenu\embedded.xml
+#modules\MicroMenu\CB_ItemLevel.lua
+#modules\MicroMenu\CB_PlayedTime.lua
+#modules\MicroMenu\CB_GameMusic.lua
 #@end-debug@
