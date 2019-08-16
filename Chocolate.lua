@@ -2,7 +2,7 @@
 local LSM = LibStub("LibSharedMedia-3.0")
 local ChocolatePiece = ChocolateBar.ChocolatePiece
 local Drag = ChocolateBar.Drag
-local Debug = ChocolateBar.Debug
+local debug = ChocolateBar and ChocolateBar.Debug or function() end
 local _G, unpack, ipairs = _G, unpack, ipairs
 local GameTooltip, CreateFrame = GameTooltip, CreateFrame
 local tempAutoHide, db
@@ -38,13 +38,25 @@ local function TextUpdater(frame, value)
 		value = string.gsub(value, "|c........", "")
 		value = string.gsub(value, "|r", "")
 	end
-	frame.text:SetText(value)
+	local label = frame.settings.showLabel and frame.obj.label or nil
+	local text = frame.settings.showText and frame.obj.text or nil
+	
+	if label and text then
+		frame.text:SetText(string.format("|c%s%s:|r %s", db.labelColor, label, text))
+	elseif label then
+		frame.text:SetText(string.format("|c%s%s|r", db.labelColor, label))
+	elseif text then
+		frame.text:SetText(text)
+	else
+		frame.text:SetText("")
+	end
 	resizeFrame(frame)
 end
 
 local function SettingsUpdater(self, value)
 	local settings = self.settings
-	if not settings.showText then
+	
+	if not settings.showText and not settings.showLabel then
 		self.text:Hide()
 	else
 		self.text:Show()
@@ -72,6 +84,8 @@ local function SettingsUpdater(self, value)
 	else -- no icon
 		self.text:SetPoint("LEFT", self, 0, 0)
 	end
+	
+	TextUpdater(self, self.obj.text)
 
 	resizeFrame(self)
 end
@@ -211,7 +225,6 @@ local function OnEnter(self)
 		PrepareTooltip(GameTooltip, self)
 		GameTooltip:SetText(obj.tooltiptext)
 		GameTooltip:Show()
-
 	elseif obj.OnEnter then
 		obj.OnEnter(self)
 	end
@@ -283,7 +296,6 @@ local function OnDragStart(frame)
 				for i = 1, child:GetNumPoints() do
 					local _,relativeTo,_,_,_ = child:GetPoint(i)
 					if relativeTo == frame then
-						Debug(i,child:GetName())
 						child:Hide()
 					end
 				end
@@ -357,12 +369,18 @@ function ChocolatePiece:New(name, obj, settings, database)
 	chocolate:Show()
 	chocolate.settings = settings
 
-	if text then
-		chocolate.text:SetText(text)
-	else
-		obj.text = name
-		chocolate.text:SetText(name)
+	if not obj.label then
+		obj.label = name
 	end
+
+	TextUpdater(chocolate, text);
+	---if text then
+	--elseif obj.label then
+	--	
+	--else
+	----	obj.text = name
+	--	chocolate.text:SetText(name)
+	--end
 
 	chocolate.name = name
 	chocolate:SetMovable(true)

@@ -3,7 +3,7 @@ local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("ChocolateBar")
 local LSM = LibStub("LibSharedMedia-3.0")
 local Bar = ChocolateBar.Bar
 local chocolate = ChocolateBar.ChocolatePiece
-local Debug = ChocolateBar.Debug
+local debug = ChocolateBar and ChocolateBar.Debug or function() end
 local jostle = ChocolateBar.Jostle
 local pairs, ipairs, table, math, mod = pairs, ipairs, table, math, mod
 local CreateFrame, UIParent = CreateFrame, UIParent
@@ -90,7 +90,6 @@ function Bar:UpdateAutoHide(db)
 end
 
 function Bar:UpdateJostle(db)
-  Debug("Bar:UpdateJostle(db)")
 	if jostle then
 		jostle:Unregister(self)
 		if db.moveFrames then
@@ -129,13 +128,15 @@ end
 
 function Bar:UpdateTexture(db)
 	--local background = LSM:Fetch("statusbar", db.background.texture)
+	
 	local bg = {
 		bgFile = db.background.texture,
 		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
 		tile = db.background.tile, tileSize = db.background.tileSize, edgeSize = db.background.edgeSize,
-		--insets = { left = 4, right = 4, top = 4, bottom = 4}
 		insets = { left = 0, right = 0, top = 0, bottom = 0}
 	}
+	--db.barSettings[name].align == "bottom" then
+	
 	--bg.bgFile = background
 	self:SetBackdrop(bg);
 	self:UpdateColors(db)
@@ -154,7 +155,7 @@ function Bar:AddChocolatePiece(choco, name, noupdate)
 
 	local chocolist = self.chocolist
 	if chocolist[name] then
-		Debug("AddChocolatePiece: ",name," already in list.")
+		debug("AddChocolatePiece: ",name," already in list.")
 		return
 	end
 

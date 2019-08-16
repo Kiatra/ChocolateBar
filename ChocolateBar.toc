@@ -4,9 +4,9 @@
 ## Author: yess
 ## Version: @project-version@
 ## X-Email: starfire@fantasymail.de
-## OptionalDeps: Ace3, LibSharedMedia-3.0, LibJostle-3.0
+## OptionalDeps: Ace3, LibSharedMedia-3.0, LibQTip-1.0
 ## X-WoWI-ID: 12326
-## SavedVariables: ChocolateBarDB
+## SavedVariables: ChocolateBarDB, CB_PlayedTime
 
 #@no-lib-strip@
 libs\libs.xml
@@ -34,7 +34,7 @@ modules\Placeholder.lua
 modules\MoreChocolate.lua
 Options.lua
 #@debug@
-#modules\MicroMenu\CB_ItemLevel.lua
-#modules\MicroMenu\CB_PlayedTime.lua
-#modules\MicroMenu\CB_GameMusic.lua
+modules\CB_ItemLevel.lua
+modules\CB_PlayedTime.lua
+modules\CB_GameMusic.lua
 #@end-debug@
