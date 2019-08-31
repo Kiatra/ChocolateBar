@@ -1118,6 +1118,21 @@ local function SetIcon(info, value)
 	ChocolateBar:AttributeChanged(nil, name, "updateSettings", value)
 end
 
+
+
+local function GetCustomLabel(info, value)
+	local cleanName = info[#info-2]
+	local name = chocolateOptions[cleanName].desc
+	return db.objSettings[name].customLabel
+end
+
+local function SetCustomLabel(info, value)
+	local cleanName = info[#info-2]
+	local name = chocolateOptions[cleanName].desc
+	db.objSettings[name].customLabel = value
+	ChocolateBar:AttributeChanged(nil, name, "updateSettings", value)
+end
+
 local function GetLabel(info, value)
 	local cleanName = info[#info-2]
 	local name = chocolateOptions[cleanName].desc
@@ -1618,6 +1633,15 @@ function ChocolateBar:AddObjectOptions(name,obj)
 						get = GetWidth,
 						set = SetWidth,
 						disabled = IsDisabledTextWidth,
+					},
+					customLabel = {
+						type = 'input',
+						order = 2,
+						name = L["Custom Label"],
+						desc = L["Change the label of this plugin."],
+						width = "full",
+						get = GetCustomLabel,
+						set = SetCustomLabel,
 					},
 				},
 			},

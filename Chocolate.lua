@@ -14,17 +14,18 @@ local function resizeFrame(self)
 	if self.icon and settings.showIcon then
 		width = width + self.icon:GetWidth() + textOffset
 	end
-	if settings.showText then
-		if settings.widthBehavior == "fixed" then
-			width = width + settings.width
-		elseif settings.widthBehavior == "max" then
-			local textWidth = self.text:GetStringWidth()
-			width = width + min(textWidth, settings.width)
-		else
-			local textWidth = self.text:GetStringWidth()
-			width = width + textWidth
-		end
+
+	local textWidth = (settings.showText or settings.showLabel) and self.text:GetStringWidth() or 0
+	--local labelWidth = settings.showLabel and self.label:GetStringWidth() or 0
+
+	if settings.widthBehavior == "fixed" then
+		width = width + settings.width
+	elseif settings.widthBehavior == "max" then
+		width = width + min(textWidth, settings.width)
+	else
+		width = width + textWidth
 	end
+	
 	self:SetWidth(width)
 	if self.bar then self.bar:UpdateCenter() end
 end
@@ -38,19 +39,41 @@ local function TextUpdater(frame, value)
 		value = string.gsub(value, "|c........", "")
 		value = string.gsub(value, "|r", "")
 	end
-	local label = frame.settings.showLabel and frame.obj.label or nil
-	local text = frame.settings.showText and frame.obj.text or nil
-	
-	if label and text then
-		frame.text:SetText(string.format("|c%s%s:|r %s", db.labelColor, label, text))
-	elseif label then
-		frame.text:SetText(string.format("|c%s%s|r", db.labelColor, label))
-	elseif text then
-		frame.text:SetText(text)
+
+	if frame.settings.showText then
+		frame.text:SetText(frame.labelText..value)
 	else
-		frame.text:SetText("")
+		frame.text:SetText(frame.labelText)
 	end
+
 	resizeFrame(frame)
+end
+
+local function isCustomLabel(frame)
+	return frame.settings.customLabel and frame.settings.customLabel ~= ""
+end
+
+local function getLabelFromObjOrSettings(frame, value)
+	if isCustomLabel(frame) then
+		return frame.settings.customLabel
+	else
+		if db.forceColor then
+			value = string.gsub(value, "|c........", "")
+			value = string.gsub(value, "|r", "")
+		end
+		return value and value or "";
+	end
+end
+
+local function LabelUpdater(frame, value)
+	if frame.settings.showLabel then
+		local delimiter = frame.settings.showText and ":" or ""
+		frame.labelText = string.format("|c%s%s%s|r ", db.labelColor, getLabelFromObjOrSettings(frame, value), delimiter)
+	else 
+		frame.labelText = ""
+	end
+
+	TextUpdater(frame, frame.obj.text)
 end
 
 local function SettingsUpdater(self, value)
@@ -85,8 +108,7 @@ local function SettingsUpdater(self, value)
 		self.text:SetPoint("LEFT", self, 0, 0)
 	end
 	
-	TextUpdater(self, self.obj.text)
-
+	LabelUpdater(self, self.obj.label)
 	resizeFrame(self)
 end
 
@@ -125,7 +147,7 @@ end
 -- updaters code taken with permission from fortress
 local updaters = {
 	text = TextUpdater,
-	label  = TextUpdater,
+	label  = LabelUpdater,
 	resizeFrame = resizeFrame,
 
 	icon = function(frame, value, name)
@@ -336,7 +358,7 @@ end
 
 function ChocolatePiece:New(name, obj, settings, database)
 	db = database
-	local text = obj.text
+
 	local icon = obj.icon
 	local chocolate = CreateFrame("Button", "Chocolate" .. name)
 	chocolate.highlight = highlightBackground
@@ -348,12 +370,10 @@ function ChocolatePiece:New(name, obj, settings, database)
 	chocolate:EnableMouse(true)
 	chocolate:RegisterForDrag("LeftButton")
 
+	local fontPath = db.fontPath == " " and LSM:GetDefault("font") or db.fontPath
+
 	chocolate.text = chocolate:CreateFontString(nil, nil, "GameFontHighlight")
-    if db.fontPath == " " then
-		chocolate.text:SetFont(LSM:GetDefault("font"), db.fontSize)
-	else
-		chocolate.text:SetFont(db.fontPath, db.fontSize) --will onl be set when db.fontPath is valid
-	end
+	chocolate.text:SetFont(db.fontPath, db.fontSize)
 	chocolate.text:SetJustifyH("LEFT")
 
 	if icon then
@@ -373,20 +393,12 @@ function ChocolatePiece:New(name, obj, settings, database)
 		obj.label = name
 	end
 
-	TextUpdater(chocolate, text);
-	---if text then
-	--elseif obj.label then
-	--	
-	--else
-	----	obj.text = name
-	--	chocolate.text:SetText(name)
-	--end
-
 	chocolate.name = name
 	chocolate:SetMovable(true)
 	chocolate:SetScript("OnDragStart", OnDragStart)
 	chocolate:SetScript("OnDragStop", OnDragStop)
 	SettingsUpdater(chocolate, settings.showText)
+	LabelUpdater(chocolate, obj.label)	
 	return chocolate
 end
 
