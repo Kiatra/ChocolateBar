@@ -11,7 +11,7 @@ ChocolateBar.Jostle = {}
 ChocolateBar.Bar = {}
 ChocolateBar.ChocolatePiece = {}
 ChocolateBar.Drag = {}
-local modules = {}
+ChocolateBar.modules = {}
 
 local Drag = ChocolateBar.Drag
 local Chocolate = ChocolateBar.ChocolatePiece
@@ -68,7 +68,7 @@ local defaults = {
 		},
 		objSettings = {
 			['*'] = {
-				barName = "", align = "left", enabled = true, showText = true,  showLabel = true,
+				barName = "", align = "left", enabled = true, showText = true,  showLabel = false,
 				showIcon = true, index = 500, width = 0,
 			},
 		},
@@ -120,13 +120,13 @@ function ChocolateBar:OnInitialize()
 	end
 	self:AnchorBars()
 
-	for name, module in pairs(modules) do
+	for name, module in pairs(self.modules) do
 		moduleDB = self.db.profile.moduleOptions[name] or {}
 		self.db.profile.moduleOptions[name] = moduleDB
 		if module.OnInitialize then module:OnInitialize(moduleDB) end
 	end
 
-	ChocolateBar:RegisterOptions(db, chocolateBars, modules)
+	ChocolateBar:RegisterOptions(db, chocolateBars, self.modules)
 	--_G.InterfaceOptions_AddCategory(self:CreateOptionPanel());
 end
 
@@ -144,11 +144,11 @@ function ChocolateBar:OnEnable()
 end
 
 function ChocolateBar:NewModule(name, moduleDefaults, options, optionsKey)
-	module = modules[name] or {}
+	local module = self.modules[name] or {}
 	module.default = defaults
 	module.options = options
 	defaults.profile.moduleOptions[name] = moduleDefaults
-	modules[name] = module
+	self.modules[name] = module
 	return module
 end
 
@@ -261,7 +261,7 @@ end
 --------
 function ChocolateBar:LibDataBroker_DataObjectCreated(event, name, obj, noupdate)
 	local t = obj.type
-
+	
 	if t == "data source" or t == "launcher" then
 		if db.objSettings[name].enabled then
 			self:EnableDataObject(name, obj, noupdate)
