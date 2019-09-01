@@ -35,6 +35,7 @@ function findpattern(text, pattern, start)
 end
 
 local function TextUpdater(frame, value)
+	value = value and value or ""
 	if db.forceColor then
 		value = string.gsub(value, "|c........", "")
 		value = string.gsub(value, "|r", "")

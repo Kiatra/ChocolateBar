@@ -37,4 +37,5 @@ Options.lua
 modules\CB_ItemLevel.lua
 modules\CB_PlayedTime.lua
 modules\CB_GameMusic.lua
+modules\CB_TestNoText.lua
 #@end-debug@
