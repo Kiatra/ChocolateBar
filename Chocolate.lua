@@ -1,4 +1,4 @@
-﻿local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("ChocolateBar")
+local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("ChocolateBar")
 local LSM = LibStub("LibSharedMedia-3.0")
 local ChocolatePiece = ChocolateBar.ChocolatePiece
 local Drag = ChocolateBar.Drag
@@ -370,7 +370,7 @@ function ChocolatePiece:New(name, obj, settings, database)
 	db = database
 
 	local icon = obj.icon
-	local chocolate = CreateFrame("Button", "Chocolate" .. name)
+	local chocolate = CreateFrame("Button", "Chocolate" .. name, _G.UIParent, BackdropTemplateMixin and "BackdropTemplate")
 	chocolate.highlight = highlightBackground
 
 	--set update function

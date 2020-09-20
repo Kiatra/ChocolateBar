@@ -1,4 +1,4 @@
-﻿local LibStub = LibStub
+local LibStub = LibStub
 local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("ChocolateBar")
 local debug = ChocolateBar and ChocolateBar.Debug or function() end
 local AceCfgDlg = LibStub("AceConfigDialog-3.0")
@@ -913,7 +913,7 @@ local function SetLockedBar(info, value)
 	if not value then
 		--unlock
 		if not moveBarDummy then
-			moveBarDummy = _G.CreateFrame("Frame",bar)
+			moveBarDummy = _G.CreateFrame("Frame",bar, _G.UIParent, BackdropTemplateMixin and "BackdropTemplate")
 			moveBarDummy:SetBackdrop({bgFile = "Interface/Tooltips/UI-Tooltip-Background",
 												nil,
 												tile = true, tileSize = 16, edgeSize = 16,
