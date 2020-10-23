@@ -42,7 +42,6 @@ externals:
     tag: latest
   libs/LibQTip-1.0:
     url: https://repos.wowace.com/wow/libqtip-1-0
-    tag: latest
   modules/MicroMenu:
     url: https://github.com/zanony/Broker_MicroMenu.git
     tag: latest
