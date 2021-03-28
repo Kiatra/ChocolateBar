@@ -75,7 +75,7 @@ JostleFrame:RegisterEvent("PLAYER_CONTROL_GAINED")
 JostleFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 
 if not ChocolateBar.isClassicWoW then
-	JostleFrame:RegisterEvent("UNIT_ENTERED_VEHICLE")
+	JostleFrame:RegisterEvent("UNIT_EXITING_VEHICLE")
 	JostleFrame:RegisterEvent("UNIT_EXITED_VEHICLE")
 end
 
@@ -131,38 +131,38 @@ function Jostle:PlayerFrame_SequenceFinished()
 	self:Refresh(PlayerFrame)
 end
 
-function Jostle:UNIT_ENTERED_VEHICLE()
-	ChocolateBar:Debug("UNIT_ENTERED_VEHICLE", UnitInVehicle("player"))
-	ChocolateBar:Debug("UnitInVehicle(player)", UnitInVehicle("player"))
-	if not InCombatLockdown() then
+local function LockMainMenuBar()
+	if not InCombatLockdown() and not UnitInVehicle("Player") then
 		MainMenuBar:SetMovable(true)
-		MainMenuBar:SetUserPlaced(false)
+		MainMenuBar:SetUserPlaced(true)
+		ChocolateBar:Debug("LockMainMenuBar")
 		MainMenuBar:SetMovable(false)
 	end
+end
+
+function Jostle:UNIT_EXITING_VEHICLE()
+	MainMenuBar:SetMovable(true)
+	MainMenuBar:SetUserPlaced(false)
+	ChocolateBar:Debug("SetUserPlaced false triggerd by UNIT_EXITING_VEHICLE")
+	MainMenuBar:SetMovable(false)
 end
 
 function Jostle:UNIT_EXITED_VEHICLE()
-	self:Refresh(MainMenuBar)
+	self:Refresh(MainMenuBar, PlayerFrame)
 end
 
 function Jostle:PLAYER_ENTERING_WORLD()
-	self:Refresh(BuffFrame, PlayerFrame, TargetFrame)
+	self:Refresh(BuffFrame, PlayerFrame, TargetFrame, MainMenuBar)
 end
 
 function Jostle:PLAYER_REGEN_ENABLED()
-	inCombat = false
-	ChocolateBar:Debug("UNIT_ENTERING_VEHICLE", UnitInVehicle("player"))
-	ChocolateBar:Debug("UnitInVehicle(player)", UnitInVehicle("player"))
-	if not InCombatLockdown() and HasFullControl() and Player then
-		MainMenuBar:SetMovable(true)
-		MainMenuBar:SetUserPlaced(true)
-		ChocolateBar:Debug("SetUserPlaced true")
-		MainMenuBar:SetMovable(false)
-	end
-	self:ProcessQueue()
+	ChocolateBar:Debug("PLAYER_REGEN_ENABLED")
+	self:Refresh(MainMenuBar, PlayerFrame)
+	LockMainMenuBar()
 end
 
 function Jostle:PLAYER_REGEN_DISABLED()
+	ChocolateBar:Debug("PLAYER_REGEN_DISABLED")
 	inCombat = true
 end
 
@@ -406,12 +406,14 @@ function Jostle:Refresh(...)
 						anchorFrame = WorldFrame
 					end
 
-					frame:ClearAllPoints()
-					frame:SetPoint(anchor, anchorFrame, anchorAlt or anchor, x, y + offset)
-					blizzardFramesData[frame].lastX = frame:GetLeft()
-					blizzardFramesData[frame].lastY = frame:GetTop()
-					blizzardFramesData[frame].lastScale = framescale
-					
+					if not InCombatLockdown() then
+						frame:ClearAllPoints()
+						frame:SetPoint(anchor, anchorFrame, anchorAlt or anchor, x, y + offset)
+						blizzardFramesData[frame].lastX = frame:GetLeft()
+						blizzardFramesData[frame].lastY = frame:GetTop()
+						blizzardFramesData[frame].lastScale = framescale
+					end
+
 					if frame == OrderHallCommandBar then
 						frame:SetPoint("RIGHT", "UIParent" ,"RIGHT",0, 0);
 					end
