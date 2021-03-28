@@ -411,13 +411,7 @@ function Jostle:Refresh(...)
 					blizzardFramesData[frame].lastX = frame:GetLeft()
 					blizzardFramesData[frame].lastY = frame:GetTop()
 					blizzardFramesData[frame].lastScale = framescale
-
-					if frame == MainMenuBar and not InCombatLockdown() and HasFullControl() then
-						--MainMenuBar:SetMovable(true)
-						--MainMenuBar:SetUserPlaced(true)
-						--ChocolateBar:Debug("SetUserPlaced true")
-						--MainMenuBar:SetMovable(false)
-					end
+					
 					if frame == OrderHallCommandBar then
 						frame:SetPoint("RIGHT", "UIParent" ,"RIGHT",0, 0);
 					end
