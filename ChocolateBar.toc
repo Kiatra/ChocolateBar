@@ -1,4 +1,9 @@
+#@retail@
 ## Interface: 90005
+#@end-retail@
+#@non-retail@
+# ## Interface: 11306
+#@end-non-retail@
 ## Title: ChocolateBar
 ## Notes: A display for LibDataBroker-1.1
 ## Author: yess
