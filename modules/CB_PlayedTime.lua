@@ -64,10 +64,10 @@ local function playedTimeEvent(self, event, totalTimeInSeconds, timeAtThisLevel)
 	dbChar.total = totalTimeInSeconds
 	if UnitLevel("player") == GetMaxLevelForPlayerExpansion() then
 		dataobj.text  =  string.format("%s", formatTime(totalTimeInSeconds))
-		dataobj.label = "Time On Level"
+		dataobj.label = "Played Time"
 	else
 		dataobj.text  =  string.format("%s", formatTime(timeAtThisLevel))
-		dataobj.label = "Played Time"
+		dataobj.label = "Time On Level"
 	end
 end
 
@@ -83,12 +83,18 @@ function formatTime(time)
 	end
 end
 
+
+local frame2 = CreateFrame("Frame")
+
 local function onEnteringWorld()
 	db = CB_PlayedTime and CB_PlayedTime or {}
 	CB_PlayedTime = db
 	RequestTimePlayed()
 	dataobj:RegisterOptions()
+	frame2:UnregisterEvent("PLAYER_ENTERING_WORLD")
 end
+
+
 
 function dataobj:Reset()
 	CB_PlayedTime = {}
@@ -107,6 +113,5 @@ end
 local frame = CreateFrame("Frame")
 frame:SetScript("OnEvent", playedTimeEvent)
 frame:RegisterEvent("TIME_PLAYED_MSG")
-local frame2 = CreateFrame("Frame")
-frame2:SetScript("OnEvent", onEnteringWorld)
 frame2:RegisterEvent("PLAYER_ENTERING_WORLD")
+frame2:SetScript("OnEvent", onEnteringWorld)
