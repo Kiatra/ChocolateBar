@@ -5,11 +5,13 @@ local debug = ChocolateBar and ChocolateBar.debug or function() end
 local GameMusic = {}
 local addonName = "CB_Entertainer"
 
+local volumeText = "Master: "..math.floor((_G.GetCVar("Sound_MasterVolume")*100)).."%"
+
 local dataobj = LibStub("LibDataBroker-1.1"):NewDataObject(addonName, {
 	type = "data source",
 	--icon = "Interface\\AddOns\\ChocolateBar\\pics\\ChocolatePiece",
 	label = addonName,
-	text  = "Volume: ---",
+	text  = volumeText,
 	OnClick = OnClick,
 	OnMouseWheel = OnMouseWheel,
 	ChocolateBar = true
