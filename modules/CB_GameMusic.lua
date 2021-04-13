@@ -27,7 +27,7 @@ function dataobj:OnMouseWheel(vector)
 	vol = vol + step
 	if vol > 1 then vol = 1 end
 	if vol < 0 then vol = 0 end
-	SetCVar(vol, voltypeCVar);
+	SetCVar(cVar, vol);
 	dataobj.text = "Master: "..math.floor((_G.GetCVar(cVar)*100)).."%"
 end
 
