@@ -132,7 +132,7 @@ function Jostle:PlayerFrame_SequenceFinished()
 end
 
 local function LockMainMenuBar()
-	if not InCombatLockdown() and not UnitInVehicle("Player") then
+	if not InCombatLockdown() and (not ChocolateBar.isClassicWoW and not UnitInVehicle("Player")) then
 		MainMenuBar:SetMovable(true)
 		MainMenuBar:SetUserPlaced(true)
 		ChocolateBar:Debug("LockMainMenuBar")
