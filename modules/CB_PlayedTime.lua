@@ -64,7 +64,7 @@ end
 
 local function getPlayerIdentifier()
   local _, engClass, _, _, _, name, server = GetPlayerInfoByGUID(UnitGUID("player"))
-	if server == "" then
+	if (server == nil or server == "") then
 		server = GetNormalizedRealmName()
 	end
 	return string.format("%s-%s", name, server)
