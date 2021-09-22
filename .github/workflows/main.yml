@@ -24,18 +24,12 @@ jobs:
 
       - name: Create version specific ToC files
         uses: Numynum/ToCDuplicator@master
-        with:
-          files: Plugins/*/*.toc *.toc
 
       - name: Create Retail Package
         uses: BigWigsMods/packager@master
 
       - name: Create Classic Package
         uses: BigWigsMods/packager@master
-        with:
-          args: -g classic
 
       - name: Create Burning Crusade Package
         uses: BigWigsMods/packager@master
-        with:
-          args: -g bcc
