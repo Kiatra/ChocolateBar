@@ -28,6 +28,10 @@ jobs:
 
       - name: Create Classic Package
         uses: BigWigsMods/packager@master
+        with:
+          args: -g classic
 
       - name: Create Burning Crusade Package
         uses: BigWigsMods/packager@master
+        with:
+          args: -g bcc
