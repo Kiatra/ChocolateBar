@@ -1,4 +1,4 @@
-## Interface: 90100
+## Interface: 90105
 ## Interface-Retail: @toc-version-retail@
 ## Interface-Classic: @toc-version-classic@
 ## Interface-BCC: @toc-version-bcc@
