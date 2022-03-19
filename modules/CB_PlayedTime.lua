@@ -1,4 +1,4 @@
-﻿-- a LDB object that will show/hide the chocolatebar set in the chocolatebar options
+-- a LDB object that will show/hide the chocolatebar set in the chocolatebar options
 local LibStub = LibStub
 local L = LibStub("AceLocale-3.0"):GetLocale("ChocolateBar")
 local acetimer = LibStub("AceTimer-3.0")
@@ -63,7 +63,10 @@ function dataobj:OnTooltipShow()
 end
 
 local function getPlayerIdentifier()
-  local _, engClass, _, _, _, name, server = GetPlayerInfoByGUID(UnitGUID("player"))
+    local _, engClass, _, _, _, name, server = GetPlayerInfoByGUID(UnitGUID("player"))
+	if not name then
+		return
+	end
 	if not server or server == "" then
 		server = GetNormalizedRealmName() or ""
 	end
@@ -75,8 +78,12 @@ local function GetMaxLevelForPlayerExpansion()
 end
 
 local function playedTimeEvent(self, event, totalTimeInSeconds, timeAtThisLevel)
-	if not db[getPlayerIdentifier()] then db[getPlayerIdentifier()] = {} end
-	local dbChar = db[getPlayerIdentifier()]
+	local playerIdentifier = getPlayerIdentifier()
+	if not playerIdentifier then
+		return
+	end
+	if not db[playerIdentifier] then db[playerIdentifier] = {} end
+	local dbChar = db[playerIdentifier]
 	local days = totalTimeInSeconds / 3600 / 24
 	dbChar.total = totalTimeInSeconds
 	if UnitLevel("player") == GetMaxLevelForPlayerExpansion() then
