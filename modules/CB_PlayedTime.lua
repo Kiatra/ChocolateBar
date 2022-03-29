@@ -58,11 +58,7 @@ function dataobj:OnTooltipShow()
 end
 
 local function getPlayerIdentifier()
-  local _, _, _, _, _, name, server = GetPlayerInfoByGUID(UnitGUID("player"))
-	if not server or server == "" then
-		server = GetNormalizedRealmName() or ""
-	end
-	--debug("getPlayerIdentifier", server,name)
+	local name, server = UnitFullName("player")
 	return string.format("%s-%s", name, server)
 end
 
@@ -97,13 +93,11 @@ local frame2 = CreateFrame("Frame")
 local function onEnteringWorld()
 	db = CB_PlayedTime and CB_PlayedTime or {}
 	CB_PlayedTime = db
-	--RequestTimePlayed()
-	acetimer:ScheduleTimer(function()
-				RequestTimePlayed()
-				acetimer:ScheduleRepeatingTimer(function()
+	RequestTimePlayed()
+	acetimer:ScheduleRepeatingTimer(function()
 							updateText()
-				end, 3)
-	end, 2)
+	end, 5)
+
 	dataobj:RegisterOptions()
 	frame2:UnregisterEvent("PLAYER_ENTERING_WORLD")
 end
