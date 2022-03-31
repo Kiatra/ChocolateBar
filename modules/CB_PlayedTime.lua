@@ -5,7 +5,8 @@ local acetimer = LibStub("AceTimer-3.0")
 local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("ChocolateBar")
 local debug = ChocolateBar and ChocolateBar.Debug or function() end
 local ReportPlayedTimeToChat = true
-local dataobj,db
+local dataobj, db
+local name, server
 
 local function RequestTimePlayed()
 	ReportPlayedTimeToChat = false
@@ -58,7 +59,9 @@ function dataobj:OnTooltipShow()
 end
 
 local function getPlayerIdentifier()
-	local name, server = UnitFullName("player")
+	if not name or not server then
+		name, server = UnitFullName("player")
+	end
 	return string.format("%s-%s", name, server)
 end
 
@@ -84,8 +87,10 @@ end
 
 local function updateText()
 	local dbChar = db[getPlayerIdentifier()]
-	local diff = GetTime() - dbChar.timeStamp
-	dataobj.text = formatTime(dbChar.timeAtThisLevel + diff)
+	if dbChar then
+		local diff = GetTime() - dbChar.timeStamp
+		dataobj.text = formatTime(dbChar.timeAtThisLevel + diff)
+	end
 end
 
 local frame2 = CreateFrame("Frame")
@@ -98,13 +103,21 @@ local function onEnteringWorld()
 							updateText()
 	end, 5)
 
-	dataobj:RegisterOptions()
+	dataobj:RegisterOptions(db)
 	frame2:UnregisterEvent("PLAYER_ENTERING_WORLD")
 end
 
 function dataobj:Reset()
 	CB_PlayedTime = {}
 	db = CB_PlayedTime
+end
+
+function dataobj:Delete(name)
+	if name and CB_PlayedTime[name] then
+		CB_PlayedTime[name] = nil
+		db = CB_PlayedTime
+		debug("deleted", name)
+	end
 end
 
 local hookedChatFrame_DisplayTimePlayed = ChatFrame_DisplayTimePlayed
