@@ -343,7 +343,7 @@ local function OnDragStart(frame)
 		Drag:Start(bar, frame.name, frame)
 		frame:StartMoving()
 		frame.isMoving = true
-		frame:highlight(1)
+		frame:highlight(1, 0, 0, 0)
 	end
 end
 
