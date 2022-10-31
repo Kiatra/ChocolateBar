@@ -109,11 +109,11 @@ end
 
 if not Jostle.hooks.PlayerFrame_SequenceFinished then
 	Jostle.hooks.PlayerFrame_SequenceFinished = true
-	hooksecurefunc("PlayerFrame_SequenceFinished", function()
-		if Jostle.PlayerFrame_SequenceFinished then
-			Jostle:PlayerFrame_SequenceFinished()
-		end
-	end)
+--	hooksecurefunc("PlayerFrame_SequenceFinished", function()
+--		if Jostle.PlayerFrame_SequenceFinished then
+--			Jostle:PlayerFrame_SequenceFinished()
+--		end
+--	end)
 end
 
 function Jostle:WorldMapFrame_Hide()
