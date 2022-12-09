@@ -327,7 +327,7 @@ local function OnDragStart(frame)
 
 		OnLeave(frame)
 		-- hide libqtip tooltips
-		local libqtip = LibStub('LibQTip-1.0')
+		local libqtip = LibStub('LibQTip-1.0', true)
 		if libqtip and libqtip.IterateTooltips then
 			for _, tooltip in LibStub('LibQTip-1.0'):IterateTooltips() do
         libqtip:Release(tooltip)
