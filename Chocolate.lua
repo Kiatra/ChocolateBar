@@ -326,17 +326,12 @@ local function OnDragStart(frame)
 		end
 
 		OnLeave(frame)
-		-- hide libqtip and libtablet tooltips
-		local kids = {_G.UIParent:GetChildren()}
-		for _, child in ipairs(kids) do
-			if not child:IsForbidden() then
-				for i = 1, child:GetNumPoints() do
-					local _,relativeTo,_,_,_ = child:GetPoint(i)
-					if relativeTo == frame then
-						child:Hide()
-					end
-				end
-			end
+		-- hide libqtip tooltips
+		local libqtip = LibStub('LibQTip-1.0')
+		if libqtip and libqtip.IterateTooltips then
+			for _, tooltip in LibStub('LibQTip-1.0'):IterateTooltips() do
+        libqtip:Release(tooltip)
+    	end
 		end
 
 		ChocolateBar:SetDropPoins(frame)
