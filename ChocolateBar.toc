@@ -30,6 +30,7 @@ localization\ruRU.lua
 
 Core.lua
 Jostle.lua
+Jostle2.lua
 DragAndDrop.lua
 Chocolate.lua
 Bar.lua
