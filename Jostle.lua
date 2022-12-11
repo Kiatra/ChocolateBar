@@ -9,6 +9,10 @@ local _G, pairs = _G, pairs
 local UnitInVehicle = UnitInVehicle and UnitInVehicle or function() end
 local UnitHasVehicleUI = UnitHasVehicleUI and UnitHasVehicleUI or function() end
 
+function ChocolateBar:IsRetail()
+ return WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
+end
+
 local blizzardFrames = {
 	'PlayerFrame',
 	'TargetFrame',
@@ -34,7 +38,20 @@ local blizzardFrames = {
 	'OrderHallCommandBar',
 	'MicroButtonAndBagsBar',
 	'OverrideActionBar',
+	'StatusTrackingBarManager',
 }
+
+if ChocolateBar:IsRetail() then
+	blizzardFrames = {
+		'MicroButtonAndBagsBar',
+		'TutorialFrameParent',
+		'FramerateLabel',
+		'DurabilityFrame',
+		
+	}
+end
+
+
 
 local blizzardFramesData = {}
 
@@ -107,13 +124,13 @@ if not Jostle.hooks.UIParent_ManageFramePositions then
 	end)
 end
 
-if not Jostle.hooks.PlayerFrame_SequenceFinished then
+if not Jostle.hooks.PlayerFrame_SequenceFinished and PlayerFrame_SequenceFinished then
 	Jostle.hooks.PlayerFrame_SequenceFinished = true
---	hooksecurefunc("PlayerFrame_SequenceFinished", function()
---		if Jostle.PlayerFrame_SequenceFinished then
---			Jostle:PlayerFrame_SequenceFinished()
---		end
---	end)
+	hooksecurefunc("PlayerFrame_SequenceFinished", function()
+		if Jostle.PlayerFrame_SequenceFinished then
+			Jostle:PlayerFrame_SequenceFinished()
+		end
+	end)
 end
 
 function Jostle:WorldMapFrame_Hide()
@@ -125,7 +142,7 @@ function Jostle:TicketStatusFrame_OnEvent()
 end
 
 function Jostle:UIParent_ManageFramePositions()
-	self:Refresh(MainMenuBar, GroupLootFrame1, TutorialFrameParent, FramerateLabel, DurabilityFrame)
+	self:Refresh(MainMenuBar, GroupLootFrame1, TutorialFrameParent, FramerateLabel, DurabilityFrame, BuffFrame)
 end
 
 function Jostle:PlayerFrame_SequenceFinished()
