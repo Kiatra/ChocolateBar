@@ -6,6 +6,7 @@ Jostle2.hooks = {}
 local debug = ChocolateBar and ChocolateBar.Debug or function() end
 local Jostle2Update = CreateFrame("Frame")
 local _G, pairs = _G, pairs
+local UnitHasVehicleUI = UnitHasVehicleUI and UnitHasVehicleUI or function() end
 
 local blizzardFrames = {
 	'MicroButtonAndBagsBar',
