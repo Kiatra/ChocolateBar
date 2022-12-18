@@ -52,49 +52,51 @@ if ChocolateBar:IsRetail() then
 end
 
 
-
+local JostleFrame = CreateFrame("Frame")
 local blizzardFramesData = {}
 
 local start = GetTime()
 local nextTime = 0
 local fullyInitted = false
 
-local JostleFrame = CreateFrame("Frame")
-Jostle.Frame  = JostleFrame
-JostleFrame:SetScript("OnUpdate", function(this, elapsed)
-	local now = GetTime()
-	if now - start >= 3 then
-		fullyInitted = true
-		for k,v in pairs(blizzardFramesData) do
-			blizzardFramesData[k] = nil
-		end
-		this:SetScript("OnUpdate", function(this, elapsed)
-			if GetTime() >= nextTime then
-				Jostle:Refresh()
-				--this:Hide()
+if not ChocolateBar:IsRetail() then
+	
+	Jostle.Frame  = JostleFrame
+	JostleFrame:SetScript("OnUpdate", function(this, elapsed)
+		local now = GetTime()
+		if now - start >= 3 then
+			fullyInitted = true
+			for k,v in pairs(blizzardFramesData) do
+				blizzardFramesData[k] = nil
 			end
-		end)
+			this:SetScript("OnUpdate", function(this, elapsed)
+				if GetTime() >= nextTime then
+					Jostle:Refresh()
+					--this:Hide()
+				end
+			end)
+		end
+	end)
+
+	function JostleFrame:Schedule(time)
+		time = time or 0
+		nextTime = GetTime() + time
+		self:Show()
 	end
-end)
 
-function JostleFrame:Schedule(time)
-	time = time or 0
-	nextTime = GetTime() + time
-	self:Show()
-end
+	JostleFrame:UnregisterAllEvents()
+	JostleFrame:SetScript("OnEvent", function(this, event, ...)
+		return Jostle[event](Jostle, ...)
+	end)
+	JostleFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
+	JostleFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
+	JostleFrame:RegisterEvent("PLAYER_CONTROL_GAINED")
+	JostleFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 
-JostleFrame:UnregisterAllEvents()
-JostleFrame:SetScript("OnEvent", function(this, event, ...)
-	return Jostle[event](Jostle, ...)
-end)
-JostleFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
-JostleFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
-JostleFrame:RegisterEvent("PLAYER_CONTROL_GAINED")
-JostleFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
-
-if ChocolateBar:IsRetail() then
-	JostleFrame:RegisterEvent("UNIT_EXITING_VEHICLE")
-	JostleFrame:RegisterEvent("UNIT_EXITED_VEHICLE")
+	if ChocolateBar:IsRetail() then
+		JostleFrame:RegisterEvent("UNIT_EXITING_VEHICLE")
+		JostleFrame:RegisterEvent("UNIT_EXITED_VEHICLE")
+	end
 end
 
 if not Jostle.hooks.WorldMapFrame_Hide then
@@ -266,9 +268,11 @@ local function isClose(alpha, bravo)
 end
 
 function Jostle:Refresh(...)
+	
 	if not fullyInitted then
 		return
 	end
+	ChocolateBar:Debug("Refresh Jostle")
 
 	local screenHeight = GetScreenHeight()
 	local topOffset = GetScreenTop() or screenHeight
