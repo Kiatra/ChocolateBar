@@ -28,7 +28,7 @@ local db --reference to ChocolateBar.db.profile
 --------
 local function debug(...)
 	if ChocolateBar.db and ChocolateBar.db.char.debug then
-	 	local s = "ChocolateBar debug:"
+	 	local s = "CB:"
 		for i=1,select("#", ...) do
 			local x = select(i, ...)
 			s = strjoin(" ",s,tostring(x))

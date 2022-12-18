@@ -99,7 +99,7 @@ function Bar:UpdateJostle(db)
 				if self.settings.align == "bottom" then
 					jostle2:RegisterBottom(self)
 				elseif  self.settings.align == "top" then
-					--jostle2:RegisterTop(self)
+					jostle2:RegisterTop(self)
 				end
 			end
 		end
