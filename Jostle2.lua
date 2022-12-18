@@ -14,51 +14,7 @@ local blizzardFrames = {
 	'DurabilityFrame',
 	'StatusTrackingBarManager',
 	'MinimapCluster',
-	'PlayerFrame',
-	'TargetFrame',
 }
-
-local editModeFrames = {
-	MinimapCluster,
-	PlayerFrame,
-	TargetFrame,
-}
-
-
---[[
-
-/dump MinimapCluster:IsUserPlaced()
-/dump MinimapCluster:GetTop() * UIParent:GetScale() --yes 767.99993179109
-/dump UIParent:GetTop() * UIParent:GetScale() == MinimapCluster:GetTop() * UIParent:GetScale()
-
-/dump UIParent:GetTop() * UIParent:GetScale() == PlayerFrame:GetTop() * UIParent:GetScale()
-
-/dump MinimapCluster:GetScale()
-
-04] Dump: value=MinimapCluster:GetTop()
-[02:41:04] [1]=1054.875
-[02:41:12] ChocolateBar debug: ChocolateBar Refresh Jostle2
-[02:41:22] Edit Mode layout 'Modern' applied
-[02:41:22] ChocolateBar debug: ChocolateBar Refresh Jostle2
-[02:41:27] Dump: value=MinimapCluster:GetTop()
-[02:41:27] [1]=1079.9998779297
-[02:41:32] ChocolateBar debug: ChocolateBar Refresh Jostle2
--- after changing ui scalde
-[02:43:00] Dump: value=MinimapCluster:GetTop()
-[02:43:00] [1]=903.52941894531
-UIParent:GetScale()
-
- GameTimeFrame
-[03:48:06] Dump: value=GameTimeFrame:Hide()
-[03:48:06] empty result
-[03:48:18] TimeManagerClockButton
-
-
-/dump for key, child in pairs(MinimapCluster) do DEFAULT_CHAT_FRAME:AddMessage(child:GetName()); end
-
-/dump PlayerFrame:GetTop() * UIParent:GetScale()
-/dump MinimapCluster:GetTop() * UIParent:GetScale()
-]]
 
 local blizzardFramesData = {}
 
@@ -125,35 +81,8 @@ local function GetScreenBottom()
 	return top
 end
 
-local function isMinimapDefaultPosition()
-	return UIParent:GetTop() * UIParent:GetScale() == frame:GetTop() * UIParent:GetScale()
-end
-
-local function getTopBarsHeight()
-	--[[
-	local height = 0
-	for _,frame in pairs(topFrames) do
-		if frame.IsShown and frame:IsShown() then
-			height = height + frame:GetHeight()
-			ChocolateBar:Debug("height", height)
-		end
-	end
-	return height
-	--]]
-	return (GetScreenHeight() - GetScreenTop()) * UIParent:GetScale()
-end
-
-local function getFrameOffsetTop(frame)
-	return UIParent:GetTop() * UIParent:GetScale() - frame:GetTop() * UIParent:GetScale() 
-end
-
-local function isFrameBelowTopBars(frame)
-    ChocolateBar.Debug("isFrameBelowTopBars", frame:GetName())
-    ChocolateBar.Debug("isFrameBelowTopBars", getFrameOffsetTop(frame) , getTopBarsHeight())
-    ChocolateBar.Debug("isFrameBelowTopBars", getFrameOffsetTop(frame) > getTopBarsHeight() )
-   
-	return getFrameOffsetTop(frame) > getTopBarsHeight()
-	--765
+local function isMinimapClusterUserPlaced()
+    return not (UIParent:GetTop() * UIParent:GetScale() == MinimapCluster:GetTop() * UIParent:GetScale()) 
 end
 
 
@@ -194,20 +123,6 @@ function Jostle2:UIParent_ManageFramePositions()
 	--self:Refresh(MinimapCluster)
 end
 
-if not Jostle2.hooks.EditModeManagerFrame_OnHide then
-	Jostle2.hooks.EditModeManagerFrame_OnHide = true
-	hooksecurefunc(EditModeManagerFrame,"Hide",  function()
-		if Jostle2.EditModeManagerFrame_OnHide then
-			Jostle2:EditModeManagerFrame_OnHide()
-		end
-	end)
-end
-
-function Jostle2:EditModeManagerFrame_OnHide()
-	ChocolateBar:Debug("EditModeManagerFrame_OnHide")
-	self:Refresh(MinimapCluster)
-end
-
 local tmp = {}
 local queue = {}
 local inCombat = false
@@ -219,31 +134,11 @@ function Jostle2:ProcessQueue()
 		end
 	end
 end
-function Jostle2:PLAYER_CONTROL_GAINED()
-	self:ProcessQueue()
-end
-
-local function isClose(alpha, bravo)
-	return math.abs(alpha - bravo) < 0.1
-end
-
 
 function Jostle2:Refresh(...)
-	--ChocolateBar:Debug("Refresh Jostle2")
 	if not fullyInitted then
 		return
 	end
-
-	--hocolateBar:Debug("gettop", GetScreenTop() - GetScreenHeight())
-
-	-- do not touch player placed frames
-	--for _, frame in ipairs(editModeFrames) do
-	--	ChocolateBar:Debug("frame", frame)
-	--	if isDefaultPosition(frame) then
-	--		ChocolateBar:Debug(frame:GetName(), " is edited = ", isUserPlacedEditMode(frame))
-	--		return
-	--	end
-	--end
 
 	local screenHeight = GetScreenHeight()
 	local topOffset = GetScreenTop() or screenHeight
@@ -310,75 +205,48 @@ function Jostle2:Refresh(...)
 			frame = _G[frame]
 		end
 
-        -- quick fix for not touching the top frames if they are not anchored at the top
-		--if frame == MinimapCluster and isMinimapUserPlaced then
-		--	return
-		--end
-		if frame == (PlayerFrame or TargetFrame or MinimapCluster) and isFrameBelowTopBars(frame) then
+		if frame == MinimapCluster and isMinimapClusterUserPlaced() then
 			return
 		end
 
-		--ChocolateBar:Debug("setting frame 2")
-
 		local framescale = frame and frame.GetScale and frame:GetScale() or 1
 
-		if ((frame and frame.IsUserPlaced and not frame:IsUserPlaced()) or ((frame == DEFAULT_CHAT_FRAME or frame == ChatFrame2) and SIMPLE_CHAT == "1") or frame == FramerateLabel) and (frame ~= ChatFrame2 or SIMPLE_CHAT == "1") then
-			--ChocolateBar:Debug("setting frame 3")
-			local frameData = blizzardFramesData[frame]
-			if (select(2, frame:GetPoint(1)) ~= UIParent and select(2, frame:GetPoint(1)) ~= WorldFrame) then
-				-- do nothing
-				--ChocolateBar:Debug("setting frame 3.1")
-			elseif bottomOffset == 0 and (frame == FramerateLabel) then
-				-- do nothing
-				--ChocolateBar:Debug("setting frame 3.2")
-			elseif frame == DurabilityFrame and DurabilityFrame:IsShown() and (DurabilityFrame:GetLeft() > GetScreenWidth() or DurabilityFrame:GetRight() < 0 or DurabilityFrame:GetBottom() > GetScreenHeight() or DurabilityFrame:GetTop() < 0) then
-				DurabilityFrame:Hide()
-				--ChocolateBar:Debug("setting frame 3.3")
-			elseif frame == FramerateLabel and ((frameData.lastX and not isClose(frameData.lastX, frame:GetLeft())) or not isClose(WorldFrame:GetHeight() * WorldFrame:GetScale(), UIParent:GetHeight() * UIParent:GetScale()))  then
-				-- do nothing
-				--ChocolateBar:Debug("setting frame 3.4")
-			elseif frame == FramerateLabel or frame == MinimapCluster or frame == DurabilityFrame or not (frameData.lastScale and frame.GetScale and frameData.lastScale == frame:GetScale()) or not (frameData.lastX and frameData.lastY and (not isClose(frameData.lastX, frame:GetLeft()) or not isClose(frameData.lastY, frame:GetTop()))) then
-				local anchor
-				local anchorAlt
-				local width, height = GetScreenWidth(), GetScreenHeight()
-				local x
+		if frame then
+			local anchor
+			local anchorAlt
+			local width, height = GetScreenWidth(), GetScreenHeight()
+			local x
 
-				--hocolateBar:Debug("setting frame 4")
+			if frame:GetRight() and frame:GetLeft() then
+				local anchorFrame = UIParent
+				if frame == GroupLootFrame1 or frame == FramerateLabel then
+					x = 0
+					anchor = ""
+				elseif frame:GetRight() / framescale <= width / 2 then
+					x = frame:GetLeft() / framescale
+					anchor = "LEFT"
+				else
+					x = frame:GetRight() - width / framescale
+					anchor = "RIGHT"
+				end
+				local y = blizzardFramesData[frame].y
+				local offset = 0
+				if blizzardFramesData[frame].top then
+					anchor = "TOP" .. anchor
+					offset = ( topOffset - height ) / framescale
+				else
+					anchor = "BOTTOM" .. anchor
+					offset = bottomOffset / framescale
+				end
+				
+				if frame == FramerateLabel then
+					anchorFrame = WorldFrame
+				end
 
-				if frame:GetRight() and frame:GetLeft() then
-					local anchorFrame = UIParent
-					if frame == GroupLootFrame1 or frame == FramerateLabel then
-						x = 0
-						anchor = ""
-					elseif frame:GetRight() / framescale <= width / 2 then
-						x = frame:GetLeft() / framescale
-						anchor = "LEFT"
-					else
-						x = frame:GetRight() - width / framescale
-						anchor = "RIGHT"
-					end
-					local y = blizzardFramesData[frame].y
-					local offset = 0
-					if blizzardFramesData[frame].top then
-						anchor = "TOP" .. anchor
-						offset = ( topOffset - height ) / framescale
-					else
-						anchor = "BOTTOM" .. anchor
-						offset = bottomOffset / framescale
-					end
-					
-					if frame == FramerateLabel then
-						anchorFrame = WorldFrame
-					end
+				if not InCombatLockdown() then
+					frame:ClearAllPoints()
+					frame:SetPoint(anchor, anchorFrame, anchorAlt or anchor, x, y + offset)
 
-					if not InCombatLockdown() then
-						frame:ClearAllPoints()
-						frame:SetPoint(anchor, anchorFrame, anchorAlt or anchor, x, y + offset)
-						--blizzardFramesData[frame].lastX = frame:GetLeft()
-						--blizzardFramesData[frame].lastY = frame:GetTop()
-						--blizzardFramesData[frame].lastScale = framescale
-						--ChocolateBar:Debug("setting frame 5 ",frame:GetName())
-					end
 				end
 			end
 		end
