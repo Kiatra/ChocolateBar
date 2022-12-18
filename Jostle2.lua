@@ -3,8 +3,6 @@ local Jostle2 = ChocolateBar.Jostle2
 local bottomFrames = {}
 local topFrames = {}
 Jostle2.hooks = {}
-local debug = ChocolateBar and ChocolateBar.Debug or function() end
-local Jostle2Update = CreateFrame("Frame")
 local _G, pairs = _G, pairs
 
 local blizzardFrames = {
@@ -29,7 +27,7 @@ if ChocolateBar:IsRetail() then
 		local now = GetTime()
 		if now - start >= 3 then
 			fullyInitted = true
-			for k,v in pairs(blizzardFramesData) do
+			for k,_ in pairs(blizzardFramesData) do
 				blizzardFramesData[k] = nil
 			end
 			this:SetScript("OnUpdate", function(this, elapsed)
@@ -48,15 +46,12 @@ if ChocolateBar:IsRetail() then
 	end
 
 	Jostle2Frame:UnregisterAllEvents()
-	Jostle2Frame:SetScript("OnEvent", function(this, event, ...)
-		return Jostle2[event](Jostle2, ...)
-	end)
+	--Jostle2Frame:SetScript("OnEvent", function(this, event, ...)
+	--	ChocolateBar.Debug(Jostle2,event)
+	--	return Jostle2[event](Jostle2, ...)
+	--end)
 
-	Jostle2Frame:RegisterEvent("PLAYER_ENTERING_WORLD")
-end
-
-function Jostle2:PLAYER_ENTERING_WORLD()
-	self:Refresh(BuffFrame, PlayerFrame, TargetFrame, MainMenuBar)
+	--Jostle2Frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 end
 
 local function GetScreenTop()
@@ -158,10 +153,6 @@ function Jostle2:Refresh(...)
 			tmp[i] = select(i, ...)
 		end
 		frames = tmp
-		
-		for _,frame in ipairs(frames) do
-			--ChocolateBar:Debug("maunall update",frame:GetName())
-		end
 	else
 		frames = blizzardFrames
 	end
@@ -178,7 +169,6 @@ function Jostle2:Refresh(...)
 		return
 	end
 
-	local screenHeight = GetScreenHeight()
 	-- setup blizzardFramesData
 	for _,frame in ipairs(frames) do
 		if type(frame) == "string" then
@@ -194,6 +184,7 @@ function Jostle2:Refresh(...)
 				blizzardFramesData[frame] = {y = frame:GetTop() - screenHeight / framescale, top = true}
 			end
 		end
+
 	end
 
 	--ChocolateBar:Debug("setting frame 1")
