@@ -231,7 +231,8 @@ function ChocolateBar:UpdateJostle()
 end
 
 function ChocolateBar:isNewInstall()
-	return ChocolateBarDB.addonVersion < GetAddOnMetadata("ChocolateBar", "Version") and true or false
+	local lastversion = ChocolateBarDB.addonVersion or ""
+	return lastversion < GetAddOnMetadata("ChocolateBar", "Version") and true or false
 end
 
 function ChocolateBar:ToggleOrderHallCommandBar()
