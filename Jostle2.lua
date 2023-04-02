@@ -4,6 +4,7 @@ local bottomFrames = {}
 local topFrames = {}
 Jostle2.hooks = {}
 local _G, pairs = _G, pairs
+local UnitHasVehicleUI = UnitHasVehicleUI and UnitHasVehicleUI or function() end
 
 local blizzardFrames = {
 	'MicroButtonAndBagsBar',
