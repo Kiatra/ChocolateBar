@@ -2,12 +2,11 @@ local LibStub = LibStub
 local addonName = "CB_PlayedTime"
 local L = LibStub("AceLocale-3.0"):GetLocale("CB_PlayedTime")
 local CB_PlayedTime = LibStub:GetLibrary("LibDataBroker-1.1",true):GetDataObjectByName(addonName)
-local version = GetAddOnMetadata("CB_PlayedTime","X-Curse-Packaged-Version") or ""
 local db
 local tobedeleted
 
 local aceoptions = {
-  name = addonName.." "..version,
+  name = addonName,
   handler = CB_PlayedTime,
 	type='group',
 	desc = addonName,
