@@ -12,7 +12,7 @@ local volumeText = "Coordinates"
 
 
 local Module = ChocolateBar:NewModule(addonName, {
-	description = "Shows player coordinates",
+	description = L["Shows player coordinates"],
 	defaults = {
 		enabled = true,
 	},
@@ -39,8 +39,12 @@ function Module:EnableModule()
 			local map = C_Map.GetBestMapForUnit("player")
 			if map then
 				local position = C_Map.GetPlayerMapPosition(map, "player")
-				local x, y = position:GetXY()
-				dataobj.text = string.format("Player: %.1f X, %.1f Y", x * 100, y * 100)
+				if position then 
+					local x, y = position:GetXY()
+					dataobj.text = string.format("Player: %.1f X, %.1f Y", x * 100, y * 100)
+				else
+					dataobj.text = "Player: Instance"
+				end
 			else
 				dataobj.text = "Player: Instance"
 			end
