@@ -272,7 +272,7 @@ function Jostle:Refresh(...)
 	if not fullyInitted then
 		return
 	end
-	ChocolateBar:Debug("Refresh Jostle")
+	--ChocolateBar:Debug("Refresh Jostle")
 
 	local screenHeight = GetScreenHeight()
 	local topOffset = GetScreenTop() or screenHeight

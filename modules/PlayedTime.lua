@@ -8,27 +8,16 @@ local ReportPlayedTimeToChat = true
 local dataobj, db
 local name, server
 
+local addonName = "Played Time"
+local dataobj
+local frame, frame2
+
+local moduleText = "---"
+
 local function RequestTimePlayed()
 	ReportPlayedTimeToChat = false
 	return _G.RequestTimePlayed()
 end
-
-dataobj = LibStub("LibDataBroker-1.1"):NewDataObject("CB_PlayedTime", {
-	type = "data source",
-	--icon = "Interface\\AddOns\\ChocolateBar\\pics\\ChocolatePiece",
-	label = "Played Time",
-	text  = "---",
-	defauldDisabled = true,
-	OnClick = function(self, button, ...)
-		if button == "RightButton" then
-			--CB_PlayedTime:OpenOptions()
-			--LibStub("AceConfigDialog-3.0"):Open("CB_PlayedTime")
-			dataobj:OpenOptions()
-		end
-		--LibQTip:Release(tooltip)
-		tooltip = nil
-	end
-})
 
 local function formatTime(time)
   local days = floor(time/86400)
@@ -42,7 +31,7 @@ local function formatTime(time)
 	end
 end
 
-function dataobj:OnTooltipShow()
+local function OnTooltipShow(self)
 	RequestTimePlayed()
 	self:AddLine("PlayedTime")
 	local totaltime = 0
@@ -93,8 +82,6 @@ local function updateText()
 	end
 end
 
-local frame2 = CreateFrame("Frame")
-
 local function onEnteringWorld()
 	db = CB_PlayedTime and CB_PlayedTime or {}
 	CB_PlayedTime = db
@@ -103,16 +90,31 @@ local function onEnteringWorld()
 							updateText()
 	end, 5)
 
-	dataobj:RegisterOptions(db)
+	Module:RegisterOptions(db)
 	frame2:UnregisterEvent("PLAYER_ENTERING_WORLD")
 end
 
-function dataobj:Reset()
+local Module = ChocolateBar:NewModule(addonName, {
+	description = L["Shows the played time for all characters. You need to login with each character first."],
+	defaults = {
+		enabled = true,
+	},
+	options = options
+})
+
+local function OnClick(self, button, ...)
+	if button == "RightButton" then
+		Module:OpenOptions()
+	end
+	tooltip = nil
+end
+
+function Module:Reset()
 	CB_PlayedTime = {}
 	db = CB_PlayedTime
 end
 
-function dataobj:Delete(name)
+function Module:Delete(name)
 	if name and CB_PlayedTime[name] then
 		CB_PlayedTime[name] = nil
 		db = CB_PlayedTime
@@ -129,8 +131,35 @@ ChatFrame_DisplayTimePlayed = function(...)
 	return
 end
 
-local frame = CreateFrame("Frame")
-frame:SetScript("OnEvent", playedTimeEvent)
-frame:RegisterEvent("TIME_PLAYED_MSG")
-frame2:RegisterEvent("PLAYER_ENTERING_WORLD")
-frame2:SetScript("OnEvent", onEnteringWorld)
+
+function Module:DisableModule()
+end
+
+function Module:EnableModule()
+	if not dataobj then 
+		dataobj = LibStub("LibDataBroker-1.1"):NewDataObject(addonName, {
+			type = "data source",
+			label = addonName,
+			text  = moduleText,
+			OnClick = OnClick,
+			OnTooltipShow = OnTooltipShow,
+		})
+	end
+
+	db = CB_PlayedTime and CB_PlayedTime or {}
+	CB_PlayedTime = db
+	
+	Module:RegisterOptions(db)
+
+	frame = CreateFrame("Frame")
+	frame:SetScript("OnEvent", playedTimeEvent)
+	frame:RegisterEvent("TIME_PLAYED_MSG")
+	--frame2 = CreateFrame("Frame")
+	--frame2:RegisterEvent("PLAYER_ENTERING_WORLD")
+	--frame2:SetScript("OnEvent", onEnteringWorld)
+
+	RequestTimePlayed()
+	acetimer:ScheduleRepeatingTimer(function()
+							updateText()
+	end, 5)
+end
