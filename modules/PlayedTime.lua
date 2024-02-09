@@ -51,6 +51,9 @@ local function getPlayerIdentifier()
 	if not name or not server then
 		name, server = UnitFullName("player")
 	end
+
+	name = name or ""
+	server = server or ""
 	return string.format("%s-%s", name, server)
 end
 
