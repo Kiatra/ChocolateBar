@@ -16,7 +16,6 @@ local function resizeFrame(self)
 	end
 
 	local textWidth = (settings.showText or settings.showLabel) and self.text:GetStringWidth() or 0
-	--local labelWidth = settings.showLabel and self.label:GetStringWidth() or 0
 
 	if settings.widthBehavior == "fixed" then
 		width = width + settings.width
@@ -40,7 +39,6 @@ local function TextUpdater(frame, value)
 		value = string.gsub(value, "|c........", "")
 		value = string.gsub(value, "|r", "")
 	end
-
 	if frame.settings.showText then
 		frame.text:SetText(frame.labelText..value)
 	else
@@ -180,7 +178,6 @@ local updaters = {
 	-- tooltiptext is no longer in the data spec, but
 	-- I'll continue to support it, as some plugins seem to use it
 	tooltiptext = function(frame, value, name)
-		ChocolateBar.Debug("tooltiptext", name)
 		local object = frame.obj
 		if not tooltipDisabled(object) then
 			local tt = object.tooltip or GameTooltip
@@ -417,7 +414,12 @@ function ChocolatePiece:New(name, obj, settings, database)
 	chocolate:SetScript("OnDragStop", OnDragStop)
 	SettingsUpdater(chocolate, settings.showText)
 	LabelUpdater(chocolate, obj.label)
+	
 	return chocolate
+end
+
+function ChocolatePiece:UpdateDB(database)
+	db = database
 end
 
 function ChocolatePiece:UpdateGap(val)

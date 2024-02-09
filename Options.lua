@@ -606,18 +606,16 @@ local aceoptions = {
 				},
 			},
 		},
-		modules={
+		moduleOptions={
 			name = L["Modules"],
 			type ="group",
 			order = 20,
 			args ={
-			--[[
 				label = {
 					type = 'description',
-					order = 0,
-					name = L["List of modules"]
+					order = 1,
+					name = L["Modules are buildin plugins that can be enabled or disabled here. Disabled plugins will not be loaded."]
 				},
-				]]
 			},
 		},
 		chocolates={
@@ -737,11 +735,15 @@ aceoptions.args.lookAndFeel.args.fontAndTextures.args.font.args.font = {
 
 local chocolateOptions = aceoptions.args.chocolates.args
 local barOptions = aceoptions.args.bars.args
-local moduleOptions = aceoptions.args.modules.args
+local moduleOptions = aceoptions.args.moduleOptions.args
 ChocolateBar.optionsTable = aceoptions
 -----
 -- bar option functions
 -----
+
+function ChocolateBar:GetAceOptions()
+	return aceoptions
+end
 
 -- return the number of bars aligend to align (top or bottom)
 function ChocolateBar:GetNumBars(align)
@@ -1405,7 +1407,8 @@ function ChocolateBar:RegisterOptions(data, chocolateBars, modules)
 	AceCfgDlg:SelectGroup("ChocolateBar", "general")
 
 	for name, module in pairs(modules) do
-		self:AddModuleOptions(name ,module.options)
+		debug("Adding Module Options: ", name)
+		self:AddModuleOptions(name, module.options)
 		if module.OnOpenOptions then module:OnOpenOptions() end
 	end
 end
@@ -1602,7 +1605,7 @@ function ChocolateBar:AddObjectOptions(name,obj)
 					enabled = {
 						type = 'toggle',
 						--width = "double",
-						order = 3,
+						order = 0,
 						name = L["Enabled"],
 						desc = L["Enabled"],
 						get = GetEnabled,
@@ -1758,6 +1761,7 @@ local function SetModuleEnabled(info, value)
 	ChocolateBar.db.moduleOptions[name].enabled = value
 end
 
+--[[
 function ChocolateBar:AddDefaultModuleOptions(name, obj)
 	self.db.moduleOptions[name] = {}
 	local moduleOptions = {
@@ -1767,13 +1771,13 @@ function ChocolateBar:AddDefaultModuleOptions(name, obj)
 		order = 0,
 		args={
 			label = {
-				order = 2,
+				order = 0,
 				type = "description",
 				name = "description",
 			},
 			enabled = {
 				type = 'toggle',
-				order = 3,
+				order = 1,
 				name = L["Enabled"],
 				desc = L["Enabled"],
 				get = GetModuleEnabled,
@@ -1783,6 +1787,7 @@ function ChocolateBar:AddDefaultModuleOptions(name, obj)
 	}
 	self:AddModuleOptions(name, moduleOptions)
 end
+]]
 
 function ChocolateBar:AddCustomPluginOptions(pluginName, customOptions)
 	for cleanName, options in pairs(chocolateOptions) do
@@ -1825,6 +1830,15 @@ function ChocolateBar:OnProfileChanged(event, database, newProfileKey)
 	debug("OnProfileChanged", event, database, newProfileKey)
 	db = database.profile
 	self:UpdateDB(db)
+
+	-- itaret modules list and call each enable fuction
+	for name, module in pairs(ChocolateBar.modules) do
+		if db.moduleSettings[name].enabled then
+			ChocolateBar:EnableModule(name)
+		else
+			ChocolateBar:DisableModule(name)
+		end
+	end
 
 	for k, v in pairs(self:GetBars()) do
 		ChocolateBar:RemoveBarOptions(k)

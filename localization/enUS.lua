@@ -2,6 +2,13 @@ local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
 local L = AceLocale:NewLocale("ChocolateBar", "enUS", true)
 if not L then return end
 
+L["Modules are buildin plugins that can be enabled or disabled here. Disabled plugins will not be loaded."] = true
+L["Shows the played time for all characters. You need to login with each character first."] = true
+L["Use your scroll wheel over this plugin to adjust the master volume."] = true
+L["Use your scroll wheel over this plugin to adjust the sound volume."] = true
+L["Use your scroll wheel over this plugin to adjust the music volume."] = true
+L["Shows player coordinates"] = true
+
 L["Disable Tooltip"] = true
 L["Only show tooltip of this plugin when a modifier (shift, alt, ctrl) is held."] = true
 

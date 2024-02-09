@@ -148,7 +148,7 @@ function Jostle2:Refresh(...)
 	if select('#', ...) >= 1 then
 		for k in pairs(tmp) do
 			tmp[k] = nil
-			ChocolateBar:Debug(k)
+			--ChocolateBar:Debug(k)
 		end
 		for i = 1, select('#', ...) do
 			tmp[i] = select(i, ...)
