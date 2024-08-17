@@ -9,7 +9,7 @@ local LSM = LibStub("LibSharedMedia-3.0")
 local _G, pairs, string = _G, pairs, string
 local db, moreChocolate
 local index = 0
-local version = GetAddOnMetadata("ChocolateBar","X-Curse-Packaged-Version") or ""
+local version = C_AddOns.GetAddOnMetadata("ChocolateBar","X-Curse-Packaged-Version") or ""
 
 local function GetStats(info)
 	local total = 0
@@ -1556,8 +1556,8 @@ function ChocolateBar:AddObjectOptions(name,obj)
 	if t ~= "data source" and t ~= "launcher" then
 		return
 	end
-	--local curse = GetAddOnMetadata(name,"X-Curse-Packaged-Version") or ""
-	--local version = GetAddOnMetadata(name,"Version") or ""
+	--local curse = C_AddOns.GetAddOnMetadata(name,"X-Curse-Packaged-Version") or ""
+	--local version = C_AddOns.GetAddOnMetadata(name,"Version") or ""
 
 	t = t or "not set"
 	local cleanName

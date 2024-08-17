@@ -6,7 +6,7 @@ local select, strjoin, CreateFrame = select, strjoin, CreateFrame
 
 local _, _, _, tocversion = GetBuildInfo()
 
-local addonVersion = GetAddOnMetadata("ChocolateBar", "Version")
+local addonVersion = C_AddOns.GetAddOnMetadata("ChocolateBar", "Version")
 
 ChocolateBar.Jostle = {}
 ChocolateBar.Jostle2 = {}
@@ -278,7 +278,7 @@ end
 
 function ChocolateBar:isNewInstall()
 	local lastversion = ChocolateBarDB.addonVersion or ""
-	return lastversion < GetAddOnMetadata("ChocolateBar", "Version") and true or false
+	return lastversion < C_AddOns.GetAddOnMetadata("ChocolateBar", "Version") and true or false
 end
 
 function ChocolateBar:ToggleOrderHallCommandBar()
