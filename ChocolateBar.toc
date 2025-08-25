@@ -30,8 +30,8 @@ localization\ptBR.lua
 localization\ruRU.lua
 
 Core.lua
-Jostle.lua
-Jostle2.lua
+JostleClassic.lua
+JostleEditMode.lua
 DragAndDrop.lua
 Chocolate.lua
 Bar.lua

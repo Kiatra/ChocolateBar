@@ -1,8 +1,8 @@
 local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("ChocolateBar")
-local Jostle2 = ChocolateBar.Jostle2
+local JostleEditMode = ChocolateBar.JostleEditMode
 local bottomFrames = {}
 local topFrames = {}
-Jostle2.hooks = {}
+JostleEditMode.hooks = {}
 local _G, pairs = _G, pairs
 local UnitHasVehicleUI = UnitHasVehicleUI and UnitHasVehicleUI or function() end
 
@@ -20,11 +20,12 @@ local blizzardFramesData = {}
 local start = GetTime()
 local nextTime = 0
 local fullyInitted = false
-local Jostle2Frame = CreateFrame("Frame")
+local JostleEditModeFrame = CreateFrame("Frame")
 
-if ChocolateBar:IsRetail() then
-	Jostle2.Frame  = Jostle2Frame
-	Jostle2Frame:SetScript("OnUpdate", function(this, elapsed)
+if ChocolateBar:WoWHasEditMode() then
+	JostleEditMode.Frame  = JostleEditModeFrame
+	--ChocolateBar:Debug("2 Refresh JostleEditMode")
+	JostleEditModeFrame:SetScript("OnUpdate", function(this, elapsed)
 		local now = GetTime()
 		if now - start >= 3 then
 			fullyInitted = true
@@ -33,26 +34,26 @@ if ChocolateBar:IsRetail() then
 			end
 			this:SetScript("OnUpdate", function(this, elapsed)
 				if GetTime() >= nextTime then
-					Jostle2:Refresh()
+					JostleEditMode:Refresh()
 					--this:Hide()
 				end
 			end)
 		end
 	end)
 
-	function Jostle2Frame:Schedule(time)
+	function JostleEditModeFrame:Schedule(time)
 		time = time or 0
 		nextTime = GetTime() + time
 		self:Show()
 	end
 
-	Jostle2Frame:UnregisterAllEvents()
-	--Jostle2Frame:SetScript("OnEvent", function(this, event, ...)
-	--	ChocolateBar.Debug(Jostle2,event)
-	--	return Jostle2[event](Jostle2, ...)
+	JostleEditModeFrame:UnregisterAllEvents()
+	--JostleEditModeFrame:SetScript("OnEvent", function(this, event, ...)
+	--	ChocolateBar.Debug(JostleEditMode,event)
+	--	return JostleEditMode[event](JostleEditMode, ...)
 	--end)
 
-	--Jostle2Frame:RegisterEvent("PLAYER_ENTERING_WORLD")
+	--JostleEditModeFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 end
 
 local function GetScreenTop()
@@ -82,39 +83,39 @@ local function isMinimapClusterUserPlaced()
 end
 
 
-function Jostle2:RegisterBottom(frame)
+function JostleEditMode:RegisterBottom(frame)
 	if frame and not bottomFrames[frame] then
 		bottomFrames[frame] = frame
-		Jostle2Frame:Schedule()
+		JostleEditModeFrame:Schedule()
 	end
 end
 
-function Jostle2:RegisterTop(frame)
+function JostleEditMode:RegisterTop(frame)
 	if frame and not topFrames[frame] then
 		topFrames[frame] = frame
-		Jostle2Frame:Schedule()
+		JostleEditModeFrame:Schedule()
 	end
 end
 
-function Jostle2:Unregister(frame)
+function JostleEditMode:Unregister(frame)
 	if frame and topFrames[frame] then
 		topFrames[frame] = nil
 	elseif frame and bottomFrames[frame] then
 		bottomFrames[frame] = nil
-		Jostle2Frame:Schedule()
+		JostleEditModeFrame:Schedule()
 	end
 end
 
-if not Jostle2.hooks.UIParent_ManageFramePositions then
-	Jostle2.hooks.UIParent_ManageFramePositions = true
+if not JostleEditMode.hooks.UIParent_ManageFramePositions then
+	JostleEditMode.hooks.UIParent_ManageFramePositions = true
 	hooksecurefunc("UIParent_ManageFramePositions", function()
-		if Jostle2.UIParent_ManageFramePositions then
-			Jostle2:UIParent_ManageFramePositions()
+		if JostleEditMode.UIParent_ManageFramePositions then
+			JostleEditMode:UIParent_ManageFramePositions()
 		end
 	end)
 end
 
-function Jostle2:UIParent_ManageFramePositions()
+function JostleEditMode:UIParent_ManageFramePositions()
 	--ChocolateBar:Debug("UIParent_ManageFramePositions")
 	--self:Refresh(MinimapCluster)
 end
@@ -122,7 +123,7 @@ end
 local tmp = {}
 local queue = {}
 local inCombat = false
-function Jostle2:ProcessQueue()
+function JostleEditMode:ProcessQueue()
 	if not inCombat and HasFullControl() then
 		for k in pairs(queue) do
 			self:Refresh(k)
@@ -131,7 +132,7 @@ function Jostle2:ProcessQueue()
 	end
 end
 
-function Jostle2:Refresh(...)
+function JostleEditMode:Refresh(...)
 	if not fullyInitted then
 		return
 	end
@@ -140,7 +141,7 @@ function Jostle2:Refresh(...)
 	local topOffset = GetScreenTop() or screenHeight
 	local bottomOffset = GetScreenBottom() or 0
 	if topOffset ~= screenHeight or bottomOffset ~= 0 then
-		Jostle2Frame:Schedule(10)
+		JostleEditModeFrame:Schedule(10)
 	end
 
 	local frames

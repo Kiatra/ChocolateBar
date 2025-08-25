@@ -8,8 +8,8 @@ local _, _, _, tocversion = GetBuildInfo()
 
 local addonVersion = C_AddOns.GetAddOnMetadata("ChocolateBar", "Version")
 
-ChocolateBar.Jostle = {}
-ChocolateBar.Jostle2 = {}
+ChocolateBar.JostleClassic = {}
+ChocolateBar.JostleEditMode = {}
 ChocolateBar.Bar = {}
 ChocolateBar.ChocolatePiece = {}
 ChocolateBar.Drag = {}
@@ -83,12 +83,16 @@ local defaults = {
 	}
 }
 
-function ChocolateBar:IsRetail()
- return WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
-end
+--function ChocolateBar:IsRetail()
+-- return WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
+--endxs
 
-function ChocolateBar:IsClassic()
- return WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
+--function ChocolateBar:IsClassic()
+-- return WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
+--end
+
+function ChocolateBar:WoWHasEditMode()
+	return LE_EXPANSION_LEVEL_CURRENT >= LE_EXPANSION_DRAGONFLIGHT
 end
 
 --------
@@ -121,7 +125,7 @@ function ChocolateBar:OnInitialize()
 	self:RegisterEvent("PLAYER_REGEN_DISABLED","OnEnterCombat")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED","OnLeaveCombat")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD","OnEnterWorld")
-	if ChocolateBar:IsRetail() then
+	if _G.LE_EXPANSION_LEVEL_CURRENT >= _G.LE_EXPANSION_MISTS_OF_PANDARIA then
 		self:RegisterEvent("PET_BATTLE_OPENING_START","OnPetBattleOpen")
 		self:RegisterEvent("PET_BATTLE_CLOSE","OnPetBattleOver")
 	end

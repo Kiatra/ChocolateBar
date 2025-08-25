@@ -4,8 +4,8 @@ local LSM = LibStub("LibSharedMedia-3.0")
 local Bar = ChocolateBar.Bar
 local chocolate = ChocolateBar.ChocolatePiece
 local debug = ChocolateBar and ChocolateBar.Debug or function() end
-local jostle = ChocolateBar.Jostle
-local jostle2 = ChocolateBar.Jostle2
+local jostleClassic = ChocolateBar.JostleClassic
+local jostleEditMode = ChocolateBar.jostleEditMode
 local _G, pairs, ipairs, table, math, mod = _G, pairs, ipairs, table, math, mod
 local CreateFrame, UIParent = CreateFrame, UIParent
 local db
@@ -82,8 +82,8 @@ function Bar:UpdateAutoHide(db)
 	if self.settings.autohide then
 		self.autohide = true
 		self:HideAll()
-		if jostle then jostle:Unregister(self) end
-		if jostle2 then jostle2:Unregister(self) end
+		if jostleClassic then jostleClassic:Unregister(self) end
+		if jostleEditMode then jostleEditMode:Unregister(self) end
 	else
 		self.autohide = false
 		self:ShowAll()
@@ -92,25 +92,25 @@ function Bar:UpdateAutoHide(db)
 end
 
 function Bar:UpdateJostle(db)
-	if ChocolateBar:IsRetail() then
-		if jostle2 then
-			jostle2:Unregister(self)
+	if ChocolateBar:WoWHasEditMode() then
+		if jostleEditMode then
+			jostleEditMode:Unregister(self)
 			if db.moveFrames then
 				if self.settings.align == "bottom" then
-					jostle2:RegisterBottom(self)
+					jostleEditMode:RegisterBottom(self)
 				elseif  self.settings.align == "top" then
-					jostle2:RegisterTop(self)
+					jostleEditMode:RegisterTop(self)
 				end
 			end
 		end
 	else
-		if jostle then
-			jostle:Unregister(self)
+		if jostleClassic then
+			jostleClassic:Unregister(self)
 			if db.moveFrames then
 				if self.settings.align == "bottom" then
-					jostle:RegisterBottom(self)
+					jostleClassic:RegisterBottom(self)
 				elseif  self.settings.align == "top" then
-					jostle:RegisterTop(self)
+					jostleClassic:RegisterTop(self)
 				end
 			end
 		end
@@ -232,8 +232,8 @@ end
 
 function Bar:Disable()
 	self:Hide()
-	if jostle then jostle:Unregister(self) end
-	if jostle2 then jostle2:Unregister(self) end
+	if jostleClassic then jostleClassic:Unregister(self) end
+	if jostleEditMode then jostleEditMode:Unregister(self) end
 end
 
 local function SortTab(tab)
