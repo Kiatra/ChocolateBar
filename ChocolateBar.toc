@@ -11,6 +11,7 @@
 ## X-WoWI-ID: 12326
 ## X-Curse-Project-ID: 17424
 ## SavedVariables: ChocolateBarDB, CB_PlayedTime
+## IconTexture: Interface/AddOns/ChocolateBar/pics/ChocolatePiece
 
 #@no-lib-strip@
 libs\libs.xml
