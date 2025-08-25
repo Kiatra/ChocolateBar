@@ -1,17 +1,13 @@
 local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("ChocolateBar")
-local Jostle = ChocolateBar.Jostle
+local JostleClassic = ChocolateBar.JostleClassic
 local bottomFrames = {}
 local topFrames = {}
-Jostle.hooks = {}
+JostleClassic.hooks = {}
 local debug = ChocolateBar and ChocolateBar.Debug or function() end
 local JostleUpdate = CreateFrame("Frame")
 local _G, pairs = _G, pairs
 local UnitInVehicle = UnitInVehicle and UnitInVehicle or function() end
 local UnitHasVehicleUI = UnitHasVehicleUI and UnitHasVehicleUI or function() end
-
-function ChocolateBar:IsRetail()
- return WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
-end
 
 local blizzardFrames = {
 	'PlayerFrame',
@@ -41,16 +37,21 @@ local blizzardFrames = {
 	'StatusTrackingBarManager',
 }
 
-if ChocolateBar:IsRetail() then
-	blizzardFrames = {
-		'MicroButtonAndBagsBar',
-		'TutorialFrameParent',
-		'FramerateLabel',
-		'DurabilityFrame',
-		
-	}
+if MicroButtonAndBagsBar then
+	table.insert(blizzardFrames, "MicroButtonAndBagsBar")
 end
 
+if TutorialFrameParent then
+	table.insert(blizzardFrames, "TutorialFrameParent")
+end
+
+if FramerateLabel then
+	table.insert(blizzardFrames, "FramerateLabel")
+end
+
+if DurabilityFrame then
+	table.insert(blizzardFrames, "DurabilityFrame")
+end
 
 local JostleFrame = CreateFrame("Frame")
 local blizzardFramesData = {}
@@ -59,10 +60,12 @@ local start = GetTime()
 local nextTime = 0
 local fullyInitted = false
 
-if not ChocolateBar:IsRetail() then
+-- we use JostleEditMode for Dragonflight and Later
+if not ChocolateBar:WoWHasEditMode() then
 	
-	Jostle.Frame  = JostleFrame
+	JostleClassic.Frame  = JostleFrame
 	JostleFrame:SetScript("OnUpdate", function(this, elapsed)
+
 		local now = GetTime()
 		if now - start >= 3 then
 			fullyInitted = true
@@ -71,7 +74,7 @@ if not ChocolateBar:IsRetail() then
 			end
 			this:SetScript("OnUpdate", function(this, elapsed)
 				if GetTime() >= nextTime then
-					Jostle:Refresh()
+					JostleClassic:Refresh()
 					--this:Hide()
 				end
 			end)
@@ -86,73 +89,74 @@ if not ChocolateBar:IsRetail() then
 
 	JostleFrame:UnregisterAllEvents()
 	JostleFrame:SetScript("OnEvent", function(this, event, ...)
-		return Jostle[event](Jostle, ...)
+		return JostleClassic[event](JostleClassic, ...)
 	end)
 	JostleFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
 	JostleFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
 	JostleFrame:RegisterEvent("PLAYER_CONTROL_GAINED")
 	JostleFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 
-	if ChocolateBar:IsRetail() then
+	-- classic does not have this does TBC?
+	if _G.LE_EXPANSION_LEVEL_CURRENT >= _G.LE_EXPANSION_BURNING_CRUSADE then
 		JostleFrame:RegisterEvent("UNIT_EXITING_VEHICLE")
 		JostleFrame:RegisterEvent("UNIT_EXITED_VEHICLE")
 	end
 end
 
-if not Jostle.hooks.WorldMapFrame_Hide then
-	Jostle.hooks.WorldMapFrame_Hide = true
+if not JostleClassic.hooks.WorldMapFrame_Hide then
+	JostleClassic.hooks.WorldMapFrame_Hide = true
 	hooksecurefunc(WorldMapFrame, "Hide", function()
-		if Jostle.WorldMapFrame_Hide then
-			Jostle:WorldMapFrame_Hide()
+		if JostleClassic.WorldMapFrame_Hide then
+			JostleClassic:WorldMapFrame_Hide()
 		end
 	end)
 end
 
-if not Jostle.hooks.TicketStatusFrame_OnEvent then
-	Jostle.hooks.TicketStatusFrame_OnEvent = true
+if not JostleClassic.hooks.TicketStatusFrame_OnEvent then
+	JostleClassic.hooks.TicketStatusFrame_OnEvent = true
 	hooksecurefunc("TicketStatusFrame_OnEvent", function()
-		if Jostle.TicketStatusFrame_OnEvent then
-			Jostle:TicketStatusFrame_OnEvent()
+		if JostleClassic.TicketStatusFrame_OnEvent then
+			JostleClassic:TicketStatusFrame_OnEvent()
 		end
 	end)
 end
 
-if not Jostle.hooks.UIParent_ManageFramePositions then
-	Jostle.hooks.UIParent_ManageFramePositions = true
+if not JostleClassic.hooks.UIParent_ManageFramePositions then
+	JostleClassic.hooks.UIParent_ManageFramePositions = true
 	hooksecurefunc("UIParent_ManageFramePositions", function()
-		if Jostle.UIParent_ManageFramePositions then
-			Jostle:UIParent_ManageFramePositions()
+		if JostleClassic.UIParent_ManageFramePositions then
+			JostleClassic:UIParent_ManageFramePositions()
 		end
 	end)
 end
 
-if not Jostle.hooks.PlayerFrame_SequenceFinished and PlayerFrame_SequenceFinished then
-	Jostle.hooks.PlayerFrame_SequenceFinished = true
+if not JostleClassic.hooks.PlayerFrame_SequenceFinished and PlayerFrame_SequenceFinished then
+	JostleClassic.hooks.PlayerFrame_SequenceFinished = true
 	hooksecurefunc("PlayerFrame_SequenceFinished", function()
-		if Jostle.PlayerFrame_SequenceFinished then
-			Jostle:PlayerFrame_SequenceFinished()
+		if JostleClassic.PlayerFrame_SequenceFinished then
+			JostleClassic:PlayerFrame_SequenceFinished()
 		end
 	end)
 end
 
-function Jostle:WorldMapFrame_Hide()
+function JostleClassic:WorldMapFrame_Hide()
 	--JostleFrame:Schedule()
 end
 
-function Jostle:TicketStatusFrame_OnEvent()
+function JostleClassic:TicketStatusFrame_OnEvent()
 	self:Refresh(TicketStatusFrame, ConsolidatedBuffs)
 end
 
-function Jostle:UIParent_ManageFramePositions()
+function JostleClassic:UIParent_ManageFramePositions()
 	self:Refresh(MainMenuBar, GroupLootFrame1, TutorialFrameParent, FramerateLabel, DurabilityFrame, BuffFrame)
 end
 
-function Jostle:PlayerFrame_SequenceFinished()
+function JostleClassic:PlayerFrame_SequenceFinished()
 	self:Refresh(PlayerFrame)
 end
 
 local function LockMainMenuBar()
-	if not InCombatLockdown() and (not ChocolateBar.isClassicWoW and not UnitInVehicle("Player")) then
+	if not InCombatLockdown() and (_G.LE_EXPANSION_LEVEL_CURRENT >= LE_EXPANSION_BURNING_CRUSADE and not UnitInVehicle("Player")) then
 		MainMenuBar:SetMovable(true)
 		MainMenuBar:SetUserPlaced(true)
 		ChocolateBar:Debug("LockMainMenuBar")
@@ -160,7 +164,7 @@ local function LockMainMenuBar()
 	end
 end
 
-function Jostle:UNIT_EXITING_VEHICLE()
+function JostleClassic:UNIT_EXITING_VEHICLE()
 	ChocolateBar:Debug("UNIT_EXITING_VEHICLE")
 	MainMenuBar:SetMovable(true)
 	MainMenuBar:SetUserPlaced(false)
@@ -168,27 +172,28 @@ function Jostle:UNIT_EXITING_VEHICLE()
 	MainMenuBar:SetMovable(false)
 end
 
-function Jostle:UNIT_EXITED_VEHICLE()
+function JostleClassic:UNIT_EXITED_VEHICLE()
 	ChocolateBar:Debug("UNIT_EXITED_VEHICLE")
 	self:Refresh(MainMenuBar, PlayerFrame)
 end
 
-function Jostle:PLAYER_ENTERING_WORLD()
+function JostleClassic:PLAYER_ENTERING_WORLD()
 	self:Refresh(BuffFrame, PlayerFrame, TargetFrame, MainMenuBar)
 end
 
-function Jostle:PLAYER_REGEN_ENABLED()
+function JostleClassic:PLAYER_REGEN_ENABLED()
 	ChocolateBar:Debug("PLAYER_REGEN_ENABLED")
 	self:Refresh(MainMenuBar, PlayerFrame)
 	LockMainMenuBar()
 end
 
-function Jostle:PLAYER_REGEN_DISABLED()
+local inCombat = false
+function JostleClassic:PLAYER_REGEN_DISABLED()
 	ChocolateBar:Debug("PLAYER_REGEN_DISABLED")
 	inCombat = true
 end
 
-function Jostle:WorldMapFrame_Hide()
+function JostleClassic:WorldMapFrame_Hide()
 	--JostleFrame:Schedule()
 end
 
@@ -225,21 +230,21 @@ end
 local function Adjust()
 end
 
-function Jostle:RegisterBottom(frame)
+function JostleClassic:RegisterBottom(frame)
 	if frame and not bottomFrames[frame] then
 		bottomFrames[frame] = frame
 		JostleFrame:Schedule()
 	end
 end
 
-function Jostle:RegisterTop(frame)
+function JostleClassic:RegisterTop(frame)
 	if frame and not topFrames[frame] then
 		topFrames[frame] = frame
 		JostleFrame:Schedule()
 	end
 end
 
-function Jostle:Unregister(frame)
+function JostleClassic:Unregister(frame)
 	if frame and topFrames[frame] then
 		topFrames[frame] = nil
 	elseif frame and bottomFrames[frame] then
@@ -250,8 +255,7 @@ end
 
 local tmp = {}
 local queue = {}
-local inCombat = false
-function Jostle:ProcessQueue()
+function JostleClassic:ProcessQueue()
 	if not inCombat and HasFullControl() then
 		for k in pairs(queue) do
 			self:Refresh(k)
@@ -259,7 +263,7 @@ function Jostle:ProcessQueue()
 		end
 	end
 end
-function Jostle:PLAYER_CONTROL_GAINED()
+function JostleClassic:PLAYER_CONTROL_GAINED()
 	self:ProcessQueue()
 end
 
@@ -267,12 +271,12 @@ local function isClose(alpha, bravo)
 	return math.abs(alpha - bravo) < 0.1
 end
 
-function Jostle:Refresh(...)
+function JostleClassic:Refresh(...)
 	
 	if not fullyInitted then
 		return
 	end
-	--ChocolateBar:Debug("Refresh Jostle")
+	--ChocolateBar:Debug("Refresh JostleClassic")
 
 	local screenHeight = GetScreenHeight()
 	local topOffset = GetScreenTop() or screenHeight
