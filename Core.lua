@@ -83,14 +83,6 @@ local defaults = {
 	}
 }
 
---function ChocolateBar:IsRetail()
--- return WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
---endxs
-
---function ChocolateBar:IsClassic()
--- return WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
---end
-
 function ChocolateBar:WoWHasEditMode()
 	return LE_EXPANSION_LEVEL_CURRENT >= LE_EXPANSION_DRAGONFLIGHT
 end
