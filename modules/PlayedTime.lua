@@ -57,8 +57,23 @@ local function getPlayerIdentifier()
 	return string.format("%s-%s", name, server)
 end
 
-local function GetMaxLevelForPlayerExpansion()
-	return not ChocolateBar:IsRetail() and 60 or _G.GetMaxLevelForPlayerExpansion()
+
+local MAX_LEVEL_MAP = {
+  [1] = 60, --classic
+  [2] = 70, --theburningcrusade
+  [3] = 80, --wrathofthelichking
+  [4] = 85, --cataclysm
+  [5] = 90, --mistsofpandaria
+  [6] = 100,  --warlordsofdraenor
+  [7] = 110,  --legion
+  [8] = 120,  --battleforazeroth
+}
+
+local function getMaxLevel()
+	if _G.GetMaxLevelForPlayerExpansion then
+		return GetMaxLevelForPlayerExpansion()
+	end
+	return MAX_LEVEL_MAP[LE_EXPANSION_LEVEL_CURRENT] or 60
 end
 
 local function playedTimeEvent(self, event, totalTimeInSeconds, timeAtThisLevel)
@@ -68,7 +83,7 @@ local function playedTimeEvent(self, event, totalTimeInSeconds, timeAtThisLevel)
 	dbChar.total = totalTimeInSeconds
 	dbChar.timeStamp = GetTime()
 	dbChar.timeAtThisLevel = timeAtThisLevel
-	if UnitLevel("player") == GetMaxLevelForPlayerExpansion() then
+	if UnitLevel("player") == getMaxLevel() then
 		dataobj.text  =  string.format("%s", formatTime(totalTimeInSeconds))
 		dataobj.label = "Played Time"
 	else
