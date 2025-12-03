@@ -1,7 +1,7 @@
 ## Interface: @toc-version-retail@, @toc-version-midnight@
 #@debug@
 ## Interface: 120000
-#@end-debug@>
+#@end-debug@
 ## Interface-Retail: @toc-version-retail@
 ## Interface-Classic: @toc-version-classic@
 ## Interface-BCC: @toc-version-bcc@
