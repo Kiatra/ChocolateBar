@@ -3,8 +3,6 @@
 ## Interface: 120000
 #@end-debug@>
 ## Interface-Retail: @toc-version-retail@, @toc-version-midnight@
-#@end-debug@
-## Interface-Retail: @toc-version-retail@
 ## Interface-Classic: @toc-version-classic@
 ## Interface-BCC: @toc-version-bcc@
 ## Interface-Wrath: @toc-version-wrath@
