@@ -1,7 +1,7 @@
 ## Interface: @toc-version-retail@, @toc-version-midnight@
 #@debug@
 ## Interface: 120000
-#@end-debug@>
+#@end-debug@
 ## Interface-Retail: @toc-version-retail@
 ## Interface-Classic: @toc-version-classic@
 ## Interface-BCC: @toc-version-bcc@
@@ -16,6 +16,17 @@
 ## X-Curse-Project-ID: 17424
 ## SavedVariables: ChocolateBarDB, CB_PlayedTime
 ## IconTexture: Interface/AddOns/ChocolateBar/pics/ChocolatePiece
+
+## Category: Data Broker
+## Category-deDE: Datenbroker
+## Category-esES: Intermediario de Datos
+## Category-esMX: Intermediario de Datos
+## Category-frFR: Courtier de Données
+## Category-itIT: Data Broker
+## Category-ptBR: Corretor de Dados
+## Category-ruRU: Посредник данных
+## Category-zhCN: 数据管理
+## Category-zhTW: 資料管理
 
 #@no-lib-strip@
 libs\libs.xml
