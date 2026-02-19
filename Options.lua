@@ -1422,7 +1422,7 @@ function ChocolateBar:OpenOptions(chocolateBars, data, input, pluginName, module
 	end
 
 	if blizzard then
-		InterfaceOptionsFrame_OpenToCategory("ChocolateBar");
+		Settings.OpenToCategory(self.BlizzardOptionsCategoryID)
 	elseif not input or input:trim() == "" then
 		AceCfgDlg:Open("ChocolateBar")
 	else

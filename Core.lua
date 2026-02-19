@@ -45,7 +45,7 @@ local defaults = {
 	profile = {
 		petBattleHideBars = true, combatopacity = 1, scale = 1,
 		height = 21, iconSize = 0.75, moveFrames = true, adjustCenter = true,
-		strata = "BACKGROUND", barRightClick = "OPTIONS",
+		strata = "BACKGROUND", barRightClick = "BLIZZ",
 		gap = 7, textOffset = 1, moreBar = "none", moreBarDelay = 4,
 		fontPath = " ", fontSize = 12, labelColor = {r=1, g=0.82, b=0, a=1},
 		background = {
@@ -103,7 +103,8 @@ function ChocolateBar:OnInitialize()
 	debug("isNewInstall()=", self:isNewInstall())
 
 	local AceCfgDlg = LibStub("AceConfigDialog-3.0")
-	AceCfgDlg:AddToBlizOptions("ChocolateBar", "ChocolateBar")
+	local _, categoryID = AceCfgDlg:AddToBlizOptions("ChocolateBar", "ChocolateBar")
+	self.BlizzardOptionsCategoryID = categoryID
 
 	LSM:Register("statusbar", "ChocolateBar Gold", "Interface\\AddOns\\ChocolateBar\\pics\\chocolatebar")
 	LSM:Register("statusbar", "ChocolateBar Gray", "Interface\\AddOns\\ChocolateBar\\pics\\chocolatebargray")
