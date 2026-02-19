@@ -1404,6 +1404,7 @@ function ChocolateBar:RegisterOptions(data, chocolateBars, modules)
 	self.db.RegisterCallback(self, "OnProfileReset", "OnProfileChanged")
 
 	AceCfgDlg:SelectGroup("ChocolateBar", "chocolates")
+	AceCfgDlg:SelectGroup("ChocolateBar", "bars")
 	AceCfgDlg:SelectGroup("ChocolateBar", "general")
 
 	for name, module in pairs(modules) do
