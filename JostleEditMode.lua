@@ -13,6 +13,7 @@ local blizzardFrames = {
 	'DurabilityFrame',
 	'StatusTrackingBarManager',
 	'MinimapCluster',
+	'BuffFrame'
 }
 
 local blizzardFramesData = {}
@@ -24,7 +25,6 @@ local JostleEditModeFrame = CreateFrame("Frame")
 
 if ChocolateBar:WoWHasEditMode() then
 	JostleEditMode.Frame  = JostleEditModeFrame
-	--ChocolateBar:Debug("2 Refresh JostleEditMode")
 	JostleEditModeFrame:SetScript("OnUpdate", function(this, elapsed)
 		local now = GetTime()
 		if now - start >= 3 then
@@ -35,7 +35,6 @@ if ChocolateBar:WoWHasEditMode() then
 			this:SetScript("OnUpdate", function(this, elapsed)
 				if GetTime() >= nextTime then
 					JostleEditMode:Refresh()
-					--this:Hide()
 				end
 			end)
 		end
@@ -48,12 +47,6 @@ if ChocolateBar:WoWHasEditMode() then
 	end
 
 	JostleEditModeFrame:UnregisterAllEvents()
-	--JostleEditModeFrame:SetScript("OnEvent", function(this, event, ...)
-	--	ChocolateBar.Debug(JostleEditMode,event)
-	--	return JostleEditMode[event](JostleEditMode, ...)
-	--end)
-
-	--JostleEditModeFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 end
 
 local function GetScreenTop()
@@ -79,9 +72,8 @@ local function GetScreenBottom()
 end
 
 local function isMinimapClusterUserPlaced()
-    return not (UIParent:GetTop() * UIParent:GetScale() == MinimapCluster:GetTop() * UIParent:GetScale()) 
+    return not (UIParent:GetTop() * UIParent:GetScale() == MinimapCluster:GetTop() * UIParent:GetScale())
 end
-
 
 function JostleEditMode:RegisterBottom(frame)
 	if frame and not bottomFrames[frame] then
@@ -93,6 +85,7 @@ end
 function JostleEditMode:RegisterTop(frame)
 	if frame and not topFrames[frame] then
 		topFrames[frame] = frame
+		ChocolateBar:Debug("RegisterTop:", frame and frame.GetName and frame:GetName() or "no name")
 		JostleEditModeFrame:Schedule()
 	end
 end
@@ -104,20 +97,6 @@ function JostleEditMode:Unregister(frame)
 		bottomFrames[frame] = nil
 		JostleEditModeFrame:Schedule()
 	end
-end
-
-if not JostleEditMode.hooks.UIParent_ManageFramePositions then
-	JostleEditMode.hooks.UIParent_ManageFramePositions = true
-	hooksecurefunc("UIParent_ManageFramePositions", function()
-		if JostleEditMode.UIParent_ManageFramePositions then
-			JostleEditMode:UIParent_ManageFramePositions()
-		end
-	end)
-end
-
-function JostleEditMode:UIParent_ManageFramePositions()
-	--ChocolateBar:Debug("UIParent_ManageFramePositions")
-	--self:Refresh(MinimapCluster)
 end
 
 local tmp = {}
@@ -189,9 +168,7 @@ function JostleEditMode:Refresh(...)
 
 	end
 
-	--ChocolateBar:Debug("setting frame 1")
-
-	-- move the blizzardFrames 
+	-- move the blizzardFrames
 	for _,frame in ipairs(frames) do
 
 		if type(frame) == "string" then
@@ -231,7 +208,7 @@ function JostleEditMode:Refresh(...)
 					anchor = "BOTTOM" .. anchor
 					offset = bottomOffset / framescale
 				end
-				
+
 				if frame == FramerateLabel then
 					anchorFrame = WorldFrame
 				end

@@ -60,9 +60,9 @@ local start = GetTime()
 local nextTime = 0
 local fullyInitted = false
 
--- we use JostleEditMode for Dragonflight and Later
+--use JostleEditMode for any game version with edit mode
 if not ChocolateBar:WoWHasEditMode() then
-	
+
 	JostleClassic.Frame  = JostleFrame
 	JostleFrame:SetScript("OnUpdate", function(this, elapsed)
 
@@ -272,7 +272,7 @@ local function isClose(alpha, bravo)
 end
 
 function JostleClassic:Refresh(...)
-	
+
 	if not fullyInitted then
 		return
 	end
