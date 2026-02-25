@@ -84,7 +84,7 @@ local defaults = {
 }
 
 function ChocolateBar:WoWHasEditMode()
-	return _G.C_EditMode ~= nil
+    return LE_EXPANSION_LEVEL_CURRENT >= LE_EXPANSION_DRAGONFLIGHT
 end
 
 --------
