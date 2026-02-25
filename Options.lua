@@ -1408,7 +1408,6 @@ function ChocolateBar:RegisterOptions(data, chocolateBars, modules)
 	AceCfgDlg:SelectGroup("ChocolateBar", "general")
 
 	for name, module in pairs(modules) do
-		debug("Adding Module Options: ", name)
 		self:AddModuleOptions(name, module.options)
 		if module.OnOpenOptions then module:OnOpenOptions() end
 	end

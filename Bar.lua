@@ -5,7 +5,7 @@ local Bar = ChocolateBar.Bar
 local chocolate = ChocolateBar.ChocolatePiece
 local debug = ChocolateBar and ChocolateBar.Debug or function() end
 local jostleClassic = ChocolateBar.JostleClassic
-local jostleEditMode = ChocolateBar.jostleEditMode
+local jostleEditMode = ChocolateBar.JostleEditMode
 local _G, pairs, ipairs, table, math, mod = _G, pairs, ipairs, table, math, mod
 local CreateFrame, UIParent = CreateFrame, UIParent
 local db
@@ -93,6 +93,7 @@ end
 
 function Bar:UpdateJostle(db)
 	if ChocolateBar:WoWHasEditMode() then
+	ChocolateBar:Debug("jostleEditMode:",jostleEditMode)
 		if jostleEditMode then
 			jostleEditMode:Unregister(self)
 			if db.moveFrames then
@@ -143,7 +144,7 @@ end
 
 function Bar:UpdateTexture(db)
 	--local background = LSM:Fetch("statusbar", db.background.texture)
-	
+
 	local bg = {
 		bgFile = db.background.texture,
 		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
@@ -151,7 +152,7 @@ function Bar:UpdateTexture(db)
 		insets = { left = 0, right = 0, top = 0, bottom = 0}
 	}
 	--db.barSettings[name].align == "bottom" then
-	
+
 	--bg.bgFile = background
 	self:SetBackdrop(bg);
 	self:UpdateColors(db)
@@ -179,7 +180,7 @@ function Bar:AddChocolatePiece(choco, name, noupdate)
 
 	local settings = choco.settings
 	settings.barName = self:GetName()
-	
+
 	if not noupdate then
 		self:UpdateBar()
 	end
@@ -190,7 +191,7 @@ function Bar:AddChocolatePiece(choco, name, noupdate)
 			choco.icon:Hide()
 		end
 	end
-	
+
 end
 
 -- eat some chocolate from a ChocolateBar
