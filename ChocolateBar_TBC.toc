@@ -1,0 +1,68 @@
+## Interface-BCC: @toc-version-bcc@
+#@debug@
+## Interface: 20505
+#@end-debug@
+## Title: ChocolateBar
+## Notes: A display for LibDataBroker-1.1
+## Author: Kiatra - github.com/Kiatra/ChocolateBar/
+## Version: v4.3.1
+## OptionalDeps: Ace3, LibSharedMedia-3.0, LibQTip-1.0
+## X-WoWI-ID: 12326
+## X-Curse-Project-ID: 17424
+## SavedVariables: ChocolateBarDB, CB_PlayedTime
+## IconTexture: Interface/AddOns/ChocolateBar/pics/ChocolatePiece
+
+## Category: Data Broker
+## Category-deDE: Datenbroker
+## Category-esES: Intermediario de Datos
+## Category-esMX: Intermediario de Datos
+## Category-frFR: Courtier de Données
+## Category-itIT: Data Broker
+## Category-ptBR: Corretor de Dados
+## Category-ruRU: Посредник данных
+## Category-zhCN: 数据管理
+## Category-zhTW: 資料管理
+
+#@no-lib-strip@
+libs\libs.xml
+#@end-no-lib-strip@
+
+libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
+
+localization\enUS.lua
+localization\deDE.lua
+localization\esES.lua
+localization\frFr.lua
+localization\koKR.lua
+localization\zhCN.lua
+localization\zhTW.lua
+localization\ptBR.lua
+localization\ruRU.lua
+
+Core.lua
+JostleTBC.lua
+DragAndDrop.lua
+Chocolate.lua
+Bar.lua
+DropPoints.lua
+modules\Placeholder.lua
+modules\MoreChocolate.lua
+
+
+#@debug@
+# modules\ItemLevel.lua
+# modules\Lauchers_LibQTip.lua
+# modules\TestNoText.lua
+#@end-debug@
+
+modules\PlayedTime_Loc.lua
+modules\PlayedTime.lua
+modules\PlayedTime_Options.lua
+
+modules\PlayerCoordinates\PlayerCoordinates.lua
+
+modules\MasterVolume\MasterVolume.lua
+modules\MusicVolume\MusicVolume.lua
+modules\SoundVolume\SoundVolume.lua
+
+Options.lua

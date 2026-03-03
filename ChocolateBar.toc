@@ -1,7 +1,12 @@
-## Interface: @toc-version-midnight@, @toc-version-retail@, @toc-version-mists@, @toc-version-cata@, @toc-version-wrath@, @toc-version-bcc@, @toc-version-classic@
+Interface: @toc-version-retail@
 #@debug@
-## Interface: 20505, 120000
+## Interface: 120000
 #@end-debug@
+## Interface-Retail: @toc-version-retail@
+## Interface-Classic: @toc-version-classic@
+## Interface-BCC: @toc-version-bcc@
+## Interface-Wrath: @toc-version-wrath@
+## Interface-Mists: @toc-version-mists@
 ## Title: ChocolateBar
 ## Notes: A display for LibDataBroker-1.1
 ## Author: Kiatra - github.com/Kiatra/ChocolateBar/
@@ -40,8 +45,7 @@ localization\ptBR.lua
 localization\ruRU.lua
 
 Core.lua
-JostleClassic.lua
-JostleEditMode.lua
+JostleMainline.lua
 DragAndDrop.lua
 Chocolate.lua
 Bar.lua
@@ -54,6 +58,7 @@ modules\MoreChocolate.lua
 modules\ItemLevel.lua
 modules\Lauchers_LibQTip.lua
 modules\TestNoText.lua
+modules\BrokerDamage.lua
 #@end-debug@
 
 modules\PlayedTime_Loc.lua
