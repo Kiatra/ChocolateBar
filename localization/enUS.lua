@@ -2,6 +2,8 @@ local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
 local L = AceLocale:NewLocale("ChocolateBar", "enUS", true)
 if not L then return end
 
+L["Whats New"] = true
+
 L["Modules are buildin plugins that can be enabled or disabled here. Disabled plugins will not be loaded."] = true
 L["Shows the played time for all characters. You need to login with each character first."] = true
 L["Use your scroll wheel over this plugin to adjust the master volume."] = true
