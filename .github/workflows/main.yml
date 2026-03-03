@@ -6,7 +6,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -22,6 +21,4 @@ jobs:
         with:
           args: -S
         env:
-          CF_API_KEY: ${{ secrets.CF_API_KEY }}
           GITHUB_OAUTH: ${{ secrets.WORKFLOW_OAUTH }}
-          WOWI_API_TOKEN: ${{ secrets.WOWI_API_TOKEN }}
