@@ -1,4 +1,4 @@
-## Interface-BCC: @toc-version-bcc@
+## Interface: @toc-version-bcc@
 #@debug@
 ## Interface: 20505
 #@end-debug@
