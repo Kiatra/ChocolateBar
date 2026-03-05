@@ -39,6 +39,7 @@ JostleFrame:SetScript("OnUpdate", function(this, elapsed)
     end
 end)
 
+---@diagnostic disable-next-line: inject-field
 function JostleFrame:Schedule(time)
     time = time or 0
     nextTime = GetTime() + time
@@ -137,6 +138,7 @@ function Jostle:Refresh(...)
         frames = blizzardFrames
     end
 
+    ---@diagnostic disable-next-line: redundant-parameter
     if inCombat or not HasFullControl() and not UnitHasVehicleUI("player") then
         for _, frame in ipairs(frames) do
             if type(frame) == "string" then

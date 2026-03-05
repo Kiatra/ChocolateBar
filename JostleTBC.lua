@@ -3,8 +3,6 @@ local Jostle = ChocolateBar.Jostle
 local bottomFrames = {}
 local topFrames = {}
 Jostle.hooks = {}
-local debug = ChocolateBar and ChocolateBar.Debug or function() end
-local JostleUpdate = CreateFrame("Frame")
 local _G, pairs = _G, pairs
 local UnitInVehicle = UnitInVehicle and UnitInVehicle or function() end
 local UnitHasVehicleUI = UnitHasVehicleUI and UnitHasVehicleUI or function() end
@@ -97,10 +95,6 @@ if not Jostle.hooks.PlayerFrame_SequenceFinished and PlayerFrame_SequenceFinishe
     end)
 end
 
-function Jostle:WorldMapFrame_Hide()
-    --JostleFrame:Schedule()
-end
-
 function Jostle:TicketStatusFrame_OnEvent()
     self:Refresh(TicketStatusFrame, ConsolidatedBuffs)
 end
@@ -114,6 +108,7 @@ function Jostle:PlayerFrame_SequenceFinished()
 end
 
 local function LockMainMenuBar()
+    ---@diagnostic disable-next-line: undefined-field, redundant-parameter
     if not InCombatLockdown() and (_G.LE_EXPANSION_LEVEL_CURRENT >= LE_EXPANSION_BURNING_CRUSADE and not UnitInVehicle("Player")) then
         MainMenuBar:SetMovable(true)
         MainMenuBar:SetUserPlaced(true)
@@ -167,46 +162,33 @@ end
 
 local function GetScreenBottom()
     local top = 0
-    local isBottomAdjusting = false
     for _, frame in pairs(bottomFrames) do
         if frame.IsShown and frame:IsShown() and frame.GetTop and frame:GetTop() and frame:GetTop() > top then
             top = frame:GetTop()
-            isBottomAdjusting = true
         end
     end
     return top
 end
 
-local function UpdateBottom()
-
-end
-
-local function UpdateTop()
-
-end
-
-local function Adjust()
-end
-
 --for classic we want to update frames regulary
 --TODO: entire rewirte of the legacy code and a better way to hook when billzards code does move specific frames
 Jostle.Frame = JostleFrame
-JostleFrame:SetScript("OnUpdate", function(this, elapsed)
+JostleFrame:SetScript("OnUpdate", function(this)
     local now = GetTime()
     if now - start >= 3 then
         fullyInitted = true
-        for k, v in pairs(blizzardFramesData) do
+        for k, _ in pairs(blizzardFramesData) do
             blizzardFramesData[k] = nil
         end
-        this:SetScript("OnUpdate", function(this, elapsed)
+        this:SetScript("OnUpdate", function()
             if GetTime() >= nextTime then
                 Jostle:Refresh()
-                --this:Hide()
             end
         end)
     end
 end)
 
+---@diagnostic disable-next-line: inject-field
 function JostleFrame:Schedule(time)
     time = time or 0
     nextTime = GetTime() + time
@@ -280,6 +262,7 @@ function Jostle:Refresh(...)
         frames = blizzardFrames
     end
 
+    ---@diagnostic disable-next-line: redundant-parameter
     if inCombat or not HasFullControl() and not UnitHasVehicleUI("player") then
         for _, frame in ipairs(frames) do
             if type(frame) == "string" then
@@ -292,7 +275,6 @@ function Jostle:Refresh(...)
         return
     end
 
-    local screenHeight = GetScreenHeight()
     for _, frame in ipairs(frames) do
         if type(frame) == "string" then
             frame = _G[frame]

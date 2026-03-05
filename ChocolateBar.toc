@@ -52,7 +52,6 @@ modules\MoreChocolate.lua
 #@debug@
 modules\ItemLevel.lua
 modules\Lauchers_LibQTip.lua
-modules\TestNoText.lua
 modules\BrokerDamage.lua
 #@end-debug@
 
