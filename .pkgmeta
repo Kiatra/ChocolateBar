@@ -49,5 +49,3 @@ externals:
 tools-used:
   - libdatabroker-1-1
   - findglobals
-
-enable-toc-creation: false

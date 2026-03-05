@@ -18,7 +18,5 @@ jobs:
 
       - name: Create Package
         uses: BigWigsMods/packager@v2
-        with:
-          args: -S
         env:
           GITHUB_OAUTH: ${{ secrets.WORKFLOW_OAUTH }}
