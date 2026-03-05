@@ -1,12 +1,3 @@
--- globals
-local LibStub = LibStub
-local LE_EXPANSION_LEVEL_CURRENT = _G.LE_EXPANSION_LEVEL_CURRENT
-local DEFAULT_CHAT_FRAME, RAID_CLASS_COLORS = DEFAULT_CHAT_FRAME, RAID_CLASS_COLORS
-local AbbreviateNumbers, InCombatLockdown, DamageMeter = AbbreviateNumbers, InCombatLockdown, DamageMeter
-local BreakUpLargeNumbers, GameTooltip, SetCVar = BreakUpLargeNumbers, GameTooltip, SetCVar
-local C_DamageMeter, time, Enum, NORMAL_FONT_COLOR = C_DamageMeter, time, Enum, NORMAL_FONT_COLOR
-local CreateFrame, GetCVarBool = CreateFrame, GetCVarBool
-----
 local ldb = LibStub:GetLibrary("LibDataBroker-1.1", true)
 local addonName = "QDB-DamageMeter"
 local path = "Interface\\AddOns\\ChocolateBar\\modules\\BrokerDamage"
@@ -26,7 +17,7 @@ end
 local dataobj = ldb:NewDataObject(addonName, {
     type    = "data source",
     icon    = path .. "green.tga",
-    label   = "QBA-Damage-Meter",
+    label   = "Damage Meter",
     text    = "Damage Meter",
     OnClick = OnClick
 })
@@ -228,7 +219,7 @@ local function AddDmgHealTwoColumn(tooltip, title, sessionType)
             )
         end
 
-        tooltip:AddDoubleLine(leftText, rightText, lr, lg, lb, 1, 1, 1)
+        tooltip:AddDoubleLine(leftText, rightText, 1, 1, 1, 1, 1, 1)
     end
 end
 
@@ -299,8 +290,8 @@ end
 local f = CreateFrame("Frame")
 f:RegisterEvent("PLAYER_ENTERING_WORLD") -- inital set cache
 f:RegisterEvent("PLAYER_REGEN_ENABLED")  -- leaving combat (safe time to query)
+---@diagnostic disable-next-line: param-type-mismatch
 f:RegisterEvent("DAMAGE_METER_RESET")    --query
-
 f:SetScript("OnEvent", function()
     -- Only refresh on these when out of combat
     if not (InCombatLockdown and InCombatLockdown()) then

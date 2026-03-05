@@ -8,10 +8,9 @@ local L = LibStub("AceLocale-3.0"):GetLocale("ChocolateBar")
 local LSM = LibStub("LibSharedMedia-3.0")
 local _G, pairs, string = _G, pairs, string
 local db, moreChocolate
-local index = 0
 local version = C_AddOns.GetAddOnMetadata("ChocolateBar", "X-Curse-Packaged-Version") or ""
 
-local function GetStats(info)
+local function GetStats()
     local total = 0
     local enabled = 0
     local data = 0
@@ -29,7 +28,8 @@ local function GetStats(info)
         end
     end
 
-    return _G.strjoin("\n", "|cffffd200" .. L["Enabled"] .. "|r  " .. enabled,
+
+    return strjoin("\n", "|cffffd200" .. L["Enabled"] .. "|r  " .. enabled,
         "|cffffd200" .. L["Disabled"] .. "|r  " .. total - enabled,
         "|cffffd200" .. L["Total"] .. "|r  " .. total,
         "",
@@ -38,19 +38,19 @@ local function GetStats(info)
     )
 end
 
-local function EnableAll(info)
+local function EnableAll()
     for name, obj in LibStub("LibDataBroker-1.1"):DataObjectIterator() do
         ChocolateBar:EnableDataObject(name, obj)
     end
 end
 
-local function DisableAll(info)
-    for name, obj in LibStub("LibDataBroker-1.1"):DataObjectIterator() do
+local function DisableAll()
+    for name, _ in LibStub("LibDataBroker-1.1"):DataObjectIterator() do
         ChocolateBar:DisableDataObject(name)
     end
 end
 
-local function DisableLauncher(info)
+local function DisableLauncher()
     for name, obj in LibStub("LibDataBroker-1.1"):DataObjectIterator() do
         if obj.type ~= "data source" then
             ChocolateBar:DisableDataObject(name)
@@ -60,7 +60,6 @@ end
 
 local function createPlaceholder()
     local placeholderNames = db.placeholderNames
-    local count = tablelength(placeholderNames) > 0 or 1
     local name = L["Placeholder"] .. tablelength(placeholderNames)
     placeholderNames[name] = true
     ChocolateBar:Debug("createPlaceholder", name, tablelength(placeholderNames))
@@ -107,10 +106,10 @@ local aceoptions = {
                             order = 1,
                             name = L["Lock Plugins"],
                             desc = L["Hold alt key to drag a plugin."],
-                            get = function(info, value)
+                            get = function()
                                 return db.locked
                             end,
-                            set = function(info, value)
+                            set = function(_, value)
                                 db.locked = value
                             end,
                         },
@@ -120,10 +119,10 @@ local aceoptions = {
                             name = L["Move Minimap, Bags and other Frames"],
                             desc = L
                                 ["Moves Minimap, Bags and other frames above/below visible ChocolateBars. \n\nDisable this if you have issues and use WoW's \"Edit Mode\" instead to place the frames away from the Bars."],
-                            get = function(info, value)
+                            get = function()
                                 return db.moveFrames
                             end,
-                            set = function(info, value)
+                            set = function(_, value)
                                 db.moveFrames = value
                                 ChocolateBar:UpdateBarOptions("UpdateAutoHide")
                             end,
@@ -133,10 +132,10 @@ local aceoptions = {
                             order = 3,
                             name = L["Hide Bars in Pet Battle"],
                             desc = L["Hide Bars during a Pet Battle."],
-                            get = function(info, value)
+                            get = function()
                                 return db.petBattleHideBars
                             end,
-                            set = function(info, value)
+                            set = function(_, value)
                                 db.petBattleHideBars = value
                             end,
                         },
@@ -145,10 +144,10 @@ local aceoptions = {
                             order = 4,
                             name = L["Hide Order Hall Bar"],
                             desc = L["Hides the command bar displayed at the Class/Order Hall."],
-                            get = function(info, value)
+                            get = function()
                                 return db.hideOrderHallCommandBar
                             end,
-                            set = function(info, value)
+                            set = function(_, value)
                                 db.hideOrderHallCommandBar = value
                                 ChocolateBar:ToggleOrderHallCommandBar()
                             end,
@@ -176,10 +175,10 @@ local aceoptions = {
                             min = 0,
                             max = 50,
                             step = 1,
-                            get = function(name)
+                            get = function()
                                 return db.gap
                             end,
-                            set = function(info, value)
+                            set = function(_, value)
                                 db.gap = value
                                 ChocolateBar.ChocolatePiece:UpdateGap(value)
                                 ChocolateBar:UpdateChoclates("updateSettings")
@@ -193,12 +192,11 @@ local aceoptions = {
                             min = -5,
                             max = 15,
                             step = 1,
-                            get = function(name)
+                            get = function()
                                 return db.textOffset
                             end,
-                            set = function(info, value)
+                            set = function(_, value)
                                 db.textOffset = value
-                                --ChocolateBar.ChocolatePiece:UpdateGap(value)
                                 ChocolateBar:UpdateChoclates("updateSettings")
                             end,
                         },
@@ -210,10 +208,10 @@ local aceoptions = {
                             min = 12,
                             max = 30,
                             step = 1,
-                            get = function(name)
+                            get = function()
                                 return db.height
                             end,
-                            set = function(info, value)
+                            set = function(_, value)
                                 db.height = value
                                 ChocolateBar:UpdateBarOptions("UpdateHeight")
                             end,
@@ -228,10 +226,10 @@ local aceoptions = {
                             step = 0.001,
                             bigStep = 0.05,
                             isPercent = true,
-                            get = function(name)
+                            get = function()
                                 return db.iconSize
                             end,
-                            set = function(info, value)
+                            set = function(_, value)
                                 if value > 1 then
                                     value = 1
                                 elseif value < 0.01 then
@@ -258,7 +256,7 @@ local aceoptions = {
                             get = function()
                                 return db.strata
                             end,
-                            set = function(info, value)
+                            set = function(_, value)
                                 db.strata = value
                                 ChocolateBar:UpdateBarOptions("UpdateStrata")
                             end,
@@ -276,7 +274,7 @@ local aceoptions = {
                             get = function()
                                 return db.barRightClick
                             end,
-                            set = function(info, value)
+                            set = function(_, value)
                                 db.barRightClick = value
                             end,
                         },
@@ -313,7 +311,7 @@ local aceoptions = {
                             get = function()
                                 return db.autodissource
                             end,
-                            set = function(info, value)
+                            set = function(_, value)
                                 db.autodissource = value
                             end,
                         },
@@ -325,7 +323,7 @@ local aceoptions = {
                             get = function()
                                 return db.autodislauncher
                             end,
-                            set = function(info, value)
+                            set = function(_, value)
                                 db.autodislauncher = value
                             end,
                         },
@@ -348,10 +346,10 @@ local aceoptions = {
                                     order = 1,
                                     name = L["Disable Tooltips"],
                                     desc = L["Disable Tooltips"],
-                                    get = function(info, value)
+                                    get = function()
                                         return db.combathidetip
                                     end,
-                                    set = function(info, value)
+                                    set = function(_, value)
                                         db.combathidetip = value
                                     end,
                                 },
@@ -360,10 +358,10 @@ local aceoptions = {
                                     order = 2,
                                     name = L["Hide Bars"],
                                     desc = L["Hide Bars"],
-                                    get = function(info, value)
+                                    get = function()
                                         return db.combathidebar
                                     end,
-                                    set = function(info, value)
+                                    set = function(_, value)
                                         db.combathidebar = value
                                     end,
                                 },
@@ -372,10 +370,10 @@ local aceoptions = {
                                     order = 2,
                                     name = L["Disable Clicking"],
                                     desc = L["Disable Clicking"],
-                                    get = function(info, value)
+                                    get = function()
                                         return db.combatdisbar
                                     end,
-                                    set = function(info, value)
+                                    set = function(_, value)
                                         db.combatdisbar = value
                                     end,
                                 },
@@ -384,10 +382,10 @@ local aceoptions = {
                                     order = 2,
                                     name = L["Disable Options"],
                                     desc = L["Disable options dialog on right click"],
-                                    get = function(info, value)
+                                    get = function()
                                         return db.disableoptons
                                     end,
-                                    set = function(info, value)
+                                    set = function(_, value)
                                         db.disableoptons = value
                                     end,
                                 },
@@ -401,18 +399,17 @@ local aceoptions = {
                                     step = 0.001,
                                     bigStep = 0.05,
                                     isPercent = true,
-                                    get = function(name)
+                                    get = function()
                                         return db.combatopacity
                                     end,
-                                    set = function(info, value)
+                                    set = function(_, value)
                                         if value > 1 then
                                             value = 1
                                         elseif value < 0.01 then
                                             value = 0.001
                                         end
                                         db.combatopacity = value
-                                        --ChocolateBar:UpdateBarOptions("UpdateOpacity")
-                                        for name, bar in pairs(ChocolateBar:GetBars()) do
+                                        for _, bar in pairs(ChocolateBar:GetBars()) do
                                             bar.tempHide = bar:GetAlpha()
                                             bar:SetAlpha(db.combatopacity)
                                         end
@@ -423,7 +420,6 @@ local aceoptions = {
                     },
                 },
                 fontAndTextures = {
-                    --inline = true,
                     name = L["Fonts and Textures"],
                     type = "group",
                     order = 4,
@@ -440,11 +436,11 @@ local aceoptions = {
                                     name = L["Texture Color/Alpha"],
                                     desc = L["Texture Color/Alpha"],
                                     hasAlpha = true,
-                                    get = function(info)
+                                    get = function(_)
                                         local t = db.background.color
                                         return t.r, t.g, t.b, t.a
                                     end,
-                                    set = function(info, r, g, b, a)
+                                    set = function(_, r, g, b, a)
                                         local t = db.background.color
                                         t.r, t.g, t.b, t.a = r, g, b, a
                                         ChocolateBar:UpdateBarOptions("UpdateColors")
@@ -456,11 +452,11 @@ local aceoptions = {
                                     name = L["Border Color/Alpha"],
                                     desc = L["Border Color/Alpha"],
                                     hasAlpha = true,
-                                    get = function(info)
+                                    get = function()
                                         local t = db.background.borderColor
                                         return t.r, t.g, t.b, t.a
                                     end,
-                                    set = function(info, r, g, b, a)
+                                    set = function(_, r, g, b, a)
                                         local t = db.background.borderColor
                                         t.r, t.g, t.b, t.a = r, g, b, a
                                         ChocolateBar:UpdateBarOptions("UpdateColors")
@@ -474,7 +470,7 @@ local aceoptions = {
                                     get = function()
                                         return db.background.tile
                                     end,
-                                    set = function(info, value)
+                                    set = function(_, value)
                                         db.background.tile = value
                                         ChocolateBar:UpdateBarOptions("UpdateTexture")
                                     end,
@@ -489,10 +485,10 @@ local aceoptions = {
                                     step = 1,
                                     bigStep = 5,
                                     isPercent = false,
-                                    get = function(name)
+                                    get = function()
                                         return db.background.tileSize
                                     end,
-                                    set = function(info, value)
+                                    set = function(_, value)
                                         if value > 256 then
                                             value = 256
                                         elseif value < 1 then
@@ -518,10 +514,10 @@ local aceoptions = {
                                     min = 8,
                                     max = 20,
                                     step = .5,
-                                    get = function(name)
+                                    get = function()
                                         return db.fontSize
                                     end,
-                                    set = function(info, value)
+                                    set = function(_, value)
                                         db.fontSize = value
                                         ChocolateBar:UpdateChoclates("updatefont")
                                     end,
@@ -533,11 +529,11 @@ local aceoptions = {
                                     desc = L
                                         ["Default text color of a plugin. This will not overwrite plugins that use own colors."],
                                     hasAlpha = true,
-                                    get = function(info)
+                                    get = function()
                                         local t = db.textColor or { r = 1, g = 1, b = 1, a = 1 }
                                         return t.r, t.g, t.b, t.a
                                     end,
-                                    set = function(info, r, g, b, a)
+                                    set = function(_, r, g, b, a)
                                         db.textColor = db.textColor or { r = 1, g = 1, b = 1, a = 1 }
                                         local t = db.textColor
                                         t.r, t.g, t.b, t.a = r, g, b, a
@@ -550,11 +546,11 @@ local aceoptions = {
                                     name = L["Label color"],
                                     desc = L["Default label color of a plugin."],
                                     hasAlpha = true,
-                                    get = function(info)
+                                    get = function()
                                         local t = db.labelColor or { r = 1, g = 0.82, b = 0, a = 1 }
                                         return t.r, t.g, t.b, t.a
                                     end,
-                                    set = function(info, r, g, b, a)
+                                    set = function(_, r, g, b, a)
                                         db.labelColor = db.labelColor or { r = 1, g = 0.82, b = 0, a = 1 }
                                         local t = db.labelColor
                                         t.r, t.g, t.b, t.a = r, g, b, a
@@ -567,12 +563,12 @@ local aceoptions = {
                                     name = L["Desaturated Icons"],
                                     desc = L
                                         ["Show icons in gray scale mode (This will not affect icons embedded in the text of a plugin)."],
-                                    get = function(info)
+                                    get = function()
                                         return db.desaturated
                                     end,
-                                    set = function(info, vale)
+                                    set = function(_, vale)
                                         db.desaturated = vale
-                                        for name, obj in broker:DataObjectIterator() do
+                                        for name, _ in broker:DataObjectIterator() do
                                             if db.objSettings[name] then
                                                 if db.objSettings[name].enabled then
                                                     local choco = ChocolateBar:GetChocolate(name)
@@ -590,10 +586,10 @@ local aceoptions = {
                                     order = 9,
                                     name = L["Force Text Color"],
                                     desc = L["Remove custom colors from plugins."],
-                                    get = function(info, value)
+                                    get = function()
                                         return db.forceColor
                                     end,
-                                    set = function(info, value)
+                                    set = function(_, value)
                                         db.forceColor = value
                                         for name, obj in broker:DataObjectIterator() do
                                             if db.objSettings[name] then
@@ -618,10 +614,10 @@ local aceoptions = {
                     order = 20,
                     name = "Debug",
                     desc = "This one is for me, not for you :P",
-                    get = function(info, value)
+                    get = function()
                         return ChocolateBar.db.char.debug
                     end,
-                    set = function(info, value)
+                    set = function(_, value)
                         ChocolateBar.db.char.debug = value
                     end,
                 },
@@ -728,7 +724,7 @@ aceoptions.args.lookAndFeel.args.fontAndTextures.args.textures.args.textureStatu
     get = function()
         return db.background.textureName
     end,
-    set = function(info, value)
+    set = function(_, value)
         db.background.texture = LSM:Fetch("statusbar", value)
         db.background.textureName = value
         db.background.tile = false
@@ -752,7 +748,7 @@ aceoptions.args.lookAndFeel.args.fontAndTextures.args.textures.args.background1 
             get = function()
                 return db.background.textureName
             end,
-            set = function(info, value)
+            set = function(_, value)
                 db.background.texture = LSM:Fetch("background", value)
                 db.background.textureName = value
                 db.background.tile = true
@@ -774,7 +770,7 @@ aceoptions.args.lookAndFeel.args.fontAndTextures.args.font.args.font = {
     get = function()
         return db.fontName
     end,
-    set = function(info, value)
+    set = function(_, value)
         db.fontPath = LSM:Fetch("font", value)
         db.fontName = value
         ChocolateBar:UpdateChoclates("updatefont")
@@ -796,7 +792,7 @@ local function removePlaceholder(info)
     chocolateOptions[cleanName] = nil
 end
 
-placeholderOptions = {
+local placeholderOptions = {
     inline = true,
     name = L["Placeholder Options"],
     type = "group",
@@ -837,7 +833,7 @@ end
 -- return the number of bars aligend to align (top or bottom)
 function ChocolateBar:GetNumBars(align)
     local i = 0
-    for k, v in pairs(ChocolateBar:GetBars()) do
+    for _, v in pairs(ChocolateBar:GetBars()) do
         if v.settings.align == align then
             i = i + 1
         end
@@ -881,17 +877,12 @@ local function SetBarAlign(info, value)
     end
 end
 
-local function GetBarAlign(info, value)
-    local name = info[#info - 2]
-    return db.barSettings[name].align
-end
-
-local function EatBar(info, value)
+local function EatBar(info)
     local name = info[#info - 2]
     ChocolateBar:RemoveBar(name)
 end
 
-local function MoveUp(info, value)
+local function MoveUp(info)
     local name = info[#info - 2]
     local bar = ChocolateBar:GetBar(name)
     local index = bar.settings.index
@@ -914,7 +905,7 @@ local function MoveUp(info, value)
     end
 end
 
-local function MoveDown(info, value)
+local function MoveDown(info)
     local name = info[#info - 2]
     local bar = ChocolateBar:GetBar(name)
     local index = bar.settings.index
@@ -937,7 +928,7 @@ local function MoveDown(info, value)
     end
 end
 
-local function getAutoHide(info, value)
+local function getAutoHide(info)
     local name = info[#info - 2]
     return db.barSettings[name].autohide
 end
@@ -947,11 +938,10 @@ local function setAutoHide(info, value)
     db.barSettings[name].autohide = value
     local bar = ChocolateBar:GetBar(name)
     bar:UpdateAutoHide(db)
-    --ChocolateBar:UpdateBarOptions("UpdateAutoHide")
 end
 
 --hide bar during combat
-local function gethideBarInCombat(info, value)
+local function gethideBarInCombat(info)
     local name = info[#info - 2]
     return db.barSettings[name].hideBarInCombat
 end
@@ -963,8 +953,6 @@ end
 
 local function GetBarWidth(info)
     local name = info[#info - 2]
-    local maxBarWidth = _G.math.floor(_G.GetScreenWidth())
-
     return db.barSettings[name].width
 end
 
@@ -976,8 +964,7 @@ local function SetBarWidth(info, value)
     if value > _G.GetScreenWidth() or value == 0 then
         bar:SetPoint("RIGHT", "UIParent", "RIGHT", 0, 0);
     else
-        local relative, relativePoint
-        settings.barPoint, relative, relativePoint, settings.barOffx, settings.barOffy = bar:GetPoint()
+        settings.barPoint, _, _, settings.barOffx, settings.barOffy = bar:GetPoint()
         if settings.barOffy == 0 then settings.barOffy = 1 end
         bar:ClearAllPoints()
         bar:SetPoint(settings.barPoint, "UIParent", settings.barOffx, settings.barOffy)
@@ -1008,6 +995,7 @@ local function SetLockedBar(info, value)
             moveBarDummy:SetBackdrop({
                 bgFile = "Interface/Tooltips/UI-Tooltip-Background",
                 nil,
+                ---@diagnostic disable-next-line: assign-type-mismatch
                 tile = true,
                 tileSize = 16,
                 edgeSize = 16,
@@ -1017,7 +1005,7 @@ local function SetLockedBar(info, value)
             moveBarDummy:RegisterForDrag("LeftButton")
             moveBarDummy:SetFrameStrata("FULLSCREEN_DIALOG")
             moveBarDummy:SetFrameLevel(10)
-            moveBarDummy:SetScript("OnMouseUp", function(self, btn)
+            moveBarDummy:SetScript("OnMouseUp", function(_, btn)
                 if btn == "RightButton" then
                     ChocolateBar:ChatCommand()
                 end
@@ -1035,17 +1023,16 @@ local function SetLockedBar(info, value)
         bar:SetScript("OnDragStart", OnDragStart)
         bar:SetScript("OnDragStop", OnDragStop)
         bar:SetClampedToScreen(true)
-        for k, v in pairs(bar.chocolist) do
+        for _, v in pairs(bar.chocolist) do
             v:Hide()
         end
     else
         bar:SetClampedToScreen(false)
-        for k, v in pairs(bar.chocolist) do
+        for _, v in pairs(bar.chocolist) do
             v:Show()
         end
         bar:SetScript("OnDragStart", nil)
-        local relative, relativePoint
-        settings.barPoint, relative, relativePoint, settings.barOffx, settings.barOffy = bar:GetPoint()
+        settings.barPoint, _, _, settings.barOffx, settings.barOffy = bar:GetPoint()
         if settings.barOffy == 0 then settings.barOffy = 1 end
         bar:SetPoint(settings.barPoint, "UIParent", settings.barOffx, settings.barOffy)
         settings.align = "custom"
@@ -1075,39 +1062,11 @@ local function SetFreeBar(info, value)
     bar:UpdateJostle(db)
 end
 
-local function GetBarOffX(info, value)
-    local name = info[#info - 2]
-    return db.barSettings[name].fineX
-end
-
-local function GetBarOffY(info, value)
-    local name = info[#info - 2]
-    return db.barSettings[name].fineY
-end
-
-local function SetBarOff(info, value)
-    local name = info[#info - 2]
-    local offtype = info[#info]
-    local bar = ChocolateBar:GetBar(name)
-    local settings = db.barSettings[name]
-    bar = ChocolateBar:GetBar(name)
-    local relative, relativePoint
-    settings.barPoint, relative, relativePoint, settings.barOffx, settings.barOffy = bar:GetPoint()
-    if offtype == "xoff" then
-        settings.fineX = value
-    else
-        settings.fineY = value
-    end
-    bar:ClearAllPoints()
-    bar:SetPoint(settings.barPoint, "UIParent", settings.barOffx + settings.fineX, settings.barOffy + settings.fineY)
-end
-
-local function GetLockedBar(info, value)
+local function GetLockedBar(info)
     local name = info[#info - 2]
     local bar = ChocolateBar:GetBar(name)
     return not bar.locked
 end
-
 
 -------------
 -- bar options disabled/enabled
@@ -1159,19 +1118,6 @@ local function GetName(info)
     return cleanName
 end
 
-local function GetObjectText(info)
-    local cleanName = info[#info]
-    local name = chocolateOptions[cleanName].desc
-    local dataobj = broker:GetDataObjectByName(name)
-
-    local text = dataobj.text
-    if text and text == "" then
-        text = string.format("(%s)", dataobj.label)
-    end
-
-    return text
-end
-
 local function GetType(info)
     local cleanName = info[#info - 2]
     local name = chocolateOptions[cleanName].desc
@@ -1218,7 +1164,7 @@ local function GetDisabled(info)
     return not GetEnabled(info)
 end
 
-local function GetIcon(info, value)
+local function GetIcon(info)
     local cleanName = info[#info - 2]
     local name = chocolateOptions[cleanName].desc
     return db.objSettings[name].showIcon
@@ -1231,9 +1177,7 @@ local function SetIcon(info, value)
     ChocolateBar:AttributeChanged(nil, name, "updateSettings", value)
 end
 
-
-
-local function GetCustomLabel(info, value)
+local function GetCustomLabel(info)
     local cleanName = info[#info - 2]
     local name = chocolateOptions[cleanName].desc
     return db.objSettings[name].customLabel
@@ -1246,7 +1190,7 @@ local function SetCustomLabel(info, value)
     ChocolateBar:AttributeChanged(nil, name, "updateSettings", value)
 end
 
-local function GetDisableTooltip(info, value)
+local function GetDisableTooltip(info)
     local cleanName = info[#info - 2]
     local name = chocolateOptions[cleanName].desc
     return db.objSettings[name].disableTooltip
@@ -1259,7 +1203,7 @@ local function SetDisableTooltip(info, value)
     ChocolateBar:AttributeChanged(nil, name, "updateSettings", value)
 end
 
-local function GetLabel(info, value)
+local function GetLabel(info)
     local cleanName = info[#info - 2]
     local name = chocolateOptions[cleanName].desc
     return db.objSettings[name].showLabel
@@ -1272,7 +1216,7 @@ local function SetLabel(info, value)
     ChocolateBar:AttributeChanged(nil, name, "updateSettings", value)
 end
 
-local function GetText(info, value)
+local function GetText(info)
     local cleanName = info[#info - 2]
     local name = chocolateOptions[cleanName].desc
     return db.objSettings[name].showText
@@ -1285,7 +1229,7 @@ local function SetText(info, value)
     ChocolateBar:AttributeChanged(nil, name, "updateSettings", value)
 end
 
-local function GetTextOffset(info, value)
+local function GetTextOffset(info)
     local cleanName = info[#info - 2]
     local name = chocolateOptions[cleanName].desc
     return db.objSettings[name].textOffset or db.textOffset
@@ -1314,7 +1258,6 @@ end
 local function GetWidthBehavior(info)
     local cleanName = info[#info - 2]
     local name = chocolateOptions[cleanName].desc
-    --return db.objSettings[name].widthBehavior or "free" and db.objSettings[name].width == 0 or "fixed"
     if not db.objSettings[name].widthBehavior and db.objSettings[name].width == 0 then
         return "free"
     else
@@ -1375,7 +1318,7 @@ local function IsEnabledSetTextOffset(info)
     return db.objSettings[name].textOffset
 end
 
-local function SetEnabledSetTextOffset(info)
+local function SetEnabledSetTextOffset(info, value)
     local cleanName = info[#info - 2]
     local name = chocolateOptions[cleanName].desc
     local settings = db.objSettings[name]
@@ -1387,7 +1330,7 @@ local function SetEnabledSetTextOffset(info)
     ChocolateBar:AttributeChanged(nil, name, "updateSettings", value)
 end
 
-local function SetEnabledOverwriteIconSize(info)
+local function SetEnabledOverwriteIconSize(info, value)
     local cleanName = info[#info - 2]
     local name = chocolateOptions[cleanName].desc
     local settings = db.objSettings[name]
@@ -1411,7 +1354,7 @@ local function SetCustomIconSize(info, value)
     ChocolateBar:UpdateBarOptions("UpdateHeight")
 end
 
-local function GetCustomIconSize(info, value)
+local function GetCustomIconSize(info)
     local cleanName = info[#info - 2]
     local name = chocolateOptions[cleanName].desc
     return db.objSettings[name].iconSize or db.iconSize
@@ -1436,16 +1379,6 @@ local function GetHeaderName(info)
     return "|T" .. GetIconImage(nil, name) .. ":18|t " .. name
 end
 
-local function GetHeaderImage(info)
-    local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
-    return GetIconImage(nil, name), 20, 20
-end
-
-local function cancelTimer()
-    pointer:Hide()
-end
-
 local function ShowPluginOnBar(info)
     local cleanName = info[#info - 2]
     local name = chocolateOptions[cleanName].desc
@@ -1458,21 +1391,20 @@ local function ShowPluginOnBar(info)
         pointer:SetPoint("CENTER", choco, "CENTER", pointer:GetWidth() / 2, 0)
         pointer:SetAlpha(0)
         pointer:Hide()
-        ChocolateBar:CancelTimer(choco.timer)
         pointer:Show()
-        choco.timer = ChocolateBar:ScheduleRepeatingTimer(function(choco)
-            local c = choco.blinkTimerCount
+        choco.timer = ChocolateBar:ScheduleRepeatingTimer(function(plugin)
+            local c = plugin.blinkTimerCount
             c = c + 1
-            choco:highlight(1, 0, 0, c % 2)
+            plugin:highlight(1, 0, 0, c % 2)
             pointer:SetAlpha(c % 2)
             if c >= 10 then
-                ChocolateBar:CancelTimer(choco.timer)
-                choco:highlight(1, 0, 0, 0)
+                ChocolateBar:CancelTimer(plugin.timer)
+                plugin:highlight(1, 0, 0, 0)
                 pointer:SetAlpha(0)
                 pointer:Hide()
             end
-            choco.blinkTimerCount = c
-        end, 0.1, choco, cancelTimer)
+            plugin.blinkTimerCount = c
+        end, 0.1, choco)
     end
 end
 
@@ -1481,12 +1413,12 @@ function ChocolateBar:UpdateOptions(chocolateBars)
         ChocolateBar:AddObjectOptions(name, obj)
     end
 
-    for name, bar in pairs(chocolateBars) do
+    for name, _ in pairs(chocolateBars) do
         ChocolateBar:AddBarOptions(name)
     end
 end
 
-function ChocolateBar:RegisterOptions(data, chocolateBars, modules)
+function ChocolateBar:RegisterOptions(data, _, modules)
     db = data
 
     LibStub("AceConfig-3.0"):RegisterOptionsTable("ChocolateBar", aceoptions)
@@ -1509,8 +1441,8 @@ function ChocolateBar:RegisterOptions(data, chocolateBars, modules)
     end
 end
 
-function ChocolateBar:OpenOptions(chocolateBars, data, input, pluginName, modules, blizzard)
-    local AceCfgDlg = LibStub("AceConfigDialog-3.0")
+function ChocolateBar:OpenOptions(_, _, input, pluginName, _, blizzard)
+    --local AceCfgDlg = LibStub("AceConfigDialog-3.0")
 
     if pluginName then
         AceCfgDlg:SelectGroup("ChocolateBar", "chocolates", pluginName)
@@ -1680,7 +1612,7 @@ function ChocolateBar:AddObjectOptions(name, obj)
                 type = "group",
                 order = 1,
                 args = {
-                    label = {
+                    label1 = {
                         order = 2,
                         type = "description",
                         name = GetType,
@@ -1844,46 +1776,8 @@ function ChocolateBar:AddObjectOptions(name, obj)
     addPlaceholderOption(cleanName)
 end
 
-local function GetModuleEnabled(info)
-    local name = info[#info - 2]
-    return ChocolateBar.db.moduleOptions[name].enabled
-end
-
-local function SetModuleEnabled(info, value)
-    local name = info[#info - 2]
-    ChocolateBar.db.moduleOptions[name].enabled = value
-end
-
---[[
-function ChocolateBar:AddDefaultModuleOptions(name, obj)
-	self.db.moduleOptions[name] = {}
-	local moduleOptions = {
-		inline = true,
-		name=name,
-		type="group",
-		order = 0,
-		args={
-			label = {
-				order = 0,
-				type = "description",
-				name = "description",
-			},
-			enabled = {
-				type = 'toggle',
-				order = 1,
-				name = L["Enabled"],
-				desc = L["Enabled"],
-				get = GetModuleEnabled,
-				set = SetModuleEnabled,
-			},
-		},
-	}
-	self:AddModuleOptions(name, moduleOptions)
-end
-]]
-
 function ChocolateBar:AddCustomPluginOptions(pluginName, customOptions)
-    for cleanName, options in pairs(chocolateOptions) do
+    for cleanName, _ in pairs(chocolateOptions) do
         if cleanName == pluginName then
             table.insert(chocolateOptions[cleanName].args, customOptions)
         end
@@ -1897,8 +1791,8 @@ function ChocolateBar:RemoveBar(name)
     if bar then
         ChocolateBar:RemoveBarOptions(name)
         bar:Disable()
-        for name, choco in pairs(bar.chocolist) do
-            self:DisableDataObject(name)
+        for objName, _ in pairs(bar.chocolist) do
+            self:DisableDataObject(objName)
         end
         self:GetBars()[name] = nil
         db.barSettings[name] = nil
@@ -1908,24 +1802,21 @@ end
 
 -- call when general bar options change
 -- updatekey: the key of the update function
-function ChocolateBar:UpdateBarOptions(updatekey, value)
-    for name, bar in pairs(self:GetBars()) do
+function ChocolateBar:UpdateBarOptions(updatekey)
+    for _, bar in pairs(self:GetBars()) do
         local func = bar[updatekey]
         if func then
             func(bar, db)
-        else
-            debug("UpdateBarOptions: invalid updatekey", updatekey)
         end
     end
 end
 
-function ChocolateBar:OnProfileChanged(event, database, newProfileKey)
-    debug("OnProfileChanged", event, database, newProfileKey)
+function ChocolateBar:OnProfileChanged(_, database)
     db = database.profile
     self:UpdateDB(db)
 
     -- itaret modules list and call each enable fuction
-    for name, module in pairs(ChocolateBar.modules) do
+    for name, _ in pairs(ChocolateBar.modules) do
         if db.moduleSettings[name].enabled then
             ChocolateBar:EnableModule(name)
         else

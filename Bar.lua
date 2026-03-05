@@ -28,6 +28,7 @@ end
 function Bar:New(name, settings, database)
     db = database
     local frame = CreateFrame("Frame", name, _G.UIParent, BackdropTemplateMixin and "BackdropTemplate")
+    ---@diagnostic disable-next-line: inject-field
     frame.chocolist = {} --create list of chocolate chocolist in the bar
 
     -- add class methods to frame object
@@ -35,40 +36,49 @@ function Bar:New(name, settings, database)
         frame[k] = v
     end
 
+    ---@diagnostic disable-next-line: param-type-mismatch
     frame:SetPoint("TOPLEFT", -1, 1);
     --frame:SetPoint("TOPLEFT", settings.xoff, settings.yoff);
     --frame:SetClampedToScreen(true)
     if settings.width == 0 then
         frame:ClearAllPoints()
+        ---@diagnostic disable-next-line: param-type-mismatch
         frame:SetPoint("TOPLEFT", "UIParent", -1, 1);
+        ---@diagnostic disable-next-line: param-type-mismatch
         frame:SetPoint("RIGHT", "UIParent", "RIGHT", 0, 0);
     else
+        ---@diagnostic disable-next-line: param-type-mismatch
         frame:SetPoint("RIGHT", "UIParent", 0, 0);
         frame:SetWidth(settings.width)
     end
 
     frame:SetHeight(db.height)
+    ---@diagnostic disable-next-line: param-type-mismatch
     frame:EnableMouse(true)
-    frame:SetScript("OnEnter", function(self)
+    frame:SetScript("OnEnter", function(this)
         if (db.combathidebar or settings.hideBarInCombat) and ChocolateBar.InCombat then return end
-        self:ShowAll()
+        this:ShowAll()
     end)
-    frame:SetScript("OnLeave", function(self)
+    frame:SetScript("OnLeave", function(this)
         if (db.combathidebar or settings.hideBarInCombat) and ChocolateBar.InCombat then return end
-        if self.autohide then
-            self:HideAll()
+        if this.autohide then
+            this:HideAll()
         end
     end)
 
-    --frame:SetScript("OnMouseUp", function(self, button)
-    --
-    --end)
     frame:SetScript("OnMouseUp", self.OnMouseUp)
 
+    ---@diagnostic disable-next-line: inject-field
     frame.settings = settings
+    ---@diagnostic disable-next-line: inject-field
     frame.autohide = settings.hideonleave
+    ---@diagnostic disable-next-line: undefined-field
     frame:UpdateTexture(db)
+    ---@diagnostic disable-next-line: undefined-field
+    frame:UpdateTexture(db)
+    ---@diagnostic disable-next-line: undefined-field
     frame:UpdateColors(db)
+    ---@diagnostic disable-next-line: undefined-field
     frame:UpdateStrata(db)
     return frame
 end
@@ -156,7 +166,7 @@ end
 function Bar:AddChocolatePiece(choco, name, noupdate)
     local chocolist = self.chocolist
     if chocolist[name] then
-        debug("Bar:AddChocolatePiece: ", name, " already in list.")
+        ChocolateBar:Debug("Bar:AddChocolatePiece: ", name, " already in list.")
         return
     end
 

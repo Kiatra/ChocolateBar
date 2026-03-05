@@ -129,6 +129,7 @@ function ChocolateBar:OnInitialize()
     self:RegisterEvent("PLAYER_REGEN_DISABLED", "OnEnterCombat")
     self:RegisterEvent("PLAYER_REGEN_ENABLED", "OnLeaveCombat")
     self:RegisterEvent("PLAYER_ENTERING_WORLD", "OnEnterWorld")
+    ---@diagnostic disable: undefined-field
     if _G.LE_EXPANSION_LEVEL_CURRENT >= _G.LE_EXPANSION_MISTS_OF_PANDARIA then
         self:RegisterEvent("PET_BATTLE_OPENING_START", "OnPetBattleOpen")
         self:RegisterEvent("PET_BATTLE_CLOSE", "OnPetBattleOver")
@@ -268,6 +269,7 @@ end
 function ChocolateBar:Blizzard_OrderHallUI()
     --hookOrderHallCommandBar(self)
     if not self.hookedOrderHallCommandBar and db.hideOrderHallCommandBar then
+        ---@diagnostic disable-next-line: undefined-field
         local orderHallCommandBar = _G.OrderHallCommandBar
 
         if orderHallCommandBar then
@@ -290,6 +292,7 @@ function ChocolateBar:isNewInstall()
 end
 
 function ChocolateBar:ToggleOrderHallCommandBar()
+    ---@diagnostic disable-next-line: undefined-field
     local orderHallCommandBar = _G.OrderHallCommandBar
     if orderHallCommandBar then
         if db.hideOrderHallCommandBar then
@@ -645,23 +648,24 @@ end
 
 function ChocolateBar:NewPlaceholder(name)
     local obj = broker:GetDataObjectByName(name) or broker:NewDataObject(name, {
-    		type = "data source",
-    		label = name,
-    		text  = "",
-    		OnClick = onRightClick,
-    	})
+        type    = "data source",
+        label   = name,
+        text    = "",
+        OnClick = onRightClick,
+    })
 
-	ChocolateBar:Debug("NewPlaceholder Name:", name,"db count:", tablelength(db.placeholderNames),"obj:", obj)
-	return obj
+    ChocolateBar:Debug("NewPlaceholder Name:", name, "db count:", tablelength(db.placeholderNames), "obj:", obj)
+    return obj
 end
 
 local function createPointer()
-    pointer = CreateFrame("Frame", "ChocolatePointer")
+    local pointer = CreateFrame("Frame", "ChocolatePointer")
     pointer:SetFrameStrata("FULLSCREEN_DIALOG")
     pointer:SetFrameLevel(20)
     pointer:SetWidth(15)
 
     local arrow = pointer:CreateTexture(nil, "BACKGROUND")
+    ---@diagnostic disable-next-line: param-type-mismatch
     arrow:SetPoint("CENTER", pointer, "LEFT", 0, 0)
     arrow:SetTexture("Interface\\AddOns\\ChocolateBar\\pics\\pointer")
     return pointer
@@ -682,7 +686,7 @@ function ChocolateBar:ChatCommand(input)
 end
 
 function ChocolateBar:LoadOptions(pluginName, input, blizzard)
-    ChocolateBar:OpenOptions(chocolateBars, db, input, pluginName, modules, blizzard)
+    ChocolateBar:OpenOptions(chocolateBars, db, input, pluginName, nil, blizzard)
 end
 
 function ChocolateBar:UpdateDB(data)
