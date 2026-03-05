@@ -92,11 +92,11 @@ local function dropOptions(frame, choco)
     local label = obj.label
     local cleanName
     if label then
-        cleanName = string.gsub(label, "\|c........", "")
+        cleanName = string.gsub(label, "|c........", "")
     else
-        cleanName = string.gsub(name, "\|c........", "")
+        cleanName = string.gsub(name, "|c........", "")
     end
-    cleanName = string.gsub(cleanName, "\|r", "")
+    cleanName = string.gsub(cleanName, "|r", "")
     cleanName = string.gsub(cleanName, "[%c \127]", "")
     ChocolateBar:LoadOptions(cleanName)
     choco.bar:ResetDrag(choco, choco.name)

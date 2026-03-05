@@ -1589,11 +1589,11 @@ function ChocolateBar:AddObjectOptions(name, obj)
     local cleanName
     local label = obj.label
     if label then
-        cleanName = string.gsub(label, "\|c........", "")
+        cleanName = string.gsub(label, "|c........", "")
     else
-        cleanName = string.gsub(name, "\|c........", "")
+        cleanName = string.gsub(name, "|c........", "")
     end
-    cleanName = string.gsub(cleanName, "\|r", "")
+    cleanName = string.gsub(cleanName, "|r", "")
     cleanName = string.gsub(cleanName, "[%c \127]", "")
 
     --use cleanName of name because aceconfig does not like some characters in the plugin names
