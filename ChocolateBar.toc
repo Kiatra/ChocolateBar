@@ -1,12 +1,7 @@
-Interface: @toc-version-retail@
+## Interface: @toc-version-retail@
 #@debug@
 ## Interface: 120000
 #@end-debug@
-## Interface-Retail: @toc-version-retail@
-## Interface-Classic: @toc-version-classic@
-## Interface-BCC: @toc-version-bcc@
-## Interface-Wrath: @toc-version-wrath@
-## Interface-Mists: @toc-version-mists@
 ## Title: ChocolateBar
 ## Notes: A display for LibDataBroker-1.1
 ## Author: Kiatra - github.com/Kiatra/ChocolateBar/
