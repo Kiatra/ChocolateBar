@@ -1,6 +1,4 @@
 ## Interface: @toc-version-classic@
-## Interface-Wrath: @toc-version-wrath@
-## Interface-Mists: @toc-version-mists@
 #@debug@
 ## Interface: 11508, 11507, 30405, 38000, 40402, 50503, 50502
 #@end-debug@
