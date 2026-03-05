@@ -1,4 +1,4 @@
-## Interface-Classic: @toc-version-classic@
+## Interface: @toc-version-classic@
 ## Interface-Wrath: @toc-version-wrath@
 ## Interface-Mists: @toc-version-mists@
 #@debug@
