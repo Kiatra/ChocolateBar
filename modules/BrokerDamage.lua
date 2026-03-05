@@ -5,7 +5,7 @@ local DEFAULT_CHAT_FRAME, RAID_CLASS_COLORS = DEFAULT_CHAT_FRAME, RAID_CLASS_COL
 local AbbreviateNumbers, InCombatLockdown, DamageMeter = AbbreviateNumbers, InCombatLockdown, DamageMeter
 local BreakUpLargeNumbers, GameTooltip, SetCVar = BreakUpLargeNumbers, GameTooltip, SetCVar
 local C_DamageMeter, time, Enum, NORMAL_FONT_COLOR = C_DamageMeter, time, Enum, NORMAL_FONT_COLOR
-local CreateFrame = CreateFrame
+local CreateFrame, GetCVarBool = CreateFrame, GetCVarBool
 ----
 local ldb = LibStub:GetLibrary("LibDataBroker-1.1", true)
 local addonName = "QDB-DamageMeter"
@@ -64,11 +64,21 @@ local function SuperShortName(name)
     return string.sub(name, 1, 3)
 end
 
-local function GetClassColorRGB(classFilename)
+local function ClassRGB(classFilename)
     local c = classFilename and RAID_CLASS_COLORS and RAID_CLASS_COLORS[classFilename]
     if c then return c.r, c.g, c.b end
     return 1, 1, 1
 end
+
+local function ClassHex(classFilename)
+    local c = classFilename and RAID_CLASS_COLORS and RAID_CLASS_COLORS[classFilename]
+    if not c then return "ffffffff" end
+    return string.format("ff%02x%02x%02x", c.r * 255, c.g * 255, c.b * 255)
+end
+
+local GREEN = "|cff00ff00"
+local RESET = "|r"
+local WHITE = "|cffffffff"
 
 local function ReadSessionRows(sessionType, meterType)
     -- IMPORTANT: do not call in combat (API is secret/blocked in combat in some builds)
@@ -135,80 +145,107 @@ local function RefreshCaches()
     end
 end
 
-local function AddMeterBlock(tooltip, title, sessionType, meterType, valueR, valueG, valueB)
-    tooltip:AddLine(title)
+-- --- live-or-cached rows ---------------------------------------------------
+-- Assumes you have:
+--   ReadSessionRows(sessionType, meterType) -> rows {name, classFilename, ps, total}
+--   CacheGet(sessionType, meterType)
+--   CacheSet(sessionType, meterType, rows)
 
-    local rows
+local function GetRowsLiveOrCached(sessionType, meterType)
     if InCombatLockdown and InCombatLockdown() then
-        rows = CacheGet(sessionType, meterType)
-    else
-        rows = ReadSessionRows(sessionType, meterType)
-        if rows then
-            CacheSet(sessionType, meterType, rows) -- keep cache fresh even out of combat
-        end
+        return CacheGet(sessionType, meterType) or {}
     end
 
-    if not rows or #rows == 0 then
+    local rows = ReadSessionRows(sessionType, meterType) or {}
+    CacheSet(sessionType, meterType, rows)
+    return rows
+end
+
+-- --- the 2-column tooltip block -------------------------------------------
+
+local function AddDmgHealTwoColumn(tooltip, title, sessionType)
+    tooltip:AddLine(title)
+    tooltip:AddLine(" ")
+
+    local dmg = GetRowsLiveOrCached(sessionType, Enum.DamageMeterType.DamageDone)
+    local heal = GetRowsLiveOrCached(sessionType, Enum.DamageMeterType.HealingDone)
+
+    if (#dmg == 0) and (#heal == 0) then
         tooltip:AddLine("  (no data)")
         return
     end
 
-    tooltip:AddDoubleLine("  Player", "PS      Total", 1, 1, 1, 1, 1, 1)
-    valueR, valueG, valueB = valueR or 1, valueG or 1, valueB or 1
+    -- sort damage list by DPS desc, then Total desc
+    table.sort(dmg, function(a, b)
+        local ad, bd = (a.ps or 0), (b.ps or 0)
+        if ad ~= bd then return ad > bd end
+        return (a.total or 0) > (b.total or 0)
+    end)
 
-    for _, r in ipairs(rows) do
-        local nr, ng, nb = GetClassColorRGB(r.classFilename)
-        tooltip:AddDoubleLine(
-            "  " .. ShortName(r.name),
-            string.format("%s  %s", FormatAmount(r.ps), FormatAmount(r.total)),
-            nr, ng, nb,
-            valueR, valueG, valueB
-        )
+    -- sort healing list by HPS desc, then Total desc
+    table.sort(heal, function(a, b)
+        local ah, bh = (a.ps or 0), (b.ps or 0)
+        if ah ~= bh then return ah > bh end
+        return (a.total or 0) > (b.total or 0)
+    end)
+
+    tooltip:AddDoubleLine(
+        "  DMG (PS/Total)",
+        "HEAL (PS/Total)",
+        1, 1, 1,
+        1, 1, 1
+    )
+
+    local n = math.max(#dmg, #heal)
+    for i = 1, n do
+        local d = dmg[i]
+        local h = heal[i]
+
+        -- Left side (damage) uses AddDoubleLine left RGB to class-color the whole left string
+        local leftText = " "
+        if d then
+            local name = ShortName(d.name)
+            local hex = ClassHex(d.classFilename)
+
+            leftText = string.format(
+                "  %d) %s%s|r %s/%s",
+                i,
+                "|c" .. hex, name,
+                FormatAmount(d.ps or 0),
+                FormatAmount(d.total or 0)
+            )
+        end
+
+        -- Right side (healing): class-color the name + make numbers green using inline codes
+        local rightText = " "
+        if h then
+            local name = ShortName(h.name)
+            local hex = ClassHex(h.classFilename)
+            rightText = string.format("  %d) |c%s%s|r %s%s/%s%s",
+                i,
+                hex, name,
+                GREEN, FormatAmount(h.ps or 0), FormatAmount(h.total or 0), RESET
+            )
+        end
+
+        tooltip:AddDoubleLine(leftText, rightText, lr, lg, lb, 1, 1, 1)
     end
-end
-
-local function AddSessionSection(tooltip, label, sessionType)
-    tooltip:AddLine(label)
-    tooltip:AddLine(" ")
-
-    AddMeterBlock(
-        tooltip,
-        "Damage (DPS + Total)",
-        sessionType,
-        Enum.DamageMeterType.DamageDone,
-        1, 1, 1 -- numbers white
-    )
-
-    tooltip:AddLine(" ")
-
-    AddMeterBlock(
-        tooltip,
-        "Healing (HPS + Total)",
-        sessionType,
-        Enum.DamageMeterType.HealingDone,
-        0, 1, 0 -- numbers green
-    )
-
-    tooltip:AddLine(" ")
 end
 
 obj.OnTooltipShow = function(tooltip)
     tooltip:AddLine("Midnight Damage Meter")
     tooltip:AddLine(" ")
 
-    if not Enum or not Enum.DamageMeterSessionType or not Enum.DamageMeterType then
-        tooltip:AddLine("Damage meter enums not available.")
-        return
-    end
-
     if InCombatLockdown and InCombatLockdown() then
         tooltip:AddLine("|cffffaaaaIn combat: showing cached values|r")
         tooltip:AddLine(" ")
     end
 
-    AddSessionSection(tooltip, "Current", Enum.DamageMeterSessionType.Current)
-    AddSessionSection(tooltip, "Overall", Enum.DamageMeterSessionType.Overall)
+    AddDmgHealTwoColumn(tooltip, "Current", Enum.DamageMeterSessionType.Current)
+    tooltip:AddLine(" ")
+    AddDmgHealTwoColumn(tooltip, "Overall", Enum.DamageMeterSessionType.Overall)
 
+    tooltip:AddLine(" ")
     tooltip:AddLine("|cffffffffLeft-click:|r Toggle meter")
 end
 
