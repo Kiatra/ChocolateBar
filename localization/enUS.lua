@@ -3,6 +3,8 @@ local L = AceLocale:NewLocale("ChocolateBar", "enUS", true)
 if not L then return end
 
 L["Whats New"] = true
+L["2026 March 5"] = true
+L["TBC Anniversary:\nThe upper row action bars will now also be moved up. Reset them in edit mode and reload the UI."] = true
 
 L["Modules are buildin plugins that can be enabled or disabled here. Disabled plugins will not be loaded."] = true
 L["Shows the played time for all characters. You need to login with each character first."] = true

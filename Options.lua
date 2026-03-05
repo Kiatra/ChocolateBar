@@ -77,7 +77,19 @@ local aceoptions = {
             name = L["Whats New"],
             type = "group",
             order = 0,
-            args = {}
+            args = {
+                header1 = {
+                    type = "header",
+                    name = L["2026 March 5"],
+                    order = 0,
+                },
+                text1 = {
+                    order = 2,
+                    type = "description",
+                    name = L
+                        ["TBC Anniversary:\nThe upper row action bars will now also be moved up. Reset them in edit mode and reload the UI."]
+                },
+            }
         },
         lookAndFeel = {
             name = L["Look and Feel"],
