@@ -1,4 +1,4 @@
-package-as: ChocolateBar
+package-as: Arcana
 
 externals:
   libs/LibStub:
