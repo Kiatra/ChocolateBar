@@ -1,8 +1,8 @@
 local addonName                                    = "CB_Laucher"
-local ChocolateBar                                 = LibStub("AceAddon-3.0"):GetAddon("ChocolateBar")
+local ChocolateBar                                 = LibStub("AceAddon-3.0"):GetAddon("Arcana")
 local ldb                                          = LibStub:GetLibrary("LibDataBroker-1.1", true)
 local LibQTip                                      = LibStub('LibQTip-1.0')
-local L                                            = LibStub("AceLocale-3.0"):GetLocale("ChocolateBar")
+local L                                            = LibStub("AceLocale-3.0"):GetLocale("Arcana")
 
 local _G, floor, string, GetNetStats, GetFramerate = _G, floor, string, GetNetStats, GetFramerate
 local delay, counter                               = 1, 0

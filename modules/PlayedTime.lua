@@ -1,8 +1,8 @@
 ﻿-- a LDB object that will show/hide the chocolatebar set in the chocolatebar options
 local LibStub = LibStub
-local L = LibStub("AceLocale-3.0"):GetLocale("ChocolateBar")
+local L = LibStub("AceLocale-3.0"):GetLocale("Arcana")
 local acetimer = LibStub("AceTimer-3.0")
-local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("ChocolateBar")
+local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("Arcana")
 local debug = ChocolateBar and ChocolateBar.Debug or function() end
 local ReportPlayedTimeToChat = true
 local dataobj, db

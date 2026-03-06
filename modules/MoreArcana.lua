@@ -3,9 +3,9 @@ local LibStub = LibStub
 local counter = 0
 local delay = 4
 local Timer = CreateFrame("Frame")
-local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("ChocolateBar")
+local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("Arcana")
 local bar
-local L = LibStub("AceLocale-3.0"):GetLocale("ChocolateBar")
+local L = LibStub("AceLocale-3.0"):GetLocale("Arcana")
 local wipe, pairs = wipe, pairs
 local moreChocolate
 
@@ -115,7 +115,7 @@ function Module:EnableModule()
     if not moreChocolate then
         moreChocolate = LibStub("LibDataBroker-1.1"):NewDataObject("MoreChocolate", {
             type    = "launcher",
-            icon    = "Interface\\AddOns\\ChocolateBar\\pics\\ChocolatePiece",
+            icon    = "Interface\\AddOns\\Arcana\\pics\\ChocolatePiece",
             label   = "MoreChocolate",
             text    = "MoreChocolate",
 
@@ -133,7 +133,7 @@ function Module:EnableModule()
                         end
                     end
                 else
-                    InterfaceOptionsFrame_OpenToCategory("ChocolateBar");
+                    InterfaceOptionsFrame_OpenToCategory("Arcana");
                 end
             end,
         })

@@ -1,14 +1,17 @@
 local LibStub = LibStub
-local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("ChocolateBar")
+local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("Arcana")
 local debug = ChocolateBar and ChocolateBar.Debug or function() end
 local AceCfgDlg = LibStub("AceConfigDialog-3.0")
 local Drag = ChocolateBar.Drag
 local broker = LibStub("LibDataBroker-1.1")
-local L = LibStub("AceLocale-3.0"):GetLocale("ChocolateBar")
+local L = LibStub("AceLocale-3.0"):GetLocale("Arcana")
 local LSM = LibStub("LibSharedMedia-3.0")
 local _G, pairs, string = _G, pairs, string
 local db, moreChocolate
-local version = C_AddOns.GetAddOnMetadata("ChocolateBar", "X-Curse-Packaged-Version") or ""
+local addonName = ... or "LALALA"
+---@diagnostic disable-next-line: undefined-field
+local GetAddOnMetadata = _G.GetAddOnMetadata or _G.C_AddOns.GetAddOnMetadata;
+local version = GetAddOnMetadata(addonName, "Version") or "unknown";
 
 local function GetStats()
     local total = 0
@@ -66,24 +69,102 @@ local function createPlaceholder()
     ChocolateBar:AddObjectOptions(name, ChocolateBar:NewPlaceholder(name))
 end
 
+StaticPopupDialogs["ArcanaURLDialog"] = {
+    text = L["CTRL-C to copy"],
+    button1 = CLOSE,
+    OnShow = function(dialog, data)
+        local function HidePopup()
+            dialog:Hide();
+        end
+        local editBox = dialog.GetEditBox and dialog:GetEditBox() or dialog.editBox;
+        editBox:SetScript('OnEscapePressed', HidePopup);
+        editBox:SetScript('OnEnterPressed', HidePopup);
+        editBox:SetScript('OnKeyUp', function(_, key)
+            if IsControlKeyDown() and (key == 'C' or key == 'X') then
+                HidePopup();
+            end
+        end);
+        editBox:SetMaxLetters(0);
+        editBox:SetText(data);
+        editBox:HighlightText();
+    end,
+    hasEditBox = true,
+    editBoxWidth = 240,
+    timeout = 0,
+    whileDead = true,
+    hideOnEscape = true,
+    preferredIndex = 3,
+}
+
+local function showURLPopup(url)
+    ---@diagnostic disable-next-line: discard-returns
+    StaticPopup_Show("ArcanaURLDialog", _, _, url);
+end
+---@diagnostic disable-next-line: undefined-global
+local increment = CreateCounter();
+
 local aceoptions = {
-    name = "ChocolateBar" .. " " .. version,
+    name = "Arcana - Quel'dorei Observatory",
     handler = ChocolateBar,
     type = 'group',
-    desc = "ChocolateBar",
+    --childGroups = "tab",
+    desc = "Arcana - Quel'dorei Observatory",
     args = {
+        text1 = {
+            order = 1,
+            type = "description",
+            name = version,
+        },
         news = {
-            name = L["Whats New"],
+            name = L["Whats New & Info"],
             type = "group",
             order = 0,
             args = {
-                header1 = {
+                info = {
+                    order = increment(),
+                    type = "header",
+                    name = L["Info"],
+                },
+                infoText = {
+                    order = increment(),
+                    type = "description",
+                    name = L
+                        ["The Quel'dorei became scattered across the world. To preserve the fragments of arcana they gathered from many sources, they maintain observatories where this knowledge is kept in careful order."]
+                },
+                infoTextPlugins = {
+                    order = increment(),
+                    type = "description",
+                    name = L
+                        ["You can add plugins to Arcana via the data-broker category in the curseforge app or the link below."],
+                },
+                plugins = {
+                    order = increment(),
+                    type = "execute",
+                    name = L["Search for plugins here"],
+                    func = function()
+                        showURLPopup(
+                            "https://www.curseforge.com/wow/search?sortBy=popularity&class=addons&categories=data-broker&search=plugin");
+                    end,
+                    width = 1.5,
+                },
+                header26March6 = {
+                    order = increment(),
+                    type = "header",
+                    name = L["2026 March 6"],
+                },
+                text26March6 = {
+                    order = increment(),
+                    type = "description",
+                    name =
+                        L["2026 March 6 - News"],
+                },
+                header26March5 = {
+                    order = increment(),
                     type = "header",
                     name = L["2026 March 5"],
-                    order = 0,
                 },
-                text1 = {
-                    order = 2,
+                text26March5 = {
+                    order = increment(),
                     type = "description",
                     name = L
                         ["TBC Anniversary:\nThe upper row action bars will now also be moved up. Reset them in edit mode and reload the UI."]
@@ -118,7 +199,7 @@ local aceoptions = {
                             order = 2,
                             name = L["Move Minimap, Bags and other Frames"],
                             desc = L
-                                ["Moves Minimap, Bags and other frames above/below visible ChocolateBars. \n\nDisable this if you have issues and use WoW's \"Edit Mode\" instead to place the frames away from the Bars."],
+                                ["Moves Minimap, Bags and other frames above/below visible Bars. \n\nDisable this if you have issues and use WoW's \"Edit Mode\" instead to place the frames away from the Bars."],
                             get = function()
                                 return db.moveFrames
                             end,
@@ -265,7 +346,7 @@ local aceoptions = {
                             type = 'select',
                             values = {
                                 NONE = L["none"],
-                                OPTIONS = L["ChocolateBar Options"],
+                                OPTIONS = L["Arcana Options"],
                                 BLIZZ = L["Blizzard Options"]
                             },
                             order = 16,
@@ -611,7 +692,7 @@ local aceoptions = {
                 debug = {
                     type = 'toggle',
                     --width = "half",
-                    order = 20,
+                    order = 30,
                     name = "Debug",
                     desc = "This one is for me, not for you :P",
                     get = function()
@@ -627,7 +708,7 @@ local aceoptions = {
         bars = {
             name = L["Bars"],
             type = "group",
-            order = 20,
+            order = 2,
             args = {
                 new = {
                     type = 'execute',
@@ -697,7 +778,7 @@ local aceoptions = {
                             type = 'execute',
                             order = 4,
                             name = L["Disable All"],
-                            desc = L["Eat all the chocolate at once, uff..."],
+                            desc = L["Disable all plugins."],
                             func = DisableAll,
                         },
                         disableLauncher = {
@@ -1287,7 +1368,7 @@ local function GetIconImage(info, name)
     if obj and obj.icon then
         return obj.icon
     end
-    return "Interface\\AddOns\\ChocolateBar\\pics\\ChocolatePiece"
+    return "Interface\\AddOns\\Arcana\\pics\\ChocolatePiece"
 end
 
 local function GetIconCoords(info)
@@ -1421,19 +1502,19 @@ end
 function ChocolateBar:RegisterOptions(data, _, modules)
     db = data
 
-    LibStub("AceConfig-3.0"):RegisterOptionsTable("ChocolateBar", aceoptions)
+    LibStub("AceConfig-3.0"):RegisterOptionsTable("Arcana", aceoptions)
     aceoptions.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
-    AceCfgDlg:SetDefaultSize("ChocolateBar", 700, 600)
+    AceCfgDlg:SetDefaultSize("Arcana", 700, 600)
 
     self.db.RegisterCallback(self, "OnProfileChanged", "OnProfileChanged")
     self.db.RegisterCallback(self, "OnProfileCopied", "OnProfileChanged")
     self.db.RegisterCallback(self, "OnProfileReset", "OnProfileChanged")
 
-    AceCfgDlg:SelectGroup("ChocolateBar", "chocolates")
-    AceCfgDlg:SelectGroup("ChocolateBar", "bars")
-    AceCfgDlg:SelectGroup("ChocolateBar", "general")
-    AceCfgDlg:SelectGroup("ChocolateBar", "lookAndFeel")
-    AceCfgDlg:SelectGroup("ChocolateBar", "news")
+    AceCfgDlg:SelectGroup("Arcana", "chocolates")
+    AceCfgDlg:SelectGroup("Arcana", "bars")
+    AceCfgDlg:SelectGroup("Arcana", "general")
+    AceCfgDlg:SelectGroup("Arcana", "lookAndFeel")
+    AceCfgDlg:SelectGroup("Arcana", "news")
 
     for name, module in pairs(modules) do
         self:AddModuleOptions(name, module.options)
@@ -1445,15 +1526,15 @@ function ChocolateBar:OpenOptions(_, _, input, pluginName, _, blizzard)
     --local AceCfgDlg = LibStub("AceConfigDialog-3.0")
 
     if pluginName then
-        AceCfgDlg:SelectGroup("ChocolateBar", "chocolates", pluginName)
+        AceCfgDlg:SelectGroup("Arcana", "chocolates", pluginName)
     end
 
     if blizzard then
         Settings.OpenToCategory(self.BlizzardOptionsCategoryID)
     elseif not input or input:trim() == "" then
-        AceCfgDlg:Open("ChocolateBar")
+        AceCfgDlg:Open("Arcana")
     else
-        LibStub("AceConfigCmd-3.0").HandleCommand(ChocolateBar, "chocolatebar", "ChocolateBar", input)
+        LibStub("AceConfigCmd-3.0").HandleCommand(ChocolateBar, "Arcana", "Arcana", input)
     end
 end
 
@@ -1486,7 +1567,7 @@ function ChocolateBar:AddBarOptions(name)
                         type = 'execute',
                         order = 6,
                         name = L["Remove Bar"],
-                        desc = L["Eat a whole chocolate bar, oh my.."],
+                        desc = L["Removes the selected Bar."],
                         func = EatBar,
                         disabled = IsDisabledRemoveBar,
                         confirm = true,
