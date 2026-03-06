@@ -5,7 +5,7 @@
 ## Title: Arcana — Quel'dorei Observatory
 ## Notes: A display for broker plugins. Formerly ChocolateBar.
 ## Author: Kiatra - https://github.com/Kiatra/Arcana
-## Version: v4.3.1
+## Version: @project-version@
 ## OptionalDeps: Ace3, LibSharedMedia-3.0, LibQTip-1.0
 ## X-WoWI-ID: 12326
 ## X-Curse-Project-ID: 17424
