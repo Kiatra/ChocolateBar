@@ -1,8 +1,27 @@
 local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
-local L = AceLocale:NewLocale("ChocolateBar", "enUS", true)
+local L = AceLocale:NewLocale("Arcana", "enUS", true)
 if not L then return end
 
-L["Whats New"] = true
+L["Info"] = true
+L["Search for plugins here"] = true
+L["CTRL-C to copy"] = true
+L["Disable all plugins."] = true
+L["Removes the selected Bar."] = true
+L["The Quel'dorei became scattered across the world. To preserve the fragments of arcana they gathered from many sources, they maintain observatories where this knowledge is kept in careful order."] = true
+L["You can add plugins to Arcana via the data-broker category in the curseforge app or the link below."] = true
+
+L["2026 March 6"] = true
+L["2026 March 6 - News"] = [[
+New name, Arcana!
+
+Remember to take all things in moderation, even World of Warcraft and especially chocolate! ;-)
+
+Thank you all for using the mod for all those years!
+The old name was around for a while... and while I liked the old funny name for me it was time to move on.
+]]
+
+
+L["Whats New & Info"] = true
 L["2026 March 5"] = true
 L["TBC Anniversary:\nThe upper row action bars will now also be moved up. Reset them in edit mode and reload the UI."] = true
 
@@ -93,7 +112,7 @@ L["Left"] = true
 L["Right"] = true
 L["Center"] = true
 L["none"] = true
-L["ChocolateBar Options"] = true
+L["Arcana Options"] = true
 L["Blizzard Options"] = true
 L["Bar Right Click"] = true
 L["Select the action when right clicking on a bar."] = true
@@ -103,7 +122,7 @@ L["Disable Options"] = true
 L["Disable options dialog on right click"] = true
 L["Icon Size"] = true
 L["Icon size in relation to the bar height."] = true
-L["Could not load ChocolateBar_Options, make sure it's installed."] = true
+L["Could not load Arcana-Options, make sure the addon is enabled."] = true
 L["Bar Width"] = true
 L["Set a width for the bar."] = true
 L["Locked"] = true
@@ -133,7 +152,7 @@ L["Default text color of a plugin. This will not overwrite plugins that use own 
 L["Lock Plugins"] = true
 L["Hold alt key to drag a plugin."] = true
 L["Move Minimap, Bags and other Frames"] = true
-L["Moves Minimap, Bags and other frames above/below visible ChocolateBars. \n\nDisable this if you have issues and use WoW's \"Edit Mode\" instead to place the frames away from the Bars."] = true
+L["Moves Minimap, Bags and other frames above/below visible Bars. \n\nDisable this if you have issues and use WoW's \"Edit Mode\" instead to place the frames away from the Bars."] = true
 L["Disable Tooltips"] = true
 L["Hide Bars"] = true
 L["Disable Clicking"] = true
@@ -148,14 +167,12 @@ L["Create New Bar"] = true
 L["Enable All"] = true
 L["Get back my plugins!"] = true
 L["Disable All"] = true
-L["Eat all the chocolate at once, uff..."] = true
 L["Disable all Launchers"] = true
 L["Disable all the bad guy's:)"] = true
 L["Move Up"] = true
 L["Move Down"] = true
 L["Autohide"] = true
 L["Remove Bar"] = true
-L["Eat a whole chocolate bar, oh my.."] = true
 L["Type"] = true
 L["Enabled"] = true
 L["Show Text"] = true

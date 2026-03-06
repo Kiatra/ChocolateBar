@@ -1,6 +1,6 @@
 local ldb = LibStub:GetLibrary("LibDataBroker-1.1", true)
 local addonName = "QDB-DamageMeter"
-local path = "Interface\\AddOns\\ChocolateBar\\modules\\BrokerDamage"
+local path = "Interface\\AddOns\\Arcana\\modules\\BrokerDamage"
 
 local lastTop2Text = "DM: —"
 

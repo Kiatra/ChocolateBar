@@ -1,16 +1,16 @@
-## Interface: @toc-version-classic@
+## Interface: @toc-version-mists@
 #@debug@
-## Interface: 11508, 11507, 30405, 38000, 40402, 50503, 50502
+## Interface: 50503
 #@end-debug@
-## Title: ChocolateBar
-## Notes: A display for LibDataBroker-1.1
-## Author: Kiatra - github.com/Kiatra/ChocolateBar/
+## Title: Arcana — Quel'dorei Observatory
+## Notes: A display for broker plugins. Formerly ChocolateBar.
+## Author: Kiatra - https://github.com/Kiatra/Arcana
 ## Version: v4.3.1
 ## OptionalDeps: Ace3, LibSharedMedia-3.0, LibQTip-1.0
 ## X-WoWI-ID: 12326
 ## X-Curse-Project-ID: 17424
 ## SavedVariables: ChocolateBarDB, CB_PlayedTime
-## IconTexture: Interface/AddOns/ChocolateBar/pics/ChocolatePiece
+## IconTexture: Interface/AddOns/Arcana/pics/ChocolatePiece
 
 ## Category: Data Broker
 ## Category-deDE: Datenbroker
@@ -42,11 +42,11 @@ localization\ruRU.lua
 Core.lua
 JostleClassic.lua
 DragAndDrop.lua
-Chocolate.lua
+Arcana.lua
 Bar.lua
 DropPoints.lua
 modules\Placeholder.lua
-modules\MoreChocolate.lua
+modules\MoreArcana.lua
 
 
 #@debug@

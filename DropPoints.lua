@@ -1,5 +1,5 @@
-local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("ChocolateBar")
-local L = LibStub("AceLocale-3.0"):GetLocale("ChocolateBar")
+local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("Arcana")
+local L = LibStub("AceLocale-3.0"):GetLocale("Arcana")
 local dropPoints
 local _G = _G
 local Drag = ChocolateBar.Drag

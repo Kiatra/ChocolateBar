@@ -1,4 +1,4 @@
-local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("ChocolateBar")
+local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("Arcana")
 local LSM = LibStub("LibSharedMedia-3.0")
 local ChocolatePiece = ChocolateBar.ChocolatePiece
 local Drag = ChocolateBar.Drag

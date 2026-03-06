@@ -1,6 +1,6 @@
 -- DragAndDrop by yess
 -- this adds drag and drop support between bars/drop points for ChocolateBar
-local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("ChocolateBar")
+local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("Arcana")
 local Drag = ChocolateBar.Drag
 local frameslist = {}
 local debug = ChocolateBar and ChocolateBar.Debug or function() end

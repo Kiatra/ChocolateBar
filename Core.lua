@@ -1,12 +1,12 @@
 local LibStub, broker, LSM = LibStub, LibStub("LibDataBroker-1.1"), LibStub("LibSharedMedia-3.0")
-local ChocolateBar = LibStub("AceAddon-3.0"):NewAddon("ChocolateBar", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
-local L = LibStub("AceLocale-3.0"):GetLocale("ChocolateBar")
+local ChocolateBar = LibStub("AceAddon-3.0"):NewAddon("Arcana", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
+local L = LibStub("AceLocale-3.0"):GetLocale("Arcana")
 local _G, pairs, ipairs, table, string, tostring = _G, pairs, ipairs, table, string, tostring
 local select, strjoin, CreateFrame = select, strjoin, CreateFrame
 
 local _, _, _, tocversion = GetBuildInfo()
 
-local addonVersion = C_AddOns.GetAddOnMetadata("ChocolateBar", "Version")
+local addonVersion = C_AddOns.GetAddOnMetadata("Arcana", "Version")
 
 ChocolateBar.Jostle = {}
 ChocolateBar.Bar = {}
@@ -60,7 +60,7 @@ local defaults = {
         labelColor = { r = 1, g = 0.82, b = 0, a = 1 },
         background = {
             textureName = "ChocolateBar Gray",
-            texture = "Interface\\AddOns\\ChocolateBar\\pics\\chocolatebargray",
+            texture = "Interface\\AddOns\\Arcana\\pics\\chocolatebargray",
             borderTexture = "Tooltip-Border",
             color = { r = 0.38, g = 0.36, b = 0.4, a = .94, },
             borderColor = { r = 0, g = 0, b = 0, a = 0, },
@@ -107,24 +107,24 @@ function ChocolateBar:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("ChocolateBarDB", defaults, "Default")
     self.db.RegisterCallback(self, "OnDatabaseShutdown", "OnDatabaseShutdown")
 
-    self:RegisterChatCommand("chocolatebar", "ChatCommand")
+    self:RegisterChatCommand("Arcana", "ChatCommand")
     db = self.db.profile
 
     debug("ChocolateBarDB.addonVersion=", ChocolateBarDB.addonVersion)
     debug("isNewInstall()=", self:isNewInstall())
 
     local AceCfgDlg = LibStub("AceConfigDialog-3.0")
-    local _, categoryID = AceCfgDlg:AddToBlizOptions("ChocolateBar", "ChocolateBar")
+    local _, categoryID = AceCfgDlg:AddToBlizOptions("Arcana", "Arcana")
     self.BlizzardOptionsCategoryID = categoryID
 
-    LSM:Register("statusbar", "ChocolateBar Gold", "Interface\\AddOns\\ChocolateBar\\pics\\chocolatebar")
-    LSM:Register("statusbar", "ChocolateBar Gray", "Interface\\AddOns\\ChocolateBar\\pics\\chocolatebargray")
+    LSM:Register("statusbar", "ChocolateBar Gold", "Interface\\AddOns\\Arcana\\pics\\chocolatebar")
+    LSM:Register("statusbar", "ChocolateBar Gray", "Interface\\AddOns\\Arcana\\pics\\chocolatebargray")
     LSM:Register("statusbar", "Tooltip", "Interface\\Tooltips\\UI-Tooltip-Background")
     LSM:Register("statusbar", "Solid", "Interface\\Buttons\\WHITE8X8")
-    LSM:Register("statusbar", "Gloss", "Interface\\AddOns\\ChocolateBar\\pics\\Gloss")
-    LSM:Register("statusbar", "DarkBottom", "Interface\\AddOns\\ChocolateBar\\pics\\DarkBottom")
-    LSM:Register("background", "Titan", "Interface\\AddOns\\ChocolateBar\\pics\\Titan")
-    LSM:Register("background", "Tribal", "Interface\\AddOns\\ChocolateBar\\pics\\Tribal")
+    LSM:Register("statusbar", "Gloss", "Interface\\AddOns\\Arcana\\pics\\Gloss")
+    LSM:Register("statusbar", "DarkBottom", "Interface\\AddOns\\Arcana\\pics\\DarkBottom")
+    LSM:Register("background", "Titan", "Interface\\AddOns\\Arcana\\pics\\Titan")
+    LSM:Register("background", "Tribal", "Interface\\AddOns\\Arcana\\pics\\Tribal")
 
     self:RegisterEvent("PLAYER_REGEN_DISABLED", "OnEnterCombat")
     self:RegisterEvent("PLAYER_REGEN_ENABLED", "OnLeaveCombat")
@@ -288,7 +288,7 @@ end
 
 function ChocolateBar:isNewInstall()
     local lastversion = ChocolateBarDB.addonVersion or ""
-    return lastversion < C_AddOns.GetAddOnMetadata("ChocolateBar", "Version") and true or false
+    return lastversion < C_AddOns.GetAddOnMetadata("Arcana", "Version") and true or false
 end
 
 function ChocolateBar:ToggleOrderHallCommandBar()
@@ -515,7 +515,7 @@ local function getFreeBarName()
     local used = false
     local name
     for i = 1, 100 do
-        name = "ChocolateBar" .. i
+        name = "Arcana" .. i
         for k, v in pairs(chocolateBars) do
             if name == v:GetName() then
                 used = true
@@ -667,7 +667,7 @@ local function createPointer()
     local arrow = pointer:CreateTexture(nil, "BACKGROUND")
     ---@diagnostic disable-next-line: param-type-mismatch
     arrow:SetPoint("CENTER", pointer, "LEFT", 0, 0)
-    arrow:SetTexture("Interface\\AddOns\\ChocolateBar\\pics\\pointer")
+    arrow:SetTexture("Interface\\AddOns\\Arcana\\pics\\pointer")
     return pointer
 end
 
