@@ -32,7 +32,7 @@ local function debug(...)
             local x = select(i, ...)
             s = strjoin(" ", s, tostring(x))
         end
-        _G.DEFAULT_CHAT_FRAME:AddMessage(s)
+        print("|cff88ccffArcana Debug|r", s)
     end
 end
 
@@ -101,7 +101,47 @@ local defaults = {
     }
 }
 
--- addon name migration helpers
+--[[
+StaticPopupDialogs["ARCANA_INFO"] = {
+    text = "Arcana did the thing.",
+    button1 = OKAY,
+    timeout = 0,
+    whileDead = true,
+    hideOnEscape = true,
+    preferredIndex = 3,
+}
+
+local function HasStubMarker(db)
+    if type(db) == "table"
+        and type(db.profileKeys) == "table"
+        and db.profileKeys["ChocolateBar.lua - FromStub"] == "Default" then
+        print("|cff88ccffArcana Debug|r profileKeys:", db.profileKeys["ChocolateBar.lua - FromStub"])
+    end
+
+    return type(db) == "table"
+        and type(db.profileKeys) == "table"
+        and db.profileKeys["ChocolateBar.lua - FromStub"] == "Default"
+end
+]]
+-- global DB name migration helpers
+local function HasData(tbl)
+    return type(tbl) == "table" and next(tbl) ~= nil
+end
+
+local f = CreateFrame("Frame")
+f:RegisterEvent("ADDON_LOADED")
+f:SetScript("OnEvent", function(_, event, addon)
+    if addon == "ChocolateBar" or addon == "Arcana" then
+        print("|cff88ccffArcana Debug|r ADDON_LOADED:", addon)
+        print("  ChocolateBarDB:", ChocolateBarDB)
+        print("  HasStubMarker:", HasData(ChocolateBarDB))
+    end
+    if addon == "ChocolateBar" then
+        ChocolateBar:AddonLoaded()
+    end
+end)
+
+-- bar name migration helpers
 local function barNameIsDeprecated(name)
     if name:match("^ChocolateBar%d+$") then
         return true
@@ -138,13 +178,31 @@ end
 -- Ace3 callbacks
 --------
 function ChocolateBar:OnInitialize()
-    self.db = LibStub("AceDB-3.0"):New("ChocolateBarDB", defaults, "Default")
+    print("|cff88ccffArcana Debug|r", "OnInitialize")
+end
+
+function ChocolateBar:AddonLoaded()
+    if ChocolateBarDB then
+        print("|cff88ccffArcana Debug|r", "Has ChocolateBarDB")
+        if HasData(ChocolateBarDB) then
+            print("|cff88ccffArcana Debug|r", "Has HasData")
+            if not ChocolateBarDB.arcanaMigrated then
+                ArcanaDB = ChocolateBarDB
+                ChocolateBarDB.arcanaMigrated = true
+                print("|cff88ccffArcana Debug|r", "Doing migration...")
+            else
+                print("|cff88ccffArcana Debug|r", "Nothing to migrate!")
+            end
+        end
+    end
+
+    self.db = LibStub("AceDB-3.0"):New("ArcanaDB", defaults, "Default")
     self.db.RegisterCallback(self, "OnDatabaseShutdown", "OnDatabaseShutdown")
 
     self:RegisterChatCommand("Arcana", "ChatCommand")
     db = self.db.profile
 
-    debug("ChocolateBarDB.addonVersion=", ChocolateBarDB.addonVersion)
+    debug("ArcanaDB.addonVersion=", ArcanaDB.addonVersion)
     debug("isNewInstall()=", self:isNewInstall())
 
     local AceCfgDlg = LibStub("AceConfigDialog-3.0")
@@ -207,7 +265,7 @@ function ChocolateBar:OnEnable()
 end
 
 function ChocolateBar:OnDatabaseShutdown()
-    ChocolateBarDB.addonVersion = addonVersion
+    ArcanaDB.addonVersion = addonVersion
 end
 
 function ChocolateBar:EnableModules()
@@ -323,7 +381,7 @@ function ChocolateBar:UpdateJostle()
 end
 
 function ChocolateBar:isNewInstall()
-    local lastversion = ChocolateBarDB.addonVersion or ""
+    local lastversion = ArcanaDB.addonVersion or ""
     return lastversion < C_AddOns.GetAddOnMetadata("Arcana", "Version") and true or false
 end
 
@@ -416,7 +474,8 @@ end
 -- LDB callbacks
 --------
 function ChocolateBar:LibDataBroker_DataObjectCreated(event, name, obj, noupdate)
-    --debug("LibDataBroker_DataObjectCreated", name)
+    if not db then return end
+
     local t = obj.type
 
     if t == "data source" or t == "launcher" then
@@ -448,7 +507,7 @@ function ChocolateBar:EnableDataObject(name, obj, noupdate)
 
     -- set default values depending on data source
     if barName == "" then
-        settings.barName = "Arcana1"
+        settings.barName = "CrcanahocolateBar1ocolateBar1ocolateBar1"
         if t and t == "data source" then
             settings.align = "left"
             settings.showText = true

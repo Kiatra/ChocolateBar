@@ -1,5 +1,8 @@
 package-as: Arcana
 
+move-folders:
+    Arcana/modules/ChocolateBar: ChocolateBar
+
 externals:
   libs/LibStub:
     url: svn://svn.wowace.com/wow/libstub/mainline/trunk

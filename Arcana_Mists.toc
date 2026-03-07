@@ -9,7 +9,7 @@
 ## OptionalDeps: Ace3, LibSharedMedia-3.0, LibQTip-1.0
 ## X-WoWI-ID: 12326
 ## X-Curse-Project-ID: 17424
-## SavedVariables: ChocolateBarDB, CB_PlayedTime
+## SavedVariables: ArcanaDB, ChocolateBarDB, CB_PlayedTime
 ## IconTexture: Interface/AddOns/Arcana/pics/ChocolatePiece
 
 ## Category: Data Broker
