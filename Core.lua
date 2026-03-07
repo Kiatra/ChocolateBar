@@ -75,10 +75,10 @@ local defaults = {
         },
         barSettings = {
             ['*'] = {
-                barName = "ChocolateBar1", align = "top", enabled = true, index = 10, width = 0,
+                barName = "Arcana1", align = "top", enabled = true, index = 10, width = 0,
             },
             ['ChocolateBar1'] = {
-                barName = "ChocolateBar1", align = "top", enabled = true, index = 1, width = 0,
+                barName = "Arcana1", align = "top", enabled = true, index = 1, width = 0,
             },
         },
         placeholderNames = {},
@@ -100,6 +100,40 @@ local defaults = {
         debug = false,
     }
 }
+
+-- addon name migration helpers
+local function barNameIsDeprecated(name)
+    if name:match("^ChocolateBar%d+$") then
+        return true
+    end
+end
+
+local function convertDeprecatedBarName(name)
+    local n = name:match("^ChocolateBar(%d+)$")
+    if n then
+        return "Arcana" .. n
+    end
+end
+
+local function migrateBarNames(db)
+    local barSettings = db.barSettings
+    local toRename = {}
+    -- collect
+    for oldName, settings in pairs(barSettings) do
+        local newName = convertDeprecatedBarName(oldName)
+        if newName and newName ~= oldName then
+            toRename[#toRename + 1] = { oldName, newName, settings }
+        end
+    end
+    -- apply
+    for _, item in ipairs(toRename) do
+        local oldName, newName, settings = item[1], item[2], item[3]
+        barSettings[newName] = settings
+        barSettings[oldName] = nil
+        settings.barName = newName
+    end
+end
+
 --------
 -- Ace3 callbacks
 --------
@@ -145,6 +179,8 @@ function ChocolateBar:OnInitialize()
         self.db.profile.fixedStrata = true
     end
 
+    migrateBarNames(db)
+    --now creating stored bars
     local barSettings = db.barSettings
     for k, v in pairs(barSettings) do
         local name = v.barName
@@ -412,8 +448,7 @@ function ChocolateBar:EnableDataObject(name, obj, noupdate)
 
     -- set default values depending on data source
     if barName == "" then
-        --barName = "ChocolateBar1"
-        settings.barName = "ChocolateBar1"
+        settings.barName = "Arcana1"
         if t and t == "data source" then
             settings.align = "left"
             settings.showText = true
@@ -441,11 +476,17 @@ function ChocolateBar:EnableDataObject(name, obj, noupdate)
 
     choco:Show()
 
+    --addon name migration
+    if barNameIsDeprecated(barName) then
+        barName = convertDeprecatedBarName(barName)
+        settings.barName = barName --store new bar name in the plugin settings
+    end
+
     local bar = chocolateBars[barName]
     if bar then
         bar:AddChocolatePiece(choco, name, noupdate)
     else
-        chocolateBars["ChocolateBar1"]:AddChocolatePiece(choco, name, noupdate)
+        chocolateBars["Arcana1"]:AddChocolatePiece(choco, name, noupdate)
     end
     broker.RegisterCallback(self, "LibDataBroker_AttributeChanged_" .. name, "AttributeChanged")
 
