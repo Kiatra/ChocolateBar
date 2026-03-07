@@ -77,7 +77,7 @@ local defaults = {
             ['*'] = {
                 barName = "Arcana1", align = "top", enabled = true, index = 10, width = 0,
             },
-            ['ChocolateBar1'] = {
+            ['Arcana1'] = {
                 barName = "Arcana1", align = "top", enabled = true, index = 1, width = 0,
             },
         },
