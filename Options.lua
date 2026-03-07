@@ -147,6 +147,18 @@ local aceoptions = {
                     end,
                     width = 1.5,
                 },
+                header26March7 = {
+                    order = increment(),
+                    type = "header",
+                    name = L["2026 March 7"],
+                },
+                text26March7 = {
+                    order = increment(),
+                    type = "description",
+                    name =
+                        L
+                        ["To resore your profile settings quit WOW and rename the file ./World of Warcraft/<game version>/WTF/Account/<your account>/SavedVariables/ChocolateBar.lua to Arcana.lua"],
+                },
                 header26March6 = {
                     order = increment(),
                     type = "header",
