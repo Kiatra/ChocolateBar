@@ -101,28 +101,6 @@ local defaults = {
     }
 }
 
---[[
-StaticPopupDialogs["ARCANA_INFO"] = {
-    text = "Arcana did the thing.",
-    button1 = OKAY,
-    timeout = 0,
-    whileDead = true,
-    hideOnEscape = true,
-    preferredIndex = 3,
-}
-
-local function HasStubMarker(db)
-    if type(db) == "table"
-        and type(db.profileKeys) == "table"
-        and db.profileKeys["ChocolateBar.lua - FromStub"] == "Default" then
-        print("|cff88ccffArcana Debug|r profileKeys:", db.profileKeys["ChocolateBar.lua - FromStub"])
-    end
-
-    return type(db) == "table"
-        and type(db.profileKeys) == "table"
-        and db.profileKeys["ChocolateBar.lua - FromStub"] == "Default"
-end
-]]
 -- global DB name migration helpers
 local function HasData(tbl)
     return type(tbl) == "table" and next(tbl) ~= nil
@@ -131,11 +109,6 @@ end
 local f = CreateFrame("Frame")
 f:RegisterEvent("ADDON_LOADED")
 f:SetScript("OnEvent", function(_, event, addon)
-    if addon == "ChocolateBar" or addon == "Arcana" then
-        print("|cff88ccffArcana Debug|r ADDON_LOADED:", addon)
-        print("  ChocolateBarDB:", ChocolateBarDB)
-        print("  HasStubMarker:", HasData(ChocolateBarDB))
-    end
     if addon == "ChocolateBar" then
         ChocolateBar:AddonLoaded()
     end
