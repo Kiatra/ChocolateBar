@@ -268,9 +268,11 @@ function Bar:GetChocolateAtCursor()
     local s = self:GetEffectiveScale()
     local x, y = GetCursorPosition()
 
+    if not s and x and y then return end
+
     x = x / s
     for _, v in pairs(self.chocolist) do
-        if x > v:GetLeft() and x < v:GetRight() then --plugin found
+        if v and x > v:GetLeft() and x < v:GetRight() then --plugin found
             if x < v:GetLeft() + v:GetWidth() / 2 then
                 return v, "left"
             else
