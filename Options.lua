@@ -102,6 +102,7 @@ local function showURLPopup(url)
 end
 ---@diagnostic disable-next-line: undefined-global
 local increment = CreateCounter();
+local opacityTimer = nil
 
 local aceoptions = {
     name = "Arcana - Quel'dorei Observatory",
@@ -156,6 +157,17 @@ local aceoptions = {
                     order = increment(),
                     type = "description",
                     name =
+                        L["Added option to set the opacity of the bars."],
+                },
+                header26March7_2 = {
+                    order = increment(),
+                    type = "header",
+                    name = L["2026 March 7"],
+                },
+                text26March7_2 = {
+                    order = increment(),
+                    type = "description",
+                    name =
                         L
                         ["Added module to automatically migrate ChocolateBar profiles to Arcana."],
                 },
@@ -204,6 +216,32 @@ local aceoptions = {
                             end,
                             set = function(_, value)
                                 db.locked = value
+                            end,
+                        },
+                        allBarsOpacity = {
+                            type = 'range',
+                            order = 2,
+                            name = L["Opacity"],
+                            desc = L["Set the opacity of the all the bars."],
+                            min = 0,
+                            max = 1,
+                            step = 0.001,
+                            bigStep = 0.05,
+                            isPercent = true,
+                            get = function()
+                                return db.allBarsOpacity
+                            end,
+                            set = function(_, value)
+                                if value > 1 then
+                                    value = 1
+                                elseif value < 0.01 then
+                                    value = 0.001
+                                end
+                                db.allBarsOpacity = value
+                                for _, bar in pairs(ChocolateBar:GetBars()) do
+                                    bar.tempHide = bar:GetAlpha()
+                                    bar:SetAlpha(db.allBarsOpacity)
+                                end
                             end,
                         },
                         adjustBlizzardFrames = {
@@ -486,7 +524,7 @@ local aceoptions = {
                                     type = 'range',
                                     order = 3,
                                     name = L["Opacity"],
-                                    desc = L["Set the opacity of the bars during combat."],
+                                    desc = L["Set the opacity of the bars during combat. Set to 100% to disable."],
                                     min = 0,
                                     max = 1,
                                     step = 0.001,
@@ -506,6 +544,12 @@ local aceoptions = {
                                             bar.tempHide = bar:GetAlpha()
                                             bar:SetAlpha(db.combatopacity)
                                         end
+                                        ChocolateBar:CancelTimer(opacityTimer)
+                                        opacityTimer = ChocolateBar:ScheduleTimer(function(plugin)
+                                            for _, bar in pairs(ChocolateBar:GetBars()) do
+                                                bar:SetAlpha(db.allBarsOpacity)
+                                            end
+                                        end, 2)
                                     end,
                                 },
                             },

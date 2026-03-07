@@ -1,4 +1,5 @@
 local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("Arcana")
+local L = LibStub("AceLocale-3.0"):GetLocale("Arcana")
 
 local LSM = LibStub("LibSharedMedia-3.0")
 local Bar = ChocolateBar.Bar
@@ -16,7 +17,12 @@ function Bar:OnMouseUp(button)
         if db.barRightClick == "OPTIONS" then
             ChocolateBar:LoadOptions()
         elseif db.barRightClick == "BLIZZ" then
-            ChocolateBar:LoadOptions(nil, nil, true)
+            if InCombatLockdown() then
+                ChocolateBar:LoadOptions()
+                print("|cff88ccffArcana|r", L["Opening Arcana only options during combat."])
+            else
+                ChocolateBar:LoadOptions(nil, nil, true)
+            end
         end
     else
         if db.moreBar == self:GetName() then
@@ -212,7 +218,7 @@ end
 
 function Bar:ShowAll()
     --Timer:SetScript("OnUpdate", nil)
-    self:SetAlpha(1)
+    self:SetAlpha(db.allBarsOpacity or 1)
     local settings
     for k, v in pairs(self.chocolist) do
         settings = v.settings

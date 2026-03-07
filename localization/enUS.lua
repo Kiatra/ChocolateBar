@@ -3,6 +3,10 @@ local L = AceLocale:NewLocale("Arcana", "enUS", true)
 if not L then return end
 
 
+L["Set the opacity of the all the bars."] = true
+L["Added option to set the opacity of the bars."] = true
+L["Opening Arcana only options during combat."] = true
+
 L["2026 March 7"] = true
 L["Added module to automatically migrate ChocolateBar profiles to Arcana."] = true
 L["Info"] = true
@@ -120,7 +124,7 @@ L["Blizzard Options"] = true
 L["Bar Right Click"] = true
 L["Select the action when right clicking on a bar."] = true
 L["Opacity"] = true
-L["Set the opacity of the bars during combat."] = true
+L["Set the opacity of the bars during combat. Set to 100% to disable."] = true
 L["Disable Options"] = true
 L["Disable options dialog on right click"] = true
 L["Icon Size"] = true
