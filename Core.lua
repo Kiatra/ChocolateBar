@@ -44,6 +44,7 @@ local defaults = {
     profile = {
         petBattleHideBars = true,
         combatopacity = 1,
+        allBarsOpacity = 1,
         scale = 1,
         height = 21,
         iconSize = 0.75,
@@ -169,7 +170,6 @@ function ChocolateBar:AddonLoaded()
         end
     end
 
-    print("|cff88ccffArcana Debug|r", "AceDB-3.0:New Table:", ArcanaDB)
     self.db = LibStub("AceDB-3.0"):New("ArcanaDB", defaults, "Default")
     self.db.RegisterCallback(self, "OnDatabaseShutdown", "OnDatabaseShutdown")
 
@@ -438,7 +438,7 @@ function ChocolateBar:OnLeaveCombat()
             end
         elseif combatOpacityAllBars < 1 then
             if bar.tempHide then
-                bar:SetAlpha(1)
+                bar:SetAlpha(db.allBarsOpacity or 1)
             end
         end
     end
