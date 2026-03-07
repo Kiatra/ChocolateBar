@@ -1160,7 +1160,7 @@ end
 --return true if RemoveBar is disabled
 local function IsDisabledRemoveBar(info)
     local name = info[#info - 2]
-    return name == "ChocolateBar1"
+    return name == "Arcana1"
 end
 
 local function IsDisabledMoveDown(info)
