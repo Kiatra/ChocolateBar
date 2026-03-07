@@ -150,21 +150,21 @@ end
 --------
 -- Ace3 callbacks
 --------
+--- we want to load after ChocolateBarDB was loead from the ChocolateBar addon for the migration
+--[[
 function ChocolateBar:OnInitialize()
     print("|cff88ccffArcana Debug|r", "OnInitialize")
 end
+]]
 
+--OnInitialize
 function ChocolateBar:AddonLoaded()
     if ChocolateBarDB then
-        print("|cff88ccffArcana Debug|r", "Has ChocolateBarDB")
         if HasData(ChocolateBarDB) then
-            print("|cff88ccffArcana Debug|r", "Has HasData")
             if not ChocolateBarDB.arcanaMigrated then
                 ArcanaDB = ChocolateBarDB
                 ChocolateBarDB.arcanaMigrated = true
-                print("|cff88ccffArcana Debug|r", "Doing migration...")
-            else
-                print("|cff88ccffArcana Debug|r", "Nothing to migrate!")
+                print("|cff88ccffArcana Debug|r", "Doing profile migration...")
             end
         end
     end
