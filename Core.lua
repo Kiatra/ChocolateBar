@@ -169,6 +169,7 @@ function ChocolateBar:AddonLoaded()
         end
     end
 
+    print("|cff88ccffArcana Debug|r", "AceDB-3.0:New Table:", ArcanaDB)
     self.db = LibStub("AceDB-3.0"):New("ArcanaDB", defaults, "Default")
     self.db.RegisterCallback(self, "OnDatabaseShutdown", "OnDatabaseShutdown")
 
@@ -480,7 +481,7 @@ function ChocolateBar:EnableDataObject(name, obj, noupdate)
 
     -- set default values depending on data source
     if barName == "" then
-        settings.barName = "CrcanahocolateBar1ocolateBar1ocolateBar1"
+        settings.barName = "Arcana1"
         if t and t == "data source" then
             settings.align = "left"
             settings.showText = true
