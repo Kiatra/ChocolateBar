@@ -4,7 +4,7 @@ if not L then return end
 
 
 L["2026 March 7"] = true
-L["To resore your profile settings quit WOW and rename the file ./World of Warcraft/<game version>/WTF/Account/<your account>/SavedVariables/ChocolateBar.lua to Arcana.lua"] = true
+L["Added module to automatically migrate ChocolateBar profiles to Arcana."] = true
 L["Info"] = true
 L["Search for plugins here"] = true
 L["CTRL-C to copy"] = true

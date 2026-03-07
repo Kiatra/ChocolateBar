@@ -157,7 +157,7 @@ local aceoptions = {
                     type = "description",
                     name =
                         L
-                        ["To resore your profile settings quit WOW and rename the file ./World of Warcraft/<game version>/WTF/Account/<your account>/SavedVariables/ChocolateBar.lua to Arcana.lua"],
+                        ["Added module to automatically migrate ChocolateBar profiles to Arcana."],
                 },
                 header26March6 = {
                     order = increment(),
