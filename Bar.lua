@@ -4,7 +4,6 @@ local L = LibStub("AceLocale-3.0"):GetLocale("Arcana")
 local LSM = LibStub("LibSharedMedia-3.0")
 local Bar = ChocolateBar.Bar
 local chocolate = ChocolateBar.ChocolatePiece
-local debug = ChocolateBar and ChocolateBar.Debug or function() end
 local jostle = ChocolateBar.Jostle
 local _G, pairs, ipairs, table, math, mod = _G, pairs, ipairs, table, math, mod
 local CreateFrame, UIParent = CreateFrame, UIParent
@@ -180,7 +179,6 @@ end
 function Bar:AddChocolatePiece(choco, name, noupdate)
     local chocolist = self.chocolist
     if chocolist[name] then
-        ChocolateBar:Debug("Bar:AddChocolatePiece: ", name, " already in list.")
         return
     end
 

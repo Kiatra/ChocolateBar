@@ -85,7 +85,6 @@ end
 function Jostle:RegisterTop(frame)
     if frame and not topFrames[frame] then
         topFrames[frame] = frame
-        ChocolateBar:Debug("RegisterTop:", frame and frame.GetName and frame:GetName() or "no name")
         JostleFrame:Schedule()
     end
 end
@@ -128,7 +127,6 @@ function Jostle:Refresh(...)
     if select('#', ...) >= 1 then
         for k in pairs(tmp) do
             tmp[k] = nil
-            --ChocolateBar:Debug(k)
         end
         for i = 1, select('#', ...) do
             tmp[i] = select(i, ...)
