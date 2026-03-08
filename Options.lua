@@ -218,32 +218,6 @@ local aceoptions = {
                                 db.locked = value
                             end,
                         },
-                        allBarsOpacity = {
-                            type = 'range',
-                            order = 2,
-                            name = L["Opacity"],
-                            desc = L["Set the opacity of the all the bars."],
-                            min = 0,
-                            max = 1,
-                            step = 0.001,
-                            bigStep = 0.05,
-                            isPercent = true,
-                            get = function()
-                                return db.allBarsOpacity
-                            end,
-                            set = function(_, value)
-                                if value > 1 then
-                                    value = 1
-                                elseif value < 0.01 then
-                                    value = 0.001
-                                end
-                                db.allBarsOpacity = value
-                                for _, bar in pairs(ChocolateBar:GetBars()) do
-                                    bar.tempHide = bar:GetAlpha()
-                                    bar:SetAlpha(db.allBarsOpacity)
-                                end
-                            end,
-                        },
                         adjustBlizzardFrames = {
                             type = 'toggle',
                             order = 2,
@@ -547,7 +521,7 @@ local aceoptions = {
                                         ChocolateBar:CancelTimer(opacityTimer)
                                         opacityTimer = ChocolateBar:ScheduleTimer(function(plugin)
                                             for _, bar in pairs(ChocolateBar:GetBars()) do
-                                                bar:SetAlpha(db.allBarsOpacity)
+                                                bar:SetAlpha(bar.settings.opacity)
                                             end
                                         end, 2)
                                     end,
@@ -1075,6 +1049,50 @@ local function setAutoHide(info, value)
     db.barSettings[name].autohide = value
     local bar = ChocolateBar:GetBar(name)
     bar:UpdateAutoHide(db)
+end
+
+------- Bar Opacity -----------------------------------
+local function getOpacity(info)
+    local name = info[#info - 2]
+    return db.barSettings[name].opacity or 1
+end
+
+local function setOpacity(info, value)
+    local name = info[#info - 2]
+    if value > 1 then
+        value = 1
+    elseif value < 0.01 then
+        value = 0.001
+    end
+    db.barSettings[name].opacity = value
+    local bar = ChocolateBar:GetBar(name)
+    bar:SetAlpha(value)
+end
+
+------- Bar OpacityMouseOver --------------------------
+local function getOpacityMouseOver(info)
+    local name = info[#info - 2]
+    return db.barSettings[name].opacityMouseOver or 1
+end
+
+local function setOpacityMouseOver(info, value)
+    local name = info[#info - 2]
+    if value > 1 then
+        value = 1
+    elseif value < 0.01 then
+        value = 0.001
+    end
+    db.barSettings[name].opacityMouseOver = value
+
+    local bar = ChocolateBar:GetBar(name)
+    bar:SetAlpha(value)
+
+    ChocolateBar:CancelTimer(opacityTimer)
+    opacityTimer = ChocolateBar:ScheduleTimer(function(plugin)
+        for _, bar in pairs(ChocolateBar:GetBars()) do
+            bar:SetAlpha(db.barSettings[name].opacity or 1)
+        end
+    end, 2)
 end
 
 --hide bar during combat
@@ -1613,11 +1631,40 @@ function ChocolateBar:AddBarOptions(name)
                 args = {
                     autohide = {
                         type = 'toggle',
-                        order = 5,
+                        order = 1,
                         name = L["Autohide"],
                         desc = L["Autohide"],
                         get = getAutoHide,
-                        set = setAutoHide,
+                        set = setAutoHide
+                    },
+                    opacity = {
+                        type = 'range',
+                        order = 2,
+                        name = L["Opacity"],
+                        desc = L
+                        ["Set the opacity of the the bars. You can set the alpha of the bar background unter textures."],
+                        min = 0,
+                        max = 1,
+                        step = 0.001,
+                        bigStep = 0.05,
+                        isPercent = true,
+                        get = getOpacity,
+                        set = setOpacity,
+                        disabled = getAutoHide
+                    },
+                    opacityMouseOver = {
+                        type = 'range',
+                        order = 3,
+                        name = L["Mouseover Opacity"],
+                        desc = L["Set the opacity of the the bars when the mouse is over a bar."],
+                        min = 0,
+                        max = 1,
+                        step = 0.001,
+                        bigStep = 0.05,
+                        isPercent = true,
+                        get = getOpacityMouseOver,
+                        set = setOpacityMouseOver,
+                        disabled = getAutoHide
                     },
                     eatBar = {
                         type = 'execute',

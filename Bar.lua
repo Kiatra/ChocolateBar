@@ -31,6 +31,23 @@ function Bar:OnMouseUp(button)
     end
 end
 
+function Bar:OnEnter()
+    if (db.combathidebar or self.settings.hideBarInCombat) and ChocolateBar.InCombat then return end
+    self:ShowAll()
+    if self.settings.opacityMouseOver ~= self.settings.opacity then
+        self:SetAlpha(self.settings.opacityMouseOver or 1)
+    end
+end
+
+function Bar:OnLeave()
+    if (db.combathidebar or self.settings.hideBarInCombat) and ChocolateBar.InCombat then return end
+    if self.settings.autohide then
+        self:HideAll()
+    elseif self.settings.opacityMouseOver ~= self.settings.opacity then
+        self:SetAlpha(self.settings.opacity or 1)
+    end
+end
+
 function Bar:New(name, settings, database)
     db = database
     local frame = CreateFrame("Frame", name, _G.UIParent, BackdropTemplateMixin and "BackdropTemplate")
@@ -61,17 +78,8 @@ function Bar:New(name, settings, database)
     frame:SetHeight(db.height)
     ---@diagnostic disable-next-line: param-type-mismatch
     frame:EnableMouse(true)
-    frame:SetScript("OnEnter", function(this)
-        if (db.combathidebar or settings.hideBarInCombat) and ChocolateBar.InCombat then return end
-        this:ShowAll()
-    end)
-    frame:SetScript("OnLeave", function(this)
-        if (db.combathidebar or settings.hideBarInCombat) and ChocolateBar.InCombat then return end
-        if this.autohide then
-            this:HideAll()
-        end
-    end)
-
+    frame:SetScript("OnEnter", self.OnEnter)
+    frame:SetScript("OnLeave", self.OnLeave)
     frame:SetScript("OnMouseUp", self.OnMouseUp)
 
     ---@diagnostic disable-next-line: inject-field
@@ -217,8 +225,7 @@ function Bar:HideAll()
 end
 
 function Bar:ShowAll()
-    --Timer:SetScript("OnUpdate", nil)
-    self:SetAlpha(db.allBarsOpacity or 1)
+    self:SetAlpha(self.settings.opacity or 1)
     local settings
     for k, v in pairs(self.chocolist) do
         settings = v.settings
