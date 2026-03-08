@@ -230,9 +230,7 @@ local function OnEnter(self)
     local obj  = self.obj
     local name = self.name
     local bar  = self.bar
-    if bar.autohide then
-        bar:ShowAll()
-    end
+    bar:OnEnter()
 
     if db.combathidetip and ChocolateBar.InCombat then return end
 
@@ -264,9 +262,7 @@ local function OnLeave(self)
     local name = self.name
 
     local bar  = self.bar
-    if bar.autohide then
-        bar:HideAll()
-    end
+    bar:OnLeave()
 
     if obj.OnTooltipShow then
         GameTooltip:Hide()
@@ -335,7 +331,7 @@ end
 local function OnDragStop(frame)
     if ChocolateBar.dragging then
         --frame:highlight(0)
-        ChocolateBar:ExecuteforAllChoclates(function(frame) frame:highlight(0, 0, 0, 0) end)
+        ChocolateBar:ExecuteforAllChoclates(function(f) f:highlight(0, 0, 0, 0) end)
         frame:StopMovingOrSizing()
         frame.isMoving = false
         Drag:Stop(frame)

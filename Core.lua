@@ -44,7 +44,6 @@ local defaults = {
     profile = {
         petBattleHideBars = true,
         combatopacity = 1,
-        allBarsOpacity = 1,
         scale = 1,
         height = 21,
         iconSize = 0.75,
@@ -76,10 +75,10 @@ local defaults = {
         },
         barSettings = {
             ['*'] = {
-                barName = "Arcana1", align = "top", enabled = true, index = 10, width = 0,
+                barName = "Arcana1", align = "top", enabled = true, index = 10, width = 0, opacity = 1, opacityMouseOver = 1,
             },
             ['Arcana1'] = {
-                barName = "Arcana1", align = "top", enabled = true, index = 1, width = 0,
+                barName = "Arcana1", align = "top", enabled = true, index = 1, width = 0, opacity = 1, opacityMouseOver = 1,
             },
         },
         placeholderNames = {},
@@ -438,7 +437,7 @@ function ChocolateBar:OnLeaveCombat()
             end
         elseif combatOpacityAllBars < 1 then
             if bar.tempHide then
-                bar:SetAlpha(db.allBarsOpacity or 1)
+                bar:SetAlpha(bar.settings.opacity or 1)
             end
         end
     end
