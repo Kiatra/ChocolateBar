@@ -11,9 +11,6 @@ local color                                        = true
 local path                                         = "Interface\\AddOns\\Broker_MicroMenu\\media\\"
 local _
 
-local debug                                        = ChocolateBar and ChocolateBar.Debug or function() end or
-    function() end
-
 local function RGBToHex(r, g, b)
     return ("%02x%02x%02x"):format(r * 255, g * 255, b * 255)
 end

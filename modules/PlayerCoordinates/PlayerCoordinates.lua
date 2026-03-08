@@ -1,6 +1,5 @@
 ﻿local LibStub = LibStub
 local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("Arcana")
-local debug = ChocolateBar and ChocolateBar.debug or function() end
 local L = LibStub("AceLocale-3.0"):GetLocale("Arcana")
 
 local addonName = "Coordinates"
@@ -23,7 +22,6 @@ end
 
 function Module:EnableModule()
     if not dataobj then
-        ChocolateBar:Debug("Creating Module: Music Volume")
         dataobj = LibStub("LibDataBroker-1.1"):NewDataObject(addonName, {
             type  = "data source",
             label = addonName,
@@ -35,7 +33,7 @@ function Module:EnableModule()
         time = time + elapsed
         if time > 0.2 then
             counter = counter + 0.1
-            --ChocolateBar:Debug("elapsed", elapsed)
+            ---@diagnostic disable: undefined-global
             local map = C_Map.GetBestMapForUnit("player")
             if map then
                 local position = C_Map.GetPlayerMapPosition(map, "player")

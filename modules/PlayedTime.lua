@@ -3,7 +3,6 @@ local LibStub = LibStub
 local L = LibStub("AceLocale-3.0"):GetLocale("Arcana")
 local acetimer = LibStub("AceTimer-3.0")
 local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("Arcana")
-local debug = ChocolateBar and ChocolateBar.Debug or function() end
 local ReportPlayedTimeToChat = true
 local dataobj, db
 local name, server

@@ -112,21 +112,17 @@ local function LockMainMenuBar()
     if not InCombatLockdown() and (_G.LE_EXPANSION_LEVEL_CURRENT >= LE_EXPANSION_BURNING_CRUSADE and not UnitInVehicle("Player")) then
         MainMenuBar:SetMovable(true)
         MainMenuBar:SetUserPlaced(true)
-        ChocolateBar:Debug("LockMainMenuBar")
         MainMenuBar:SetMovable(false)
     end
 end
 
 function Jostle:UNIT_EXITING_VEHICLE()
-    ChocolateBar:Debug("UNIT_EXITING_VEHICLE")
     MainMenuBar:SetMovable(true)
     MainMenuBar:SetUserPlaced(false)
-    ChocolateBar:Debug("SetUserPlaced(false)")
     MainMenuBar:SetMovable(false)
 end
 
 function Jostle:UNIT_EXITED_VEHICLE()
-    ChocolateBar:Debug("UNIT_EXITED_VEHICLE")
     self:Refresh(MainMenuBar, PlayerFrame)
 end
 
@@ -135,14 +131,12 @@ function Jostle:PLAYER_ENTERING_WORLD()
 end
 
 function Jostle:PLAYER_REGEN_ENABLED()
-    ChocolateBar:Debug("PLAYER_REGEN_ENABLED")
     self:Refresh(MainMenuBar, PlayerFrame)
     LockMainMenuBar()
 end
 
 local inCombat = false
 function Jostle:PLAYER_REGEN_DISABLED()
-    ChocolateBar:Debug("PLAYER_REGEN_DISABLED")
     inCombat = true
 end
 
@@ -309,7 +303,6 @@ function Jostle:Refresh(...)
                 -- do nothing
             elseif frame.systemInfo and not frame.systemInfo.isInDefaultPosition then
                 -- do nothing
-                ChocolateBar:Debug("frame is not in isInDefaultPosition")
             elseif bottomOffset == 0 and (frame == MainMenuBar or frame == CastingBarFrame or frame == FramerateLabel or ((frame == DEFAULT_CHAT_FRAME or frame == ChatFrame2))) then
                 -- do nothing
             elseif frame == PlayerFrame and (CT_PlayerFrame_Drag or Gypsy_PlayerFrameCapsule) then

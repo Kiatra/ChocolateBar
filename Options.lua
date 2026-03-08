@@ -1,6 +1,5 @@
 local LibStub = LibStub
 local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("Arcana")
-local debug = ChocolateBar and ChocolateBar.Debug or function() end
 local AceCfgDlg = LibStub("AceConfigDialog-3.0")
 local Drag = ChocolateBar.Drag
 local broker = LibStub("LibDataBroker-1.1")
@@ -65,7 +64,6 @@ local function createPlaceholder()
     local placeholderNames = db.placeholderNames
     local name = L["Placeholder"] .. tablelength(placeholderNames)
     placeholderNames[name] = true
-    ChocolateBar:Debug("createPlaceholder", name, tablelength(placeholderNames))
     ChocolateBar:AddObjectOptions(name, ChocolateBar:NewPlaceholder(name))
 end
 
@@ -928,7 +926,6 @@ local placeholderOptions = {
 local function addPlaceholderOption(cleanName)
     for k, _ in pairs(db.placeholderNames) do
         if cleanName == k then
-            ChocolateBar:Debug("addPlaceholderOption", k)
             table.insert(chocolateOptions[cleanName].args, placeholderOptions)
         end
     end
@@ -1642,7 +1639,7 @@ function ChocolateBar:AddBarOptions(name)
                         order = 2,
                         name = L["Opacity"],
                         desc = L
-                        ["Set the opacity of the the bars. You can set the alpha of the bar background unter textures."],
+                            ["Set the opacity of the the bars. You can set the alpha of the bar background unter textures."],
                         min = 0,
                         max = 1,
                         step = 0.001,
@@ -1764,7 +1761,7 @@ local widthBehaviorTypes = { free = L["Free"], fixed = L["Fixed"], max = L["Max"
 
 function ChocolateBar:AddObjectOptions(name, obj)
     if not obj or not obj.type or (obj.type ~= "data source" and obj.type ~= "launcher") then
-        ChocolateBar:Debug("Not adding plugin object: ", obj)
+        ChocolateBar:Log("Not adding plugin object: ", obj)
         return
     end
     --local curse = C_AddOns.GetAddOnMetadata(name,"X-Curse-Packaged-Version") or ""

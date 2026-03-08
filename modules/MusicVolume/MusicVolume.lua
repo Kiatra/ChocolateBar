@@ -1,6 +1,5 @@
 ﻿local LibStub = LibStub
 local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("Arcana")
-local debug = ChocolateBar and ChocolateBar.debug or function() end
 local L = LibStub("AceLocale-3.0"):GetLocale("Arcana")
 
 local addonName = "MusicVolume"
@@ -10,7 +9,7 @@ local volumeText = "Music: " .. math.floor((_G.GetCVar("Sound_MusicVolume") * 10
 
 local function OnMouseWheel(self, vector)
     local cVar = "Sound_MusicVolume" --Sound_MusicVolume  Sound_SFXVolume
-    local vol = GetCVar(cVar)
+    local vol = GetCVar(cVar) or 1
     local step = IsAltKeyDown() and vector * .01 or vector * .1
     vol = vol + step
     if vol > 1 then vol = 1 end
@@ -24,7 +23,7 @@ local Module = ChocolateBar:NewModule(addonName, {
     defaults = {
         enabled = true,
     },
-    options = options
+    --options = options
 })
 
 function Module:DisableModule()
@@ -32,7 +31,6 @@ end
 
 function Module:EnableModule()
     if not dataobj then
-        ChocolateBar:Debug("Creating Module: Music Volume")
         dataobj = LibStub("LibDataBroker-1.1"):NewDataObject(addonName, {
             type         = "data source",
             icon         = "Interface\\AddOns\\Arcana\\modules\\MusicVolume\\icon.tga",
