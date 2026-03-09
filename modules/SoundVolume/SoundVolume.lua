@@ -1,5 +1,5 @@
 ﻿local LibStub = LibStub
-local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("Arcana")
+local Arcana = LibStub("AceAddon-3.0"):GetAddon("Arcana")
 local L = LibStub("AceLocale-3.0"):GetLocale("Arcana")
 
 local addonName = "Sound Volume"
@@ -18,7 +18,7 @@ local function OnMouseWheel(self, vector)
     dataobj.text = "Sound: " .. math.floor((_G.GetCVar(cVar) * 100)) .. "%"
 end
 
-local Module = ChocolateBar:NewModule(addonName, {
+local Module = Arcana:NewModule(addonName, {
     description = "Use your scroll wheel over this plugin to adjust the sound volume.",
     defaults = {
         enabled = true,

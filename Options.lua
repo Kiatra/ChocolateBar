@@ -8,14 +8,14 @@
 --  Forgetting to to close the brackes is even more fun!
 -- ✧───────────────────────────────────────--------───────✧
 local LibStub = LibStub
-local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("Arcana")
+local Arcana = LibStub("AceAddon-3.0"):GetAddon("Arcana")
 local AceCfgDlg = LibStub("AceConfigDialog-3.0")
-local Drag = ChocolateBar.Drag
+local Drag = Arcana.Drag
 local broker = LibStub("LibDataBroker-1.1")
 local L = LibStub("AceLocale-3.0"):GetLocale("Arcana")
 local LSM = LibStub("LibSharedMedia-3.0")
 local _G, pairs, string = _G, pairs, string
-local db, moreChocolate
+local db, moreArcana
 local addonName = ...
 ---@diagnostic disable-next-line: undefined-field
 local GetAddOnMetadata = _G.GetAddOnMetadata or _G.C_AddOns.GetAddOnMetadata;
@@ -51,20 +51,20 @@ end
 
 local function EnableAll()
     for name, obj in LibStub("LibDataBroker-1.1"):DataObjectIterator() do
-        ChocolateBar:EnableDataObject(name, obj)
+        Arcana:EnableDataObject(name, obj)
     end
 end
 
 local function DisableAll()
     for name, _ in LibStub("LibDataBroker-1.1"):DataObjectIterator() do
-        ChocolateBar:DisableDataObject(name)
+        Arcana:DisableDataObject(name)
     end
 end
 
 local function DisableLauncher()
     for name, obj in LibStub("LibDataBroker-1.1"):DataObjectIterator() do
         if obj.type ~= "data source" then
-            ChocolateBar:DisableDataObject(name)
+            Arcana:DisableDataObject(name)
         end
     end
 end
@@ -73,7 +73,7 @@ local function createPlaceholder()
     local placeholderNames = db.placeholderNames
     local name = L["Placeholder"] .. tablelength(placeholderNames)
     placeholderNames[name] = true
-    ChocolateBar:AddObjectOptions(name, ChocolateBar:NewPlaceholder(name))
+    Arcana:AddObjectOptions(name, Arcana:NewPlaceholder(name))
 end
 
 StaticPopupDialogs["ArcanaURLDialog"] = {
@@ -114,7 +114,7 @@ local opacityTimer = nil
 local aceoptions = {
     name = "|TInterface\\AddOns\\Arcana\\Media\\Icons\\ArcanaKnowledge.tga:" ..
         12 .. ":" .. 12 .. ":0:0|t " .. "Arcana - Quel'dorei Observatory",
-    handler = ChocolateBar,
+    handler = Arcana,
     type = 'group',
     --childGroups = "tab",
     desc = "Arcana - Quel'dorei Observatory",
@@ -237,7 +237,7 @@ local aceoptions = {
                             end,
                             set = function(_, value)
                                 db.moveFrames = value
-                                ChocolateBar:UpdateBarOptions("UpdateAutoHide")
+                                Arcana:UpdateBarOptions("UpdateAutoHide")
                             end,
                         },
                         hideBarsPetBattle = {
@@ -262,7 +262,7 @@ local aceoptions = {
                             end,
                             set = function(_, value)
                                 db.hideOrderHallCommandBar = value
-                                ChocolateBar:ToggleOrderHallCommandBar()
+                                Arcana:ToggleOrderHallCommandBar()
                             end,
                         },
                         --[[
@@ -277,7 +277,7 @@ local aceoptions = {
 								end,
 								set = function(info, value)
 										db.adjustCenter = value
-										ChocolateBar:UpdateBarOptions("UpdateBar")
+										Arcana:UpdateBarOptions("UpdateBar")
 								end,
 							},]] --
                         gap = {
@@ -293,8 +293,8 @@ local aceoptions = {
                             end,
                             set = function(_, value)
                                 db.gap = value
-                                ChocolateBar.ChocolatePiece:UpdateGap(value)
-                                ChocolateBar:UpdateChoclates("updateSettings")
+                                Arcana.ArcanaPiece:UpdateGap(value)
+                                Arcana:UpdatePlugins("updateSettings")
                             end,
                         },
                         textOffset = {
@@ -310,7 +310,7 @@ local aceoptions = {
                             end,
                             set = function(_, value)
                                 db.textOffset = value
-                                ChocolateBar:UpdateChoclates("updateSettings")
+                                Arcana:UpdatePlugins("updateSettings")
                             end,
                         },
                         size = {
@@ -326,7 +326,7 @@ local aceoptions = {
                             end,
                             set = function(_, value)
                                 db.height = value
-                                ChocolateBar:UpdateBarOptions("UpdateHeight")
+                                Arcana:UpdateBarOptions("UpdateHeight")
                             end,
                         },
                         iconSize = {
@@ -349,7 +349,7 @@ local aceoptions = {
                                     value = 0.001
                                 end
                                 db.iconSize = value
-                                ChocolateBar:UpdateBarOptions("UpdateHeight")
+                                Arcana:UpdateBarOptions("UpdateHeight")
                             end,
                         },
                         strata = {
@@ -371,7 +371,7 @@ local aceoptions = {
                             end,
                             set = function(_, value)
                                 db.strata = value
-                                ChocolateBar:UpdateBarOptions("UpdateStrata")
+                                Arcana:UpdateBarOptions("UpdateStrata")
                             end,
                         },
                         barRightClick = {
@@ -522,13 +522,13 @@ local aceoptions = {
                                             value = 0.001
                                         end
                                         db.combatopacity = value
-                                        for _, bar in pairs(ChocolateBar:GetBars()) do
+                                        for _, bar in pairs(Arcana:GetBars()) do
                                             bar.tempHide = bar:GetAlpha()
                                             bar:SetAlpha(db.combatopacity)
                                         end
-                                        ChocolateBar:CancelTimer(opacityTimer)
-                                        opacityTimer = ChocolateBar:ScheduleTimer(function(plugin)
-                                            for _, bar in pairs(ChocolateBar:GetBars()) do
+                                        Arcana:CancelTimer(opacityTimer)
+                                        opacityTimer = Arcana:ScheduleTimer(function(plugin)
+                                            for _, bar in pairs(Arcana:GetBars()) do
                                                 bar:SetAlpha(bar.settings.opacity)
                                             end
                                         end, 2)
@@ -562,7 +562,7 @@ local aceoptions = {
                                     set = function(_, r, g, b, a)
                                         local t = db.background.color
                                         t.r, t.g, t.b, t.a = r, g, b, a
-                                        ChocolateBar:UpdateBarOptions("UpdateColors")
+                                        Arcana:UpdateBarOptions("UpdateColors")
                                     end,
                                 },
                                 bordercolour = {
@@ -578,7 +578,7 @@ local aceoptions = {
                                     set = function(_, r, g, b, a)
                                         local t = db.background.borderColor
                                         t.r, t.g, t.b, t.a = r, g, b, a
-                                        ChocolateBar:UpdateBarOptions("UpdateColors")
+                                        Arcana:UpdateBarOptions("UpdateColors")
                                     end,
                                 },
                                 textureTile = {
@@ -591,7 +591,7 @@ local aceoptions = {
                                     end,
                                     set = function(_, value)
                                         db.background.tile = value
-                                        ChocolateBar:UpdateBarOptions("UpdateTexture")
+                                        Arcana:UpdateBarOptions("UpdateTexture")
                                     end,
                                 },
                                 textureTileSize = {
@@ -614,7 +614,7 @@ local aceoptions = {
                                             value = 1
                                         end
                                         db.background.tileSize = value
-                                        ChocolateBar:UpdateBarOptions("UpdateTexture")
+                                        Arcana:UpdateBarOptions("UpdateTexture")
                                     end,
                                 },
                             },
@@ -638,7 +638,7 @@ local aceoptions = {
                                     end,
                                     set = function(_, value)
                                         db.fontSize = value
-                                        ChocolateBar:UpdateChoclates("updatefont")
+                                        Arcana:UpdatePlugins("updatefont")
                                     end,
                                 },
                                 textcolour = {
@@ -656,7 +656,7 @@ local aceoptions = {
                                         db.textColor = db.textColor or { r = 1, g = 1, b = 1, a = 1 }
                                         local t = db.textColor
                                         t.r, t.g, t.b, t.a = r, g, b, a
-                                        ChocolateBar:UpdateChoclates("updateSettings")
+                                        Arcana:UpdatePlugins("updateSettings")
                                     end,
                                 },
                                 labelColor = {
@@ -673,7 +673,7 @@ local aceoptions = {
                                         db.labelColor = db.labelColor or { r = 1, g = 0.82, b = 0, a = 1 }
                                         local t = db.labelColor
                                         t.r, t.g, t.b, t.a = r, g, b, a
-                                        ChocolateBar:UpdateChoclates("updateSettings")
+                                        Arcana:UpdatePlugins("updateSettings")
                                     end,
                                 },
                                 iconcolour = {
@@ -690,9 +690,9 @@ local aceoptions = {
                                         for name, _ in broker:DataObjectIterator() do
                                             if db.objSettings[name] then
                                                 if db.objSettings[name].enabled then
-                                                    local choco = ChocolateBar:GetChocolate(name)
-                                                    if choco then
-                                                        choco:Update(choco, "iconR", nil)
+                                                    local plugin = Arcana:GetPlugin(name)
+                                                    if plugin then
+                                                        plugin:Update(plugin, "iconR", nil)
                                                     end
                                                 end
                                             end
@@ -713,9 +713,9 @@ local aceoptions = {
                                         for name, obj in broker:DataObjectIterator() do
                                             if db.objSettings[name] then
                                                 if db.objSettings[name].enabled then
-                                                    local choco = ChocolateBar:GetChocolate(name)
-                                                    if choco then
-                                                        choco:Update(choco, "text", obj.text)
+                                                    local plugin = Arcana:GetPlugin(name)
+                                                    if plugin then
+                                                        plugin:Update(plugin, "text", obj.text)
                                                     end
                                                 end
                                             end
@@ -734,10 +734,10 @@ local aceoptions = {
                     name = "Debug",
                     desc = "This one is for me, not for you :P",
                     get = function()
-                        return ChocolateBar.db.char.debug
+                        return Arcana.db.char.debug
                     end,
                     set = function(_, value)
-                        ChocolateBar.db.char.debug = value
+                        Arcana.db.char.debug = value
                     end,
                 },
                 --@end-debug@
@@ -755,8 +755,8 @@ local aceoptions = {
                     name = L["Create Bar"],
                     desc = L["Create New Bar"],
                     func = function()
-                        local name = ChocolateBar:AddBar()
-                        ChocolateBar:AddBarOptions(name)
+                        local name = Arcana:AddBar()
+                        Arcana:AddBarOptions(name)
                     end,
                 },
                 newPlaceholder = {
@@ -781,7 +781,7 @@ local aceoptions = {
                 },
             },
         },
-        chocolates = {
+        plugins = {
             name = L["Plugins"],
             type = "group",
             order = -1,
@@ -847,7 +847,7 @@ aceoptions.args.lookAndFeel.args.fontAndTextures.args.textures.args.textureStatu
         db.background.texture = LSM:Fetch("statusbar", value)
         db.background.textureName = value
         db.background.tile = false
-        ChocolateBar:UpdateBarOptions("UpdateTexture")
+        Arcana:UpdateBarOptions("UpdateTexture")
     end,
 }
 
@@ -873,7 +873,7 @@ aceoptions.args.lookAndFeel.args.fontAndTextures.args.textures.args.background1 
                 db.background.tile = true
                 local t = db.background.color
                 t.r, t.g, t.b, t.a = 1, 1, 1, 1
-                ChocolateBar:UpdateBarOptions("UpdateTexture")
+                Arcana:UpdateBarOptions("UpdateTexture")
             end,
         }
     }
@@ -892,23 +892,23 @@ aceoptions.args.lookAndFeel.args.fontAndTextures.args.font.args.font = {
     set = function(_, value)
         db.fontPath = LSM:Fetch("font", value)
         db.fontName = value
-        ChocolateBar:UpdateChoclates("updatefont")
+        Arcana:UpdatePlugins("updatefont")
     end,
 }
 
-local chocolateOptions = aceoptions.args.chocolates.args
+local arcanaOptions = aceoptions.args.plugins.args
 local barOptions = aceoptions.args.bars.args
 local moduleOptions = aceoptions.args.moduleOptions.args
-ChocolateBar.optionsTable = aceoptions
+Arcana.optionsTable = aceoptions
 ---
 -- placeholder options
 local function removePlaceholder(info)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     db.placeholderNames[cleanName] = nil
     print(db.placeholderNames)
-    ChocolateBar:DisableDataObject(name)
-    chocolateOptions[cleanName] = nil
+    Arcana:DisableDataObject(name)
+    arcanaOptions[cleanName] = nil
 end
 
 local placeholderOptions = {
@@ -936,7 +936,7 @@ local placeholderOptions = {
 local function addPlaceholderOption(cleanName)
     for k, _ in pairs(db.placeholderNames) do
         if cleanName == k then
-            table.insert(chocolateOptions[cleanName].args, placeholderOptions)
+            table.insert(arcanaOptions[cleanName].args, placeholderOptions)
         end
     end
 end
@@ -944,14 +944,14 @@ end
 -- bar option functions
 -----
 
-function ChocolateBar:GetAceOptions()
+function Arcana:GetAceOptions()
     return aceoptions
 end
 
 -- return the number of bars aligend to align (top or bottom)
-function ChocolateBar:GetNumBars(align)
+function Arcana:GetNumBars(align)
     local i = 0
-    for _, v in pairs(ChocolateBar:GetBars()) do
+    for _, v in pairs(Arcana:GetBars()) do
         if v.settings.align == align then
             i = i + 1
         end
@@ -961,7 +961,7 @@ end
 
 local function GetBarName(info)
     local name = info[#info]
-    local bar = ChocolateBar:GetBar(name)
+    local bar = Arcana:GetBar(name)
     if bar and bar.settings.align == "top" then
         name = name .. " (top) "
     elseif bar and bar.settings.align == "bottom" then
@@ -974,7 +974,7 @@ end
 
 local function GetBarIndex(info)
     local name = info[#info]
-    local bar = ChocolateBar:GetBar(name)
+    local bar = Arcana:GetBar(name)
     local index = bar.settings.index
     if db.barSettings[name].align == "bottom" then
         --reverse order and force below top bars
@@ -987,28 +987,28 @@ local function SetBarAlign(info, value)
     local name = info[#info - 2]
     if value then
         db.barSettings[name].align = value
-        local bar = ChocolateBar:GetBar(name)
+        local bar = Arcana:GetBar(name)
         if bar then
             bar:UpdateAutoHide(db)
-            ChocolateBar:AnchorBars()
+            Arcana:AnchorBars()
         end
     end
 end
 
-local function EatBar(info)
+local function RemoveBar(info)
     local name = info[#info - 2]
-    ChocolateBar:RemoveBar(name)
+    Arcana:RemoveBar(name)
 end
 
 local function MoveUp(info)
     local name = info[#info - 2]
-    local bar = ChocolateBar:GetBar(name)
+    local bar = Arcana:GetBar(name)
     local index = bar.settings.index
     if bar then
         if db.barSettings[name].align == "bottom" then
             index = index + 1.5
-            if index > (ChocolateBar:GetNumBars("bottom") + 1) then
-                index = ChocolateBar:GetNumBars("top") + 1
+            if index > (Arcana:GetNumBars("bottom") + 1) then
+                index = Arcana:GetNumBars("top") + 1
                 SetBarAlign(info, "top")
             end
         elseif db.barSettings[name].align == "top" then
@@ -1019,21 +1019,21 @@ local function MoveUp(info)
             SetBarAlign(info, "top")
         end
         bar.settings.index = index
-        ChocolateBar:AnchorBars()
+        Arcana:AnchorBars()
     end
 end
 
 local function MoveDown(info)
     local name = info[#info - 2]
-    local bar = ChocolateBar:GetBar(name)
+    local bar = Arcana:GetBar(name)
     local index = bar.settings.index
     if bar then
         if db.barSettings[name].align == "bottom" then
             index = index - 1.5
         elseif db.barSettings[name].align == "top" then
             index = index + 1.5
-            if index > (ChocolateBar:GetNumBars("top") + 1) then
-                index = ChocolateBar:GetNumBars("bottom") + 1
+            if index > (Arcana:GetNumBars("top") + 1) then
+                index = Arcana:GetNumBars("bottom") + 1
                 SetBarAlign(info, "bottom")
             end
         else
@@ -1042,7 +1042,7 @@ local function MoveDown(info)
             SetBarAlign(info, "top")
         end
         bar.settings.index = index
-        ChocolateBar:AnchorBars()
+        Arcana:AnchorBars()
     end
 end
 
@@ -1054,7 +1054,7 @@ end
 local function setAutoHide(info, value)
     local name = info[#info - 2]
     db.barSettings[name].autohide = value
-    local bar = ChocolateBar:GetBar(name)
+    local bar = Arcana:GetBar(name)
     bar:UpdateAutoHide(db)
 end
 
@@ -1072,7 +1072,7 @@ local function setOpacity(info, value)
         value = 0.001
     end
     db.barSettings[name].opacity = value
-    local bar = ChocolateBar:GetBar(name)
+    local bar = Arcana:GetBar(name)
     bar:SetAlpha(value)
 end
 
@@ -1091,12 +1091,12 @@ local function setOpacityMouseOver(info, value)
     end
     db.barSettings[name].opacityMouseOver = value
 
-    local bar = ChocolateBar:GetBar(name)
+    local bar = Arcana:GetBar(name)
     bar:SetAlpha(value)
 
-    ChocolateBar:CancelTimer(opacityTimer)
-    opacityTimer = ChocolateBar:ScheduleTimer(function(plugin)
-        for _, bar in pairs(ChocolateBar:GetBars()) do
+    Arcana:CancelTimer(opacityTimer)
+    opacityTimer = Arcana:ScheduleTimer(function(plugin)
+        for _, bar in pairs(Arcana:GetBars()) do
             bar:SetAlpha(db.barSettings[name].opacity or 1)
         end
     end, 2)
@@ -1122,7 +1122,7 @@ local function SetBarWidth(info, value)
     local name = info[#info - 2]
     local settings = db.barSettings[name]
     settings.width = value
-    local bar = ChocolateBar:GetBar(name)
+    local bar = Arcana:GetBar(name)
     if value > _G.GetScreenWidth() or value == 0 then
         bar:SetPoint("RIGHT", "UIParent", "RIGHT", 0, 0);
     else
@@ -1148,7 +1148,7 @@ end
 local function SetLockedBar(info, value)
     local name = info[#info - 2]
     local settings = db.barSettings[name]
-    local bar = ChocolateBar:GetBar(name)
+    local bar = Arcana:GetBar(name)
     bar.locked = not value
     if not value then
         --unlock
@@ -1169,7 +1169,7 @@ local function SetLockedBar(info, value)
             moveBarDummy:SetFrameLevel(10)
             moveBarDummy:SetScript("OnMouseUp", function(_, btn)
                 if btn == "RightButton" then
-                    ChocolateBar:ChatCommand()
+                    Arcana:ChatCommand()
                 end
             end)
         end
@@ -1185,12 +1185,12 @@ local function SetLockedBar(info, value)
         bar:SetScript("OnDragStart", OnDragStart)
         bar:SetScript("OnDragStop", OnDragStop)
         bar:SetClampedToScreen(true)
-        for _, v in pairs(bar.chocolist) do
+        for _, v in pairs(bar.pluginList) do
             v:Hide()
         end
     else
         bar:SetClampedToScreen(false)
-        for _, v in pairs(bar.chocolist) do
+        for _, v in pairs(bar.pluginList) do
             v:Show()
         end
         bar:SetScript("OnDragStart", nil)
@@ -1212,12 +1212,12 @@ end
 
 local function SetFreeBar(info, value)
     local name = info[#info - 2]
-    local bar = ChocolateBar:GetBar(name)
+    local bar = Arcana:GetBar(name)
     if not value then
         SetLockedBar(info, true)
         db.barSettings[name].align = "top"
         bar:SetPoint("RIGHT", "UIParent", "RIGHT", 0, 0);
-        ChocolateBar:AnchorBars()
+        Arcana:AnchorBars()
     else
         db.barSettings[name].align = "custom"
     end
@@ -1226,7 +1226,7 @@ end
 
 local function GetLockedBar(info)
     local name = info[#info - 2]
-    local bar = ChocolateBar:GetBar(name)
+    local bar = Arcana:GetBar(name)
     return not bar.locked
 end
 
@@ -1246,25 +1246,25 @@ end
 
 local function IsDisabledMoveDown(info)
     local name = info[#info - 2]
-    local bar = ChocolateBar:GetBar(name)
+    local bar = Arcana:GetBar(name)
     local settings = bar.settings
     return settings.align == "custom" or (settings.align == "bottom" and settings.index < 1.5)
 end
 
 local function IsDisabledMoveUp(info)
     local name = info[#info - 2]
-    local bar = ChocolateBar:GetBar(name)
+    local bar = Arcana:GetBar(name)
     local settings = db.barSettings[name]
     return settings.align == "custom" or (settings.align == "top" and bar.settings.index < 1.5)
 end
 
 -----
--- chocolate option functions
+-- plugin option functions
 -----
 local function GetName(info)
     local cleanName = info[#info]
-    local name = chocolateOptions[cleanName].desc
-    --local icon = chocolateOptions[cleanName].icon
+    local name = arcanaOptions[cleanName].desc
+    --local icon = arcanaOptions[cleanName].icon
     local dataobj = broker:GetDataObjectByName(name)
     if (not db.objSettings[name].enabled) then
         -- disabled
@@ -1282,43 +1282,43 @@ end
 
 local function GetType(info)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     return (broker:GetDataObjectByName(name).type == "data source" and L["Type"] .. ": " .. L["Data Source"] .. "\n") or
         L["Type"] .. ": " .. L["Launcher"] .. "\n"
 end
 
 local function GetAlignment(info)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     return db.objSettings[name].align
 end
 
 local function SetAlignment(info, value)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     db.objSettings[name].align = value
-    local choco = ChocolateBar:GetChocolate(name)
+    local plugin = Arcana:GetPlugin(name)
     db.objSettings[name].index = 500
-    if choco and choco.bar then
-        choco.bar:UpdateBar(true)
-        --choco.bar:UpdateBar()
+    if plugin and plugin.bar then
+        plugin.bar:UpdateBar(true)
+        --plugin.bar:UpdateBar()
     end
 end
 
 local function SetEnabled(info, value)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     if value then
         local obj = broker:GetDataObjectByName(name)
-        ChocolateBar:EnableDataObject(name, obj)
+        Arcana:EnableDataObject(name, obj)
     else
-        ChocolateBar:DisableDataObject(name)
+        Arcana:DisableDataObject(name)
     end
 end
 
 local function GetEnabled(info)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     return db.objSettings[name].enabled
 end
 
@@ -1328,98 +1328,98 @@ end
 
 local function GetIcon(info)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     return db.objSettings[name].showIcon
 end
 
 local function SetIcon(info, value)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     db.objSettings[name].showIcon = value
-    ChocolateBar:AttributeChanged(nil, name, "updateSettings", value)
+    Arcana:AttributeChanged(nil, name, "updateSettings", value)
 end
 
 local function GetCustomLabel(info)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     return db.objSettings[name].customLabel
 end
 
 local function SetCustomLabel(info, value)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     db.objSettings[name].customLabel = value
-    ChocolateBar:AttributeChanged(nil, name, "updateSettings", value)
+    Arcana:AttributeChanged(nil, name, "updateSettings", value)
 end
 
 local function GetDisableTooltip(info)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     return db.objSettings[name].disableTooltip
 end
 
 local function SetDisableTooltip(info, value)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     db.objSettings[name].disableTooltip = value
-    ChocolateBar:AttributeChanged(nil, name, "updateSettings", value)
+    Arcana:AttributeChanged(nil, name, "updateSettings", value)
 end
 
 local function GetLabel(info)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     return db.objSettings[name].showLabel
 end
 
 local function SetLabel(info, value)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     db.objSettings[name].showLabel = value
-    ChocolateBar:AttributeChanged(nil, name, "updateSettings", value)
+    Arcana:AttributeChanged(nil, name, "updateSettings", value)
 end
 
 local function GetText(info)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     return db.objSettings[name].showText
 end
 
 local function SetText(info, value)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     db.objSettings[name].showText = value
-    ChocolateBar:AttributeChanged(nil, name, "updateSettings", value)
+    Arcana:AttributeChanged(nil, name, "updateSettings", value)
 end
 
 local function GetTextOffset(info)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     return db.objSettings[name].textOffset or db.textOffset
 end
 
 local function SetTextOffset(info, value)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     db.objSettings[name].textOffset = value
-    ChocolateBar:AttributeChanged(nil, name, "updateSettings", value)
+    Arcana:AttributeChanged(nil, name, "updateSettings", value)
 end
 
 local function GetWidth(info)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     return db.objSettings[name].width
 end
 
 local function SetWidth(info, value)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     db.objSettings[name].width = value
-    ChocolateBar:AttributeChanged(nil, name, "updateSettings", value)
+    Arcana:AttributeChanged(nil, name, "updateSettings", value)
 end
 
 local function GetWidthBehavior(info)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     if not db.objSettings[name].widthBehavior and db.objSettings[name].width == 0 then
         return "free"
     else
@@ -1429,32 +1429,32 @@ end
 
 local function SetWidthBehavior(info, value)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     db.objSettings[name].widthBehavior = value
-    ChocolateBar:AttributeChanged(nil, name, "updateSettings", value)
+    Arcana:AttributeChanged(nil, name, "updateSettings", value)
 end
 
 local function IsDisabledTextWidth(info)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     return true and (db.objSettings[name].widthBehavior == "free" or not db.objSettings[name].widthBehavior) or false
 end
 
 local function GetIconImage(info, name)
     if info then
         local cleanName = info[#info]
-        name = chocolateOptions[cleanName].desc
+        name = arcanaOptions[cleanName].desc
     end
     local obj = broker:GetDataObjectByName(name)
     if obj and obj.icon then
         return obj.icon
     end
-    return "Interface\\AddOns\\Arcana\\pics\\ChocolatePiece"
+    return "Interface\\AddOns\\Arcana\\Media\\ArcanaKnowledge"
 end
 
 local function GetIconCoords(info)
     local cleanName = info[#info]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     local obj = broker:GetDataObjectByName(name)
     if obj and obj.iconCoords then
         return obj.iconCoords
@@ -1463,124 +1463,124 @@ end
 
 local function IsDisabledIcon(info)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     local obj = broker:GetDataObjectByName(name)
     return not (obj and obj.icon) --return true if there is no icon
 end
 
 local function IsDisabledSetTextOffset(info)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     return not db.objSettings[name].textOffset
 end
 
 local function IsEnabledSetTextOffset(info)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     return db.objSettings[name].textOffset
 end
 
 local function SetEnabledSetTextOffset(info, value)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     local settings = db.objSettings[name]
     if settings.textOffset then
         settings.textOffset = nil
     else
         settings.textOffset = db.textOffset
     end
-    ChocolateBar:AttributeChanged(nil, name, "updateSettings", value)
+    Arcana:AttributeChanged(nil, name, "updateSettings", value)
 end
 
 local function SetEnabledOverwriteIconSize(info, value)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     local settings = db.objSettings[name]
     if settings.iconSize then
         settings.iconSize = nil
     else
         settings.iconSize = db.iconSize
     end
-    ChocolateBar:AttributeChanged(nil, name, "updateSettings", value)
+    Arcana:AttributeChanged(nil, name, "updateSettings", value)
 end
 
 local function SetCustomIconSize(info, value)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     if value > 1 then
         value = 1
     elseif value < 0.01 then
         value = 0.001
     end
     db.objSettings[name].iconSize = value
-    ChocolateBar:UpdateBarOptions("UpdateHeight")
+    Arcana:UpdateBarOptions("UpdateHeight")
 end
 
 local function GetCustomIconSize(info)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     return db.objSettings[name].iconSize or db.iconSize
 end
 
 local function IsEnabledOvwerwriteIconSize(info)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     return db.objSettings[name].iconSize
 end
 
 local function IsDisabledOvwerwriteIconSize(info)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     return not db.objSettings[name].iconSize
 end
 
 
 local function GetHeaderName(info)
     local cleanName = info[#info - 1]
-    local name = chocolateOptions[cleanName].desc
+    local name = arcanaOptions[cleanName].desc
     return "|T" .. GetIconImage(nil, name) .. ":18|t " .. name
 end
 
 local function ShowPluginOnBar(info)
     local cleanName = info[#info - 2]
-    local name = chocolateOptions[cleanName].desc
-    local choco = ChocolateBar:GetChocolate(name)
-    if choco then
-        choco.blinkTimerCount = 0
+    local name = arcanaOptions[cleanName].desc
+    local plugin = Arcana:GetPlugin(name)
+    if plugin then
+        plugin.blinkTimerCount = 0
 
-        local pointer = ChocolateBar:GetPointer(choco)
+        local pointer = Arcana:GetPointer(plugin)
         pointer:ClearAllPoints()
-        pointer:SetPoint("CENTER", choco, "CENTER", pointer:GetWidth() / 2, 0)
+        pointer:SetPoint("CENTER", plugin, "CENTER", pointer:GetWidth() / 2, 0)
         pointer:SetAlpha(0)
         pointer:Hide()
         pointer:Show()
-        choco.timer = ChocolateBar:ScheduleRepeatingTimer(function(plugin)
+        plugin.timer = Arcana:ScheduleRepeatingTimer(function(plugin)
             local c = plugin.blinkTimerCount
             c = c + 1
             plugin:highlight(1, 0, 0, c % 2)
             pointer:SetAlpha(c % 2)
             if c >= 10 then
-                ChocolateBar:CancelTimer(plugin.timer)
+                Arcana:CancelTimer(plugin.timer)
                 plugin:highlight(1, 0, 0, 0)
                 pointer:SetAlpha(0)
                 pointer:Hide()
             end
             plugin.blinkTimerCount = c
-        end, 0.1, choco)
+        end, 0.1, plugin)
     end
 end
 
-function ChocolateBar:UpdateOptions(chocolateBars)
+function Arcana:UpdateOptions(arcanaBars)
     for name, obj in broker:DataObjectIterator() do
-        ChocolateBar:AddObjectOptions(name, obj)
+        Arcana:AddObjectOptions(name, obj)
     end
 
-    for name, _ in pairs(chocolateBars) do
-        ChocolateBar:AddBarOptions(name)
+    for name, _ in pairs(arcanaBars) do
+        Arcana:AddBarOptions(name)
     end
 end
 
-function ChocolateBar:RegisterOptions(data, _, modules)
+function Arcana:RegisterOptions(data, _, modules)
     db = data
 
     LibStub("AceConfig-3.0"):RegisterOptionsTable("Arcana", aceoptions)
@@ -1591,7 +1591,7 @@ function ChocolateBar:RegisterOptions(data, _, modules)
     self.db.RegisterCallback(self, "OnProfileCopied", "OnProfileChanged")
     self.db.RegisterCallback(self, "OnProfileReset", "OnProfileChanged")
 
-    AceCfgDlg:SelectGroup("Arcana", "chocolates")
+    AceCfgDlg:SelectGroup("Arcana", "plugins")
     AceCfgDlg:SelectGroup("Arcana", "bars")
     AceCfgDlg:SelectGroup("Arcana", "general")
     AceCfgDlg:SelectGroup("Arcana", "lookAndFeel")
@@ -1603,11 +1603,11 @@ function ChocolateBar:RegisterOptions(data, _, modules)
     end
 end
 
-function ChocolateBar:OpenOptions(_, _, input, pluginName, _, blizzard)
+function Arcana:OpenOptions(_, _, input, pluginName, _, blizzard)
     --local AceCfgDlg = LibStub("AceConfigDialog-3.0")
 
     if pluginName then
-        AceCfgDlg:SelectGroup("Arcana", "chocolates", pluginName)
+        AceCfgDlg:SelectGroup("Arcana", "plugins", pluginName)
     end
 
     if blizzard then
@@ -1615,15 +1615,15 @@ function ChocolateBar:OpenOptions(_, _, input, pluginName, _, blizzard)
     elseif not input or input:trim() == "" then
         AceCfgDlg:Open("Arcana")
     else
-        LibStub("AceConfigCmd-3.0").HandleCommand(ChocolateBar, "Arcana", "Arcana", input)
+        LibStub("AceConfigCmd-3.0").HandleCommand(Arcana, "Arcana", "Arcana", input)
     end
 end
 
-function ChocolateBar:AddModuleOptions(name, options)
+function Arcana:AddModuleOptions(name, options)
     moduleOptions[name] = options
 end
 
-function ChocolateBar:AddBarOptions(name)
+function Arcana:AddBarOptions(name)
     barOptions[name] = {
         name = GetBarName,
         desc = name,
@@ -1673,12 +1673,12 @@ function ChocolateBar:AddBarOptions(name)
                         set = setOpacityMouseOver,
                         disabled = getAutoHide
                     },
-                    eatBar = {
+                    removeBar = {
                         type = 'execute',
                         order = 6,
                         name = L["Remove Bar"],
                         desc = L["Removes the selected Bar."],
-                        func = EatBar,
+                        func = RemoveBar,
                         disabled = IsDisabledRemoveBar,
                         confirm = true,
                     },
@@ -1758,20 +1758,20 @@ function ChocolateBar:AddBarOptions(name)
     }
 end
 
-function ChocolateBar:RemoveBarOptions(name)
+function Arcana:RemoveBarOptions(name)
     barOptions[name] = nil
 end
 
-function ChocolateBar:RemovePluginOptions(cleanName)
-    chocolateOptions[cleanName] = nil
+function Arcana:RemovePluginOptions(cleanName)
+    arcanaOptions[cleanName] = nil
 end
 
 local alignments         = { left = L["Left"], center = L["Center"], right = L["Right"] }
 local widthBehaviorTypes = { free = L["Free"], fixed = L["Fixed"], max = L["Max"] }
 
-function ChocolateBar:AddObjectOptions(name, obj)
+function Arcana:AddObjectOptions(name, obj)
     if not obj or not obj.type or (obj.type ~= "data source" and obj.type ~= "launcher") then
-        ChocolateBar:Log("Not adding plugin object: ", obj)
+        Arcana:Log("Not adding plugin object: ", obj)
         return
     end
     --local curse = C_AddOns.GetAddOnMetadata(name,"X-Curse-Packaged-Version") or ""
@@ -1788,7 +1788,7 @@ function ChocolateBar:AddObjectOptions(name, obj)
     cleanName = string.gsub(cleanName, "[%c \127]", "")
 
     --use cleanName of name because aceconfig does not like some characters in the plugin names
-    chocolateOptions[cleanName] = {
+    arcanaOptions[cleanName] = {
         --name = GetObjectText,
         name = GetName,
         desc = name,
@@ -1797,7 +1797,7 @@ function ChocolateBar:AddObjectOptions(name, obj)
         iconCoords = GetIconCoords,
         type = "group",
         args = {
-            chocoSettings = {
+            pluginSettings = {
                 inline = true,
                 name = GetHeaderName,
                 type = "group",
@@ -1967,22 +1967,22 @@ function ChocolateBar:AddObjectOptions(name, obj)
     addPlaceholderOption(cleanName)
 end
 
-function ChocolateBar:AddCustomPluginOptions(pluginName, customOptions)
-    for cleanName, _ in pairs(chocolateOptions) do
+function Arcana:AddCustomPluginOptions(pluginName, customOptions)
+    for cleanName, _ in pairs(arcanaOptions) do
         if cleanName == pluginName then
-            table.insert(chocolateOptions[cleanName].args, customOptions)
+            table.insert(arcanaOptions[cleanName].args, customOptions)
         end
     end
 end
 
 -- remove a bar and disalbe all plugins in it
-function ChocolateBar:RemoveBar(name)
+function Arcana:RemoveBar(name)
     local bar = self:GetBar(name)
     Drag:UnregisterFrame(bar)
     if bar then
-        ChocolateBar:RemoveBarOptions(name)
+        Arcana:RemoveBarOptions(name)
         bar:Disable()
-        for objName, _ in pairs(bar.chocolist) do
+        for objName, _ in pairs(bar.pluginList) do
             self:DisableDataObject(objName)
         end
         self:GetBars()[name] = nil
@@ -1993,7 +1993,7 @@ end
 
 -- call when general bar options change
 -- updatekey: the key of the update function
-function ChocolateBar:UpdateBarOptions(updatekey)
+function Arcana:UpdateBarOptions(updatekey)
     for _, bar in pairs(self:GetBars()) do
         local func = bar[updatekey]
         if func then
@@ -2002,21 +2002,21 @@ function ChocolateBar:UpdateBarOptions(updatekey)
     end
 end
 
-function ChocolateBar:OnProfileChanged(_, database)
+function Arcana:OnProfileChanged(_, database)
     db = database.profile
     self:UpdateDB(db)
 
     -- itaret modules list and call each enable fuction
-    for name, _ in pairs(ChocolateBar.modules) do
+    for name, _ in pairs(Arcana.modules) do
         if db.moduleSettings[name].enabled then
-            ChocolateBar:EnableModule(name)
+            Arcana:EnableModule(name)
         else
-            ChocolateBar:DisableModule(name)
+            Arcana:DisableModule(name)
         end
     end
 
     for k, v in pairs(self:GetBars()) do
-        ChocolateBar:RemoveBarOptions(k)
+        Arcana:RemoveBarOptions(k)
         v:Hide()
         Drag:UnregisterFrame(v)
         v = nil
@@ -2036,9 +2036,9 @@ function ChocolateBar:OnProfileChanged(_, database)
         if t == "data source" or t == "launcher" then
             --for name, obj in pairs(dataObjects) do
             if db.objSettings[name].enabled then
-                local choco = self:GetChocolate(name)
-                if choco then
-                    choco.settings = db.objSettings[name]
+                local plugin = self:GetPlugin(name)
+                if plugin then
+                    plugin.settings = db.objSettings[name]
                 end
                 self:DisableDataObject(name)
                 self:EnableDataObject(name, obj, true) --no bar update
@@ -2047,8 +2047,8 @@ function ChocolateBar:OnProfileChanged(_, database)
             end
         end
     end
-    self:UpdateBars(true) --update chocolateBars here
-    self:UpdateChoclates("resizeFrame")
-    moreChocolate = broker:GetDataObjectByName("MoreChocolate")
-    if moreChocolate then moreChocolate:SetBar(db) end
+    self:UpdateBars(true) --update arcanaBars here
+    self:UpdatePlugins("resizeFrame")
+    moreArcana = broker:GetDataObjectByName("MoreArcana")
+    if moreArcana then moreArcana:SetBar(db) end
 end

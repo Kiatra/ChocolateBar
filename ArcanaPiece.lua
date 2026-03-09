@@ -1,16 +1,16 @@
 -- -- ✧──────────────────────────────────────────────✧
 --  Arcana
---  Arcana.lua
+--  ArcanaPiece.lua
 --
 --  The knowledge (plugin) magic
 --
 --  Made with love by Kiatra ♡
 --  Soooory for all the bugs and taints over the many years :D
 -- ✧──────────────────────────────────────────────✧
-local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("Arcana")
+local Arcana = LibStub("AceAddon-3.0"):GetAddon("Arcana")
 local LSM = LibStub("LibSharedMedia-3.0")
-local ChocolatePiece = ChocolateBar.ChocolatePiece
-local Drag = ChocolateBar.Drag
+local ArcanaPiece = Arcana.ArcanaPiece
+local Drag = Arcana.Drag
 local _G, unpack, ipairs = _G, unpack, ipairs
 local GameTooltip, CreateFrame = GameTooltip, CreateFrame
 local tempAutoHide, db
@@ -233,14 +233,14 @@ local function PrepareTooltip(frame, anchorFrame)
 end
 
 local function OnEnter(self)
-    if (db.combathidebar and ChocolateBar.InCombat) or ChocolateBar.dragging then return end
+    if (db.combathidebar and Arcana.InCombat) or Arcana.dragging then return end
 
     local obj  = self.obj
     local name = self.name
     local bar  = self.bar
     bar:OnEnter()
 
-    if db.combathidetip and ChocolateBar.InCombat then return end
+    if db.combathidetip and Arcana.InCombat then return end
 
     if tooltipDisabled(self) then return end
 
@@ -264,7 +264,7 @@ local function OnEnter(self)
 end
 
 local function OnLeave(self)
-    if db.combathidebar and ChocolateBar.InCombat then return end
+    if db.combathidebar and Arcana.InCombat then return end
 
     local obj  = self.obj
     local name = self.name
@@ -276,7 +276,7 @@ local function OnLeave(self)
         GameTooltip:Hide()
     end
 
-    if db.combathidetip and ChocolateBar.InCombat then return end
+    if db.combathidetip and Arcana.InCombat then return end
     if obj.OnLeave then
         obj.OnLeave(self)
     elseif obj.tooltip then
@@ -287,7 +287,7 @@ local function OnLeave(self)
 end
 
 local function OnClick(self, ...)
-    if db.combatdisbar and ChocolateBar.InCombat then return end
+    if db.combatdisbar and Arcana.InCombat then return end
     if self.obj.OnClick then
         self.obj.OnClick(self, ...)
     end
@@ -308,13 +308,13 @@ local function Update(self, f, key, value, name)
 end
 
 local function OnDragStart(frame)
-    if not ChocolateBar.db.profile.locked or _G.IsAltKeyDown() then
+    if not Arcana.db.profile.locked or _G.IsAltKeyDown() then
         local bar = frame.bar
-        ChocolateBar:TempDisAutohide(true)
-        ChocolateBar.dragging = true
+        Arcana:TempDisAutohide(true)
+        Arcana.dragging = true
 
-        if ChocolateBar.db.profile.colorizedDragging then
-            ChocolateBar:ExecuteforAllChoclates(function(frame)
+        if Arcana.db.profile.colorizedDragging then
+            Arcana:ExecuteforAllPlugins(function(frame)
                 frame:highlight(math.random(), math.random(), math.random(), .8)
             end)
         end
@@ -328,7 +328,7 @@ local function OnDragStart(frame)
             end
         end
 
-        ChocolateBar:SetDropPoins(frame)
+        Arcana:SetDropPoins(frame)
         Drag:Start(bar, frame.name, frame)
         frame:StartMoving()
         frame.isMoving = true
@@ -337,16 +337,16 @@ local function OnDragStart(frame)
 end
 
 local function OnDragStop(frame)
-    if ChocolateBar.dragging then
+    if Arcana.dragging then
         --frame:highlight(0)
-        ChocolateBar:ExecuteforAllChoclates(function(f) f:highlight(0, 0, 0, 0) end)
+        Arcana:ExecuteforAllPlugins(function(f) f:highlight(0, 0, 0, 0) end)
         frame:StopMovingOrSizing()
         frame.isMoving = false
         Drag:Stop(frame)
-        ChocolateBar.dropFrames:Hide()
-        ChocolateBar.dragging = false
+        Arcana.dropFrames:Hide()
+        Arcana.dragging = false
         frame:SetParent(frame.bar)
-        ChocolateBar:TempDisAutohide()
+        Arcana:TempDisAutohide()
     end
 end
 
@@ -368,71 +368,71 @@ local function isLauncherAndHasNoText(obj)
     return obj.type and obj.type == "launcher" and (obj.text == nil or obj.text == "")
 end
 
-function ChocolatePiece:New(name, obj, settings, database)
+function ArcanaPiece:New(name, obj, settings, database)
     db = database
 
     local icon = obj.icon
-    local chocolate = CreateFrame("Button", "Chocolate" .. name, _G.UIParent,
+    local plugin = CreateFrame("Button", "Arcana" .. name, _G.UIParent,
         BackdropTemplateMixin and "BackdropTemplate")
     ---@diagnostic disable-next-line: inject-field
-    chocolate.highlight = highlightBackground
+    plugin.highlight = highlightBackground
 
     --set update function
     ---@diagnostic disable-next-line: inject-field
-    chocolate.Update = Update
+    plugin.Update = Update
     ---@diagnostic disable-next-line: inject-field
-    chocolate.obj = obj
+    plugin.obj = obj
 
     ---@diagnostic disable-next-line: param-type-mismatch
-    chocolate:EnableMouse(true)
-    chocolate:RegisterForDrag("LeftButton")
+    plugin:EnableMouse(true)
+    plugin:RegisterForDrag("LeftButton")
 
     local fontPath = db.fontPath == " " and LSM:GetDefault("font") or db.fontPath
 
     ---@diagnostic disable-next-line: inject-field, param-type-mismatch
-    chocolate.text = chocolate:CreateFontString(nil, nil, "GameFontHighlight")
+    plugin.text = plugin:CreateFontString(nil, nil, "GameFontHighlight")
     ---@diagnostic disable-next-line: missing-parameter
-    chocolate.text:SetFont(db.fontPath, db.fontSize)
-    chocolate.text:SetJustifyH("LEFT")
+    plugin.text:SetFont(db.fontPath, db.fontSize)
+    plugin.text:SetJustifyH("LEFT")
 
     if isLauncherAndHasNoText(obj) then
         obj.text = obj.label and obj.label or name
     end
 
     if icon then
-        CreateIcon(chocolate, icon)
+        CreateIcon(plugin, icon)
     end
 
-    chocolate:SetScript("OnEnter", OnEnter)
-    chocolate:SetScript("OnLeave", OnLeave)
-    chocolate:RegisterForClicks("AnyUp")
-    chocolate:SetScript("OnClick", OnClick)
-    chocolate:SetScript("OnMouseWheel", OnMouseWheel)
+    plugin:SetScript("OnEnter", OnEnter)
+    plugin:SetScript("OnLeave", OnLeave)
+    plugin:RegisterForClicks("AnyUp")
+    plugin:SetScript("OnClick", OnClick)
+    plugin:SetScript("OnMouseWheel", OnMouseWheel)
 
-    chocolate:Show()
+    plugin:Show()
     ---@diagnostic disable-next-line: inject-field
-    chocolate.settings = settings
+    plugin.settings = settings
 
     if not obj.label then
         obj.label = name
     end
 
     ---@diagnostic disable-next-line: inject-field
-    chocolate.name = name
+    plugin.name = name
     ---@diagnostic disable-next-line: param-type-mismatch
-    chocolate:SetMovable(true)
-    chocolate:SetScript("OnDragStart", OnDragStart)
-    chocolate:SetScript("OnDragStop", OnDragStop)
-    SettingsUpdater(chocolate, settings.showText)
-    LabelUpdater(chocolate, obj.label)
+    plugin:SetMovable(true)
+    plugin:SetScript("OnDragStart", OnDragStart)
+    plugin:SetScript("OnDragStop", OnDragStop)
+    SettingsUpdater(plugin, settings.showText)
+    LabelUpdater(plugin, obj.label)
 
-    return chocolate
+    return plugin
 end
 
-function ChocolatePiece:UpdateDB(database)
+function ArcanaPiece:UpdateDB(database)
     db = database
 end
 
-function ChocolatePiece:UpdateGap(val)
+function ArcanaPiece:UpdateGap(val)
     db.gap = val
 end

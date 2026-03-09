@@ -1,5 +1,5 @@
 ﻿local LibStub = LibStub
-local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("Arcana")
+local Arcana = LibStub("AceAddon-3.0"):GetAddon("Arcana")
 local L = LibStub("AceLocale-3.0"):GetLocale("Arcana")
 
 local addonName = "Coordinates"
@@ -10,7 +10,7 @@ local counter = 0
 local volumeText = "Coordinates"
 
 
-local Module = ChocolateBar:NewModule(addonName, {
+local Module = Arcana:NewModule(addonName, {
     description = L["Shows player coordinates"],
     defaults = {
         enabled = true,

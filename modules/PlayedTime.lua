@@ -1,8 +1,7 @@
-﻿-- a LDB object that will show/hide the chocolatebar set in the chocolatebar options
-local LibStub = LibStub
+﻿local LibStub = LibStub
 local L = LibStub("AceLocale-3.0"):GetLocale("Arcana")
 local acetimer = LibStub("AceTimer-3.0")
-local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("Arcana")
+local Arcana = LibStub("AceAddon-3.0"):GetAddon("Arcana")
 local ReportPlayedTimeToChat = true
 local dataobj, db
 local name, server
@@ -99,7 +98,7 @@ local function updateText()
     end
 end
 
-local Module = ChocolateBar:NewModule(addonName, {
+local Module = Arcana:NewModule(addonName, {
     description = L["Shows the played time for all characters. You need to login with each character first."],
     defaults = {
         enabled = true,

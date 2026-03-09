@@ -1,20 +1,20 @@
 -- DragAndDrop by yess
--- this adds drag and drop support between bars/drop points for ChocolateBar
-local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("Arcana")
-local Drag = ChocolateBar.Drag
+-- this adds drag and drop support between bars/drop points for Arcana
+local Arcana = LibStub("AceAddon-3.0"):GetAddon("Arcana")
+local Drag = Arcana.Drag
 local frameslist = {}
 local DragUpdate = CreateFrame("Frame")
 local GetCursorPosition, pairs = GetCursorPosition, pairs
 local counter = 0
 local delay = .1
 local focus = nil
-local choconame
+local pluginName
 
 local function ChangeFocus(newfocus)
     if focus and focus.LoseFocus then
-        focus:LoseFocus(choconame)
+        focus:LoseFocus(pluginName)
     end
-    newfocus:GetFocus(choconame)
+    newfocus:GetFocus(pluginName)
     focus = newfocus
 end
 
@@ -34,8 +34,8 @@ local function GetFocus()
             end
         end
     end
-    if focus and focus.UpdateDragChocolate then
-        focus:UpdateDragChocolate()
+    if focus and focus.UpdateDragPlugin then
+        focus:UpdateDragPlugin()
     end
     return focus
 end
@@ -60,13 +60,13 @@ function Drag:UnregisterFrame(frame)
     frameslist[frame:GetName()] = nil
 end
 
-function Drag:Start(bar, name, choco)
+function Drag:Start(bar, name, _)
     for k, v in pairs(frameslist) do
         v.dragshow = v:IsVisible()
         v:Show()
     end
 
-    choconame = name
+    pluginName = name
     bar:Drag(name)
     focus = bar
     DragUpdate:SetScript("OnUpdate", OnDragUpdate)

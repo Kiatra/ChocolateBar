@@ -1,7 +1,7 @@
 name: Bug Report
-description: Report a bug in ChocolateBar
+description: Report a bug in Arcana
 title: "[Bug Report] <title here>"
-labels: ['bug', 'needs-investigation']
+labels: ["bug", "needs-investigation"]
 body:
   - type: dropdown
     id: game-version
@@ -21,7 +21,7 @@ body:
       label: Troubleshooting
       description: By submitting this issue you agree that you have followed our Troubleshooting steps.
       options:
-        - label: I have verified that ChocolateBar is up to date.
+        - label: I have verified that Arcana is up to date.
           required: true
         - label: I have tried to reproduce the bug with no other addons loaded.
           required: true
