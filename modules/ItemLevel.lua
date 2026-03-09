@@ -1,6 +1,5 @@
-﻿-- a LDB object that will show/hide the chocolatebar set in the chocolatebar options
-local LibStub = LibStub
-local addonName = "CB_ItemLevel"
+﻿local LibStub = LibStub
+local addonName = "Arcana-ItemLevel"
 
 local GetAverageItemLevel = GetAverageItemLevel or
     function()
@@ -11,7 +10,6 @@ local GetAverageItemLevel = GetAverageItemLevel or
 local dataobj = LibStub("LibDataBroker-1.1"):NewDataObject(addonName, {
     type        = "data source",
     description = "A broker plugin to show the characters item level",
-    --icon = "Interface\\AddOns\\Arcana\\pics\\ChocolatePiece",
     label       = "Item Level",
     text        = "iLevel: ---",
     enabled     = false,

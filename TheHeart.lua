@@ -22,7 +22,7 @@
 --  Everyone who submitted a friendly bug report ;)
 -- ✧────────────────────────────────────────────────────✧
 local LibStub, broker, LSM = LibStub, LibStub("LibDataBroker-1.1"), LibStub("LibSharedMedia-3.0")
-local ChocolateBar = LibStub("AceAddon-3.0"):NewAddon("Arcana", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
+local Arcana = LibStub("AceAddon-3.0"):NewAddon("Arcana", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("Arcana")
 local _G, pairs, ipairs, table, string, tostring = _G, pairs, ipairs, table, string, tostring
 local select, strjoin, CreateFrame = select, strjoin, CreateFrame
@@ -31,25 +31,25 @@ local _, _, _, tocversion = GetBuildInfo()
 
 local addonVersion = C_AddOns.GetAddOnMetadata("Arcana", "Version")
 
-ChocolateBar.Jostle = {}
-ChocolateBar.Bar = {}
-ChocolateBar.ChocolatePiece = {}
-ChocolateBar.Drag = {}
-ChocolateBar.modules = {}
+Arcana.Jostle = {}
+Arcana.Bar = {}
+Arcana.ArcanaPiece = {}
+Arcana.Drag = {}
+Arcana.modules = {}
 
-local Drag = ChocolateBar.Drag
-local Chocolate = ChocolateBar.ChocolatePiece
-local Bar = ChocolateBar.Bar
+local Drag = Arcana.Drag
+local ArcanaPiece = Arcana.ArcanaPiece
+local Bar = Arcana.Bar
 
-local chocolateBars = {}
-local chocolateObjects = {}
-local db --reference to ChocolateBar.db.profile
+local arcanaBars = {}
+local pluginObjects = {}
+local db --reference to Arcana.db.profile
 
 --------
 -- utility functions
 --------
 local function debug(...)
-    if ChocolateBar.db and ChocolateBar.db.char.debug then
+    if Arcana.db and Arcana.db.char.debug then
         local s = "CB:"
         for i = 1, select("#", ...) do
             local x = select(i, ...)
@@ -59,11 +59,11 @@ local function debug(...)
     end
 end
 
-function ChocolateBar:Debug(...)
+function Arcana:Debug(...)
     debug(self, ...)
 end
 
-function ChocolateBar:Log(...)
+function Arcana:Log(...)
     debug(self, ...)
 end
 
@@ -86,8 +86,8 @@ local defaults = {
         fontSize = 12,
         labelColor = { r = 1, g = 0.82, b = 0, a = 1 },
         background = {
-            textureName = "ChocolateBar Gray",
-            texture = "Interface\\AddOns\\Arcana\\pics\\chocolatebargray",
+            textureName = "Arcana Gray",
+            texture = "Interface\\AddOns\\Arcana\\Media\\ArcanaBarGray",
             borderTexture = "Tooltip-Border",
             color = { r = 0.38, g = 0.36, b = 0.4, a = .94, },
             borderColor = { r = 0, g = 0, b = 0, a = 0, },
@@ -137,7 +137,7 @@ local f = CreateFrame("Frame")
 f:RegisterEvent("ADDON_LOADED")
 f:SetScript("OnEvent", function(_, event, addon)
     if addon == "ChocolateBar" then
-        ChocolateBar:AddonLoaded()
+        Arcana:AddonLoaded()
     end
 end)
 
@@ -203,20 +203,21 @@ end
 --------
 -- Ace3 callbacks
 --------
---- we want to load after ChocolateBarDB was loead from the ChocolateBar addon for the migration
+--- we want to load after old DB was loead from the old name of the addon for the migration
 --[[
-function ChocolateBar:OnInitialize()
+function Arcana:OnInitialize()
     print("|cff88ccffArcana Debug|r", "OnInitialize")
 end
 ]]
 
 --OnInitialize
-function ChocolateBar:AddonLoaded()
-    if ChocolateBarDB then
-        if HasData(ChocolateBarDB) then
-            if not ChocolateBarDB.arcanaMigrated then
-                ArcanaDB = ChocolateBarDB
-                ChocolateBarDB.arcanaMigrated = true
+function Arcana:AddonLoaded()
+    local oldDB = ChocolateBarDB
+    if oldDB then
+        if HasData(oldDB) then
+            if not oldDB.arcanaMigrated then
+                ArcanaDB = oldDB
+                oldDB.arcanaMigrated = true
                 print("|cff88ccffArcana|r ", "Doing profile migration...")
             end
         end
@@ -271,80 +272,80 @@ function ChocolateBar:AddonLoaded()
     end
     self:AnchorBars()
 
-    ChocolateBar:RegisterOptions(db, chocolateBars, self.modules)
-    ChocolateBar:EnableModules()
-    ChocolateBar:CreateSavePlaceholdes()
+    Arcana:RegisterOptions(db, arcanaBars, self.modules)
+    Arcana:EnableModules()
+    Arcana:CreateSavePlaceholdes()
 end
 
-function ChocolateBar:OnEnable()
+function Arcana:OnEnable()
     for name, obj in broker:DataObjectIterator() do
-        self:LibDataBroker_DataObjectCreated(nil, name, obj, true) --force noupdate on chocolateBars
+        self:LibDataBroker_DataObjectCreated(nil, name, obj, true) --force noupdate on arcanaBars
     end
-    self:UpdateBars()                                              --update chocolateBars here
+    self:UpdateBars()                                              --update arcanaBars here
     broker.RegisterCallback(self, "LibDataBroker_DataObjectCreated")
 
-    local moreChocolate = LibStub("LibDataBroker-1.1"):GetDataObjectByName("MoreChocolate")
-    if moreChocolate then
-        moreChocolate:SetBar(db)
+    local moreArcana = LibStub("LibDataBroker-1.1"):GetDataObjectByName("MoreArcana")
+    if moreArcana then
+        moreArcana:SetBar(db)
     end
 end
 
-function ChocolateBar:OnDatabaseShutdown()
+function Arcana:OnDatabaseShutdown()
     ArcanaDB.addonVersion = addonVersion
 end
 
-function ChocolateBar:EnableModules()
+function Arcana:EnableModules()
     -- itaret modules list and call each enable fuction
-    for name, module in pairs(ChocolateBar.modules) do
+    for name, module in pairs(Arcana.modules) do
         if db.moduleSettings[name].enabled then
-            ChocolateBar:EnableModule(name)
+            Arcana:EnableModule(name)
         end
     end
 end
 
-function ChocolateBar:EnableModule(name)
-    ChocolateBar.modules[name]:EnableModule()
+function Arcana:EnableModule(name)
+    Arcana.modules[name]:EnableModule()
 
-    local subModuleOptions = ChocolateBar:GetAceOptions().args.moduleOptions.args[name].args
-    subModuleOptions.Options = ChocolateBar.modules[name].optionsExtended
+    local subModuleOptions = Arcana:GetAceOptions().args.moduleOptions.args[name].args
+    subModuleOptions.Options = Arcana.modules[name].optionsExtended
 
     -- in case the module was enabled in this seesion before but was disabled we need to enable it again
     local obj = broker:GetDataObjectByName(name)
     if obj then
-        ChocolateBar:EnableDataObject(name, obj)
+        Arcana:EnableDataObject(name, obj)
     end
 end
 
-function ChocolateBar:DisableModule(name)
-    ChocolateBar.modules[name]:DisableModule()
-    ChocolateBar:DisableDataObject(name)
-    local subModuleOptions = ChocolateBar:GetAceOptions().args.moduleOptions.args[name].args
+function Arcana:DisableModule(name)
+    Arcana.modules[name]:DisableModule()
+    Arcana:DisableDataObject(name)
+    local subModuleOptions = Arcana:GetAceOptions().args.moduleOptions.args[name].args
     subModuleOptions.Options = {}
 end
 
-function ChocolateBar:GetModule(name)
-    local module = ChocolateBar.modules[name]
+function Arcana:GetModule(name)
+    local module = Arcana.modules[name]
     return module
 end
 
 local function GetModuleEnabled(info)
     local name = info[#info - 1]
-    return ChocolateBar.db.profile.moduleSettings[name].enabled
+    return Arcana.db.profile.moduleSettings[name].enabled
 end
 
 local function SetModuleEnabled(info, value)
     local name = info[#info - 1]
-    ChocolateBar.db.profile.moduleSettings[name].enabled = value
+    Arcana.db.profile.moduleSettings[name].enabled = value
 
     if value then
-        ChocolateBar:EnableModule(name)
+        Arcana:EnableModule(name)
     else
-        ChocolateBar:DisableModule(name)
+        Arcana:DisableModule(name)
     end
 end
 
 
-function ChocolateBar:NewModule(name, values)
+function Arcana:NewModule(name, values)
     local module = self.modules[name] or {}
     module.defaults = values.moduleDefaults
 
@@ -380,32 +381,32 @@ function ChocolateBar:NewModule(name, values)
 end
 
 -- called on ADDON_LOADED of Blizzard_OrderHallUI
-function ChocolateBar:Blizzard_OrderHallUI()
+function Arcana:Blizzard_OrderHallUI()
     --hookOrderHallCommandBar(self)
     if not self.hookedOrderHallCommandBar and db.hideOrderHallCommandBar then
         ---@diagnostic disable-next-line: undefined-field
         local orderHallCommandBar = _G.OrderHallCommandBar
 
         if orderHallCommandBar then
-            orderHallCommandBar:HookScript("OnShow", function() ChocolateBar:ToggleOrderHallCommandBar() end)
+            orderHallCommandBar:HookScript("OnShow", function() Arcana:ToggleOrderHallCommandBar() end)
             orderHallCommandBar:Hide()
             self.hookedOrderHallCommandBar = true
         end
     end
 end
 
-function ChocolateBar:UpdateJostle()
-    for name, bar in pairs(chocolateBars) do
+function Arcana:UpdateJostle()
+    for name, bar in pairs(arcanaBars) do
         bar:UpdateJostle(db)
     end
 end
 
-function ChocolateBar:isNewInstall()
+function Arcana:isNewInstall()
     local lastversion = ArcanaDB.addonVersion or ""
     return lastversion < C_AddOns.GetAddOnMetadata("Arcana", "Version") and true or false
 end
 
-function ChocolateBar:ToggleOrderHallCommandBar()
+function Arcana:ToggleOrderHallCommandBar()
     ---@diagnostic disable-next-line: undefined-field
     local orderHallCommandBar = _G.OrderHallCommandBar
     if orderHallCommandBar then
@@ -415,39 +416,39 @@ function ChocolateBar:ToggleOrderHallCommandBar()
             orderHallCommandBar:Show()
         end
     end
-    ChocolateBar:UpdateJostle()
+    Arcana:UpdateJostle()
 end
 
-function ChocolateBar:OnDisable()
+function Arcana:OnDisable()
     for name, obj in broker:DataObjectIterator() do
-        if chocolateObjects[name] then chocolateObjects[name]:Hide() end
+        if pluginObjects[name] then pluginObjects[name]:Hide() end
     end
-    for k, v in pairs(chocolateBars) do
+    for k, v in pairs(arcanaBars) do
         v:Hide()
     end
     broker.UnregisterCallback(self, "LibDataBroker_DataObjectCreated")
 end
 
-function ChocolateBar:OnEnterWorld()
-    self:UpdateChoclates("resizeFrame")
+function Arcana:OnEnterWorld()
+    self:UpdatePlugins("resizeFrame")
     self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-    ChocolateBar:UpdateOptions(chocolateBars)
+    Arcana:UpdateOptions(arcanaBars)
 end
 
-function ChocolateBar:OnPetBattleOpen(...)
+function Arcana:OnPetBattleOpen(...)
     self.InCombat = true
     if db.petBattleHideBars then
-        for name, bar in pairs(chocolateBars) do
+        for name, bar in pairs(arcanaBars) do
             bar.petHide = bar:IsShown()
             bar:Hide()
         end
     end
 end
 
-function ChocolateBar:OnPetBattleOver(...)
+function Arcana:OnPetBattleOver(...)
     self.InCombat = false
     if db.petBattleHideBars then
-        for name, bar in pairs(chocolateBars) do
+        for name, bar in pairs(arcanaBars) do
             if bar.petHide then
                 bar:Show()
                 bar:UpdateJostle(db)
@@ -456,11 +457,11 @@ function ChocolateBar:OnPetBattleOver(...)
     end
 end
 
-function ChocolateBar:OnEnterCombat()
+function Arcana:OnEnterCombat()
     self.InCombat = true
     local combatHideAllBars = db.combathidebar
     local combatOpacityAllBars = db.combatopacity
-    for name, bar in pairs(chocolateBars) do
+    for name, bar in pairs(arcanaBars) do
         local settings = bar.settings
         if combatHideAllBars or settings.hideBarInCombat then
             bar.tempHide = bar:IsShown()
@@ -472,11 +473,11 @@ function ChocolateBar:OnEnterCombat()
     end
 end
 
-function ChocolateBar:OnLeaveCombat()
+function Arcana:OnLeaveCombat()
     self.InCombat = false
     local combatHideAllBars = db.combathidebar
     local combatOpacityAllBars = db.combatopacity
-    for name, bar in pairs(chocolateBars) do
+    for name, bar in pairs(arcanaBars) do
         local settings = bar.settings
         if combatHideAllBars or settings.hideBarInCombat then
             if bar.tempHide then
@@ -493,7 +494,7 @@ end
 --------
 -- LDB callbacks
 --------
-function ChocolateBar:LibDataBroker_DataObjectCreated(event, name, obj, noupdate)
+function Arcana:LibDataBroker_DataObjectCreated(event, name, obj, noupdate)
     if not db then return end
 
     local t = obj.type
@@ -508,14 +509,14 @@ function ChocolateBar:LibDataBroker_DataObjectCreated(event, name, obj, noupdate
             self:EnableDataObject(name, obj, noupdate)
         end
     else
-        ChocolateBar:Log("Unknown type", t, name)
+        Arcana:Log("Unknown type", t, name)
     end
 end
 
-function ChocolateBar:EnableDataObject(name, obj, noupdate)
+function Arcana:EnableDataObject(name, obj, noupdate)
     local t = obj.type
     if t ~= "data source" and t ~= "launcher" then
-        ChocolateBar:Log("Unknown type", t, name)
+        Arcana:Log("Unknown type", t, name)
         return 0
     end
 
@@ -534,7 +535,7 @@ function ChocolateBar:EnableDataObject(name, obj, noupdate)
                 settings.enabled = false
                 return
             end
-            if name == "ChocolateClock" or name == "Broker_uClock" then
+            if name == "ArcanaClock" or name == "Broker_uClock" then
                 settings.align = "right"
                 settings.index = -1
             end
@@ -549,10 +550,10 @@ function ChocolateBar:EnableDataObject(name, obj, noupdate)
     end
     obj.name = name
 
-    local choco = chocolateObjects[name] or Chocolate:New(name, obj, settings, db)
-    chocolateObjects[name] = choco
+    local plugin = pluginObjects[name] or ArcanaPiece:New(name, obj, settings, db)
+    pluginObjects[name] = plugin
 
-    choco:Show()
+    plugin:Show()
 
     --addon name migration
     if barNameIsDeprecated(barName) then
@@ -560,41 +561,41 @@ function ChocolateBar:EnableDataObject(name, obj, noupdate)
         settings.barName = barName --store new bar name in the plugin settings
     end
 
-    local bar = chocolateBars[barName]
+    local bar = arcanaBars[barName]
     if bar then
-        bar:AddChocolatePiece(choco, name, noupdate)
+        bar:AddArcanaPiece(plugin, name, noupdate)
     else
-        chocolateBars["Arcana1"]:AddChocolatePiece(choco, name, noupdate)
+        arcanaBars["Arcana1"]:AddArcanaPiece(plugin, name, noupdate)
     end
     broker.RegisterCallback(self, "LibDataBroker_AttributeChanged_" .. name, "AttributeChanged")
 
-    ChocolateBar:AddObjectOptions(name, obj)
+    Arcana:AddObjectOptions(name, obj)
 end
 
-function ChocolateBar:DisableDataObject(name)
+function Arcana:DisableDataObject(name)
     broker.UnregisterCallback(self, "LibDataBroker_AttributeChanged_" .. name)
     --get bar from setings
     if db.objSettings[name] then
         db.objSettings[name].enabled = false
         local barName = db.objSettings[name].barName
-        if (barName and chocolateBars[barName]) then
-            chocolateBars[barName]:EatChocolatePiece(name)
+        if (barName and arcanaBars[barName]) then
+            arcanaBars[barName]:RemoveArcanaPiece(name)
         end
     end
 end
 
-function ChocolateBar:AttributeChanged(event, name, key, value)
+function Arcana:AttributeChanged(event, name, key, value)
     local settings = db.objSettings[name]
     if not settings.enabled then
         return
     end
-    local choco = chocolateObjects[name]
-    choco:Update(choco, key, value, name)
+    local plugin = pluginObjects[name]
+    plugin:Update(plugin, key, value, name)
 end
 
 -- disable autohide for all bars during drag and drop
-function ChocolateBar:TempDisAutohide(value)
-    for name, bar in pairs(chocolateBars) do
+function Arcana:TempDisAutohide(value)
+    for name, bar in pairs(arcanaBars) do
         if value then
             bar.tempHide = bar.autohide
             bar.autohide = false
@@ -609,24 +610,24 @@ function ChocolateBar:TempDisAutohide(value)
 end
 
 -- returns nil if the plugin is disabled
-function ChocolateBar:GetChocolate(name)
-    return chocolateObjects[name]
+function Arcana:GetPlugin(name)
+    return pluginObjects[name]
 end
 
-function ChocolateBar:GetChocolates()
-    return chocolateObjects
+function Arcana:GetArcanas()
+    return pluginObjects
 end
 
-function ChocolateBar:GetBar(name)
-    return chocolateBars[name]
+function Arcana:GetBar(name)
+    return arcanaBars[name]
 end
 
-function ChocolateBar:GetBars()
-    return chocolateBars
+function Arcana:GetBars()
+    return arcanaBars
 end
 
-function ChocolateBar:SetBars(tab)
-    chocolateBars = tab or {}
+function Arcana:SetBars(tab)
+    arcanaBars = tab or {}
 end
 
 local function getFreeBarName()
@@ -634,7 +635,7 @@ local function getFreeBarName()
     local name
     for i = 1, 100 do
         name = "Arcana" .. i
-        for k, v in pairs(chocolateBars) do
+        for k, v in pairs(arcanaBars) do
             if name == v:GetName() then
                 used = true
             end
@@ -646,22 +647,22 @@ local function getFreeBarName()
     end
 end
 
-function ChocolateBar:UpdateChoclates(key, val)
-    for name, choco in pairs(chocolateObjects) do
-        choco:Update(choco, key, val)
+function Arcana:UpdatePlugins(key, val)
+    for name, plugin in pairs(pluginObjects) do
+        plugin:Update(plugin, key, val)
     end
 end
 
-function ChocolateBar:ExecuteforAllChoclates(func, ...)
-    for name, choco in pairs(chocolateObjects) do
-        func(choco, ...)
+function Arcana:ExecuteforAllPlugins(func, ...)
+    for name, plugin in pairs(pluginObjects) do
+        func(plugin, ...)
     end
 end
 
 --------
 -- Bars Management
 --------
-function ChocolateBar:AddBar(name, settings, noupdate)
+function Arcana:AddBar(name, settings, noupdate)
     if not name then --find free name
         name = getFreeBarName()
     end
@@ -670,7 +671,7 @@ function ChocolateBar:AddBar(name, settings, noupdate)
     end
     local bar = Bar:New(name, settings, db)
     Drag:RegisterFrame(bar)
-    chocolateBars[name] = bar
+    arcanaBars[name] = bar
     settings.barName = name
     if not noupdate then
         self:AnchorBars()
@@ -678,19 +679,19 @@ function ChocolateBar:AddBar(name, settings, noupdate)
     return name, bar
 end
 
-function ChocolateBar:UpdateBars(updateindex)
-    for k, v in pairs(chocolateBars) do
+function Arcana:UpdateBars(updateindex)
+    for k, v in pairs(arcanaBars) do
         v:UpdateBar(updateindex)
         v:UpdateAutoHide(db)
     end
 end
 
 -- sort and anchor all bars
-function ChocolateBar:AnchorBars()
+function Arcana:AnchorBars()
     local temptop = {}
     local tempbottom = {}
 
-    for k, v in pairs(chocolateBars) do
+    for k, v in pairs(arcanaBars) do
         local settings = v.settings
         local index = settings.index or 500
         if settings.align == "top" then
@@ -757,13 +758,13 @@ function onRightClick(self)
     self:GetParent():OnMouseUp("RightButton")
 end
 
-function ChocolateBar:CreateSavePlaceholdes()
+function Arcana:CreateSavePlaceholdes()
     for name, v in pairs(db.placeholderNames) do
-        ChocolateBar:NewPlaceholder(name)
+        Arcana:NewPlaceholder(name)
     end
 end
 
-function ChocolateBar:NewPlaceholder(name)
+function Arcana:NewPlaceholder(name)
     local obj = broker:GetDataObjectByName(name) or broker:NewDataObject(name, {
         type    = "data source",
         label   = name,
@@ -775,7 +776,7 @@ function ChocolateBar:NewPlaceholder(name)
 end
 
 local function createPointer()
-    local pointer = CreateFrame("Frame", "ChocolatePointer")
+    local pointer = CreateFrame("Frame", "ArcanaPointer")
     pointer:SetFrameStrata("FULLSCREEN_DIALOG")
     pointer:SetFrameLevel(20)
     pointer:SetWidth(15)
@@ -783,11 +784,11 @@ local function createPointer()
     local arrow = pointer:CreateTexture(nil, "BACKGROUND")
     ---@diagnostic disable-next-line: param-type-mismatch
     arrow:SetPoint("CENTER", pointer, "LEFT", 0, 0)
-    arrow:SetTexture("Interface\\AddOns\\Arcana\\pics\\pointer")
+    arrow:SetTexture("Interface\\AddOns\\Arcana\\Media\\pointer")
     return pointer
 end
 
-function ChocolateBar:GetPointer(parent)
+function Arcana:GetPointer(parent)
     local pointer = self.pointer or createPointer()
     pointer:SetHeight(parent:GetHeight())
     pointer:SetParent(parent)
@@ -797,20 +798,20 @@ end
 --------
 -- option functions
 --------
-function ChocolateBar:ChatCommand(input)
-    ChocolateBar:LoadOptions(nil, input)
+function Arcana:ChatCommand(input)
+    Arcana:LoadOptions(nil, input)
 end
 
-function ChocolateBar:LoadOptions(pluginName, input, blizzard)
-    ChocolateBar:OpenOptions(chocolateBars, db, input, pluginName, nil, blizzard)
+function Arcana:LoadOptions(pluginName, input, blizzard)
+    Arcana:OpenOptions(arcanaBars, db, input, pluginName, nil, blizzard)
 end
 
-function ChocolateBar:UpdateDB(data)
+function Arcana:UpdateDB(data)
     db = data
-    Chocolate:UpdateDB(db)
+    ArcanaPiece:UpdateDB(db)
 end
 
 --helper API
-function ChocolateBar:GetLabelColor()
+function Arcana:GetLabelColor()
     return db and db.labelColor or { r = 1, g = 0.82, b = 0, a = 1 }
 end

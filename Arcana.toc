@@ -42,7 +42,7 @@ localization\ruRU.lua
 TheHeart.lua
 JostleMainline.lua
 DragAndDrop.lua
-Arcana.lua
+ArcanaPiece.lua
 Bar.lua
 DropPoints.lua
 modules\Placeholder.lua

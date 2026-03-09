@@ -1,5 +1,5 @@
-local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("Arcana")
-local Jostle = ChocolateBar.Jostle
+local Arcana = LibStub("AceAddon-3.0"):GetAddon("Arcana")
+local Jostle = Arcana.Jostle
 local bottomFrames = {}
 local topFrames = {}
 Jostle.hooks = {}

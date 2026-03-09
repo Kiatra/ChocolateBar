@@ -1,5 +1,5 @@
 local addonName                                    = "CB_Laucher"
-local ChocolateBar                                 = LibStub("AceAddon-3.0"):GetAddon("Arcana")
+local Arcana                                       = LibStub("AceAddon-3.0"):GetAddon("Arcana")
 local ldb                                          = LibStub:GetLibrary("LibDataBroker-1.1", true)
 local LibQTip                                      = LibStub('LibQTip-1.0')
 local L                                            = LibStub("AceLocale-3.0"):GetLocale("Arcana")
@@ -64,11 +64,11 @@ end
 function cellPrototype:ReleaseCell()
 end
 
-local function MouseHandler(event, choco, button, ...)
+local function MouseHandler(event, plugin, button, ...)
     LibQTip:Release(tooltip)
     tooltip = nil
 
-    choco.obj.OnClick(dataobj.frame, button)
+    plugin.obj.OnClick(dataobj.frame, button)
 end
 
 function dataobj:OnEnter()
@@ -82,13 +82,13 @@ function dataobj:OnEnter()
     tooltip:Clear()
     self.tooltip = tooltip
 
-    for name, choco in pairs(ChocolateBar:GetChocolates()) do
-        local obj = choco.obj
+    for name, plugin in pairs(Arcana:GetArcanas()) do
+        local obj = plugin.obj
         if obj.type == "launcher" then
             local y, x = tooltip:AddLine()
             tooltip:SetCell(y, 1, obj.icon, myProvider)
             tooltip:SetCell(y, 2, name)
-            tooltip:SetLineScript(y, "OnMouseUp", MouseHandler, choco)
+            tooltip:SetLineScript(y, "OnMouseUp", MouseHandler, plugin)
         end
     end
 

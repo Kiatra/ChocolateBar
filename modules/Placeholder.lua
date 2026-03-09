@@ -1,6 +1,6 @@
 if true then return end
 
-local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("Arcana")
+local Arcana = LibStub("AceAddon-3.0"):GetAddon("Arcana")
 local L = LibStub("AceLocale-3.0"):GetLocale("Arcana")
 
 local moduleDB
@@ -15,15 +15,14 @@ end
 local function createPlaceholder()
     local name = "CB_" .. L["Placeholder"] .. tablelength(placeholderNames)
     placeholderNames[name] = true
-    ChocolateBar:AddObjectOptions(name, module:NewPlaceholder(name))
+    Arcana:AddObjectOptions(name, module:NewPlaceholder(name))
 end
 
 local function removePlaceholder(info)
     local cleanName = info[#info - 2]
-    --local name = chocolateOptions[cleanName].desc
     moduleDB.placeholderNames[cleanName] = nil
-    ChocolateBar:DisableDataObject(cleanName)
-    ChocolateBar:RemovePluginOptions(cleanName)
+    Arcana:DisableDataObject(cleanName)
+    Arcana:RemovePluginOptions(cleanName)
 end
 
 local placeholderPluginOptions = {
@@ -75,11 +74,11 @@ local options = {
     },
 }
 
-module = ChocolateBar:NewModule("Placeholder", nil, options)
+module = Arcana:NewModule("Placeholder", nil, options)
 
 local function addPlaceholderOptionsToPlugins()
     for name, _ in pairs(placeholderNames) do
-        ChocolateBar:AddCustomPluginOptions(name, placeholderPluginOptions)
+        Arcana:AddCustomPluginOptions(name, placeholderPluginOptions)
     end
 end
 

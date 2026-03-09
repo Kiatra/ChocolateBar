@@ -1,13 +1,13 @@
-﻿-- a LDB object that will show/hide the chocolatebar set in the chocolatebar options
+﻿-- a LDB object that will show/hide the Arcana set in the Arcana options
 local LibStub = LibStub
 local counter = 0
 local delay = 4
 local Timer = CreateFrame("Frame")
-local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("Arcana")
+local Arcana = LibStub("AceAddon-3.0"):GetAddon("Arcana")
 local bar
 local L = LibStub("AceLocale-3.0"):GetLocale("Arcana")
 local wipe, pairs = wipe, pairs
-local moreChocolate
+local moreArcana
 
 local function onEnter()
     counter = 0
@@ -20,7 +20,7 @@ local function onEnter()
 end
 
 local function setBar(_, db)
-    bar = ChocolateBar:GetBar(db.moreBar)
+    bar = Arcana:GetBar(db.moreBar)
     if bar and bar:IsShown() then
         bar:Hide()
     end
@@ -29,18 +29,18 @@ end
 
 
 local function GetList()
-    wipe(moreChocolate.barNames)
-    moreChocolate.barNames.none = L["None"]
-    for k, _ in pairs(ChocolateBar:GetBars()) do
-        moreChocolate.barNames[k] = k
+    wipe(moreArcana.barNames)
+    moreArcana.barNames.none = L["None"]
+    for k, _ in pairs(Arcana:GetBars()) do
+        moreArcana.barNames[k] = k
     end
-    return moreChocolate.barNames
+    return moreArcana.barNames
 end
 
 ---@diagnostic disable-next-line: inject-field
 function Timer:OnUpdate(elapsed)
     counter = counter + elapsed
-    if counter >= delay and bar and not ChocolateBar.dragging then
+    if counter >= delay and bar and not Arcana.dragging then
         bar:Hide()
         counter = 0
         Timer:SetScript("OnUpdate", nil)
@@ -65,14 +65,14 @@ local options = {
             name = L["Select Bar"],
             desc = L["Select Bar"],
             get = function()
-                return ChocolateBar.db.profile.moreBar
+                return Arcana.db.profile.moreBar
             end,
             set = function(_, value)
                 if bar then
                     bar:Show()
                 end
-                ChocolateBar.db.profile.moreBar = value
-                moreChocolate:SetBar(ChocolateBar.db.profile)
+                Arcana.db.profile.moreBar = value
+                moreArcana:SetBar(Arcana.db.profile)
             end,
         },
         delay = {
@@ -84,18 +84,18 @@ local options = {
             max = 15,
             step = 1,
             get = function()
-                return ChocolateBar.db.profile.moreBarDelay
+                return Arcana.db.profile.moreBarDelay
             end,
             set = function(_, value)
                 delay = value
-                ChocolateBar.db.profile.moreBarDelay = value
+                Arcana.db.profile.moreBarDelay = value
             end,
         },
     },
 }
 
 
-local Module = ChocolateBar:NewModule("MoreArcana", {
+local Module = Arcana:NewModule("MoreArcana", {
     description = "A plugin that can toggle the visibility of a specific Arcana bar.",
     defaults = {
         enabled = true,
@@ -107,13 +107,13 @@ function Module:DisableModule()
     if bar then
         bar:Show()
     end
-    ChocolateBar.db.profile.moreBar = "none"
-    setBar(moreChocolate, ChocolateBar.db.profile)
+    Arcana.db.profile.moreBar = "none"
+    setBar(moreArcana, Arcana.db.profile)
 end
 
 function Module:EnableModule()
-    if not moreChocolate then
-        moreChocolate = LibStub("LibDataBroker-1.1"):NewDataObject("MoreArcana", {
+    if not moreArcana then
+        moreArcana = LibStub("LibDataBroker-1.1"):NewDataObject("MoreArcana", {
             type    = "launcher",
             icon    = "Interface\\AddOns\\Arcana\\Media\\Icons\\ArcanaKnowledge",
             label   = "MoreArcana",
@@ -138,8 +138,8 @@ function Module:EnableModule()
             end,
         })
 
-        moreChocolate.barNames = { none = "none" }
-        moreChocolate.SetBar = setBar
-        moreChocolate.OnEnter = onEnter
+        moreArcana.barNames = { none = "none" }
+        moreArcana.SetBar = setBar
+        moreArcana.OnEnter = onEnter
     end
 end

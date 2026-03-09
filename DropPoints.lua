@@ -1,15 +1,15 @@
-local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("Arcana")
+local Arcana = LibStub("AceAddon-3.0"):GetAddon("Arcana")
 local L = LibStub("AceLocale-3.0"):GetLocale("Arcana")
 local dropPoints
 local _G = _G
-local Drag = ChocolateBar.Drag
+local Drag = Arcana.Drag
 
 local function createDropPoint(name, dropfunc, offx, text, texture)
-    if not ChocolateBar.dropFrames then
+    if not Arcana.dropFrames then
         local dropFrames = CreateFrame("Frame", nil, _G.UIParent, BackdropTemplateMixin and "BackdropTemplate")
         dropFrames:SetWidth(420)
         dropFrames:SetHeight(200)
-        ChocolateBar.dropFrames = dropFrames
+        Arcana.dropFrames = dropFrames
         dropFrames:SetBackdrop({
             bgFile = "Interface\\ACHIEVEMENTFRAME\\UI-Achievement-Parchment-Horizontal-Desaturated",
             edgeFile = "Interface\\LFGFrame\\LFGBorder",
@@ -27,7 +27,7 @@ local function createDropPoint(name, dropfunc, offx, text, texture)
         dropFrames.text:SetFormattedText("|T%s:%d|t%s", "Interface\\FriendsFrame\\InformationIcon", 16,
             " " .. L["Drop a Plugin onto any of the icons above."])
     end
-    local frame = CreateFrame("Frame", name, ChocolateBar.dropFrames, BackdropTemplateMixin and "BackdropTemplate")
+    local frame = CreateFrame("Frame", name, Arcana.dropFrames, BackdropTemplateMixin and "BackdropTemplate")
     frame:SetWidth(100)
     frame:SetHeight(100)
     frame:SetFrameStrata("DIALOG")
@@ -77,17 +77,17 @@ end
 --------
 -- drop points functions
 --------
-local function dropText(_, choco)
-    local name = choco.name
-    local db = ChocolateBar.db.profile
+local function dropText(_, plugin)
+    local name = plugin.name
+    local db = Arcana.db.profile
     db.objSettings[name].showText = not db.objSettings[name].showText
-    ChocolateBar:AttributeChanged(nil, name, "updateSettings", db.objSettings[name].showText)
-    choco.bar:ResetDrag(choco, name)
+    Arcana:AttributeChanged(nil, name, "updateSettings", db.objSettings[name].showText)
+    plugin.bar:ResetDrag(plugin, name)
     --frame:SetBackdropColor(0,0,0,1)
 end
 
-local function dropOptions(frame, choco)
-    local obj = choco.obj
+local function dropOptions(frame, plugin)
+    local obj = plugin.obj
     local name = obj.name
     local label = obj.label
     local cleanName
@@ -98,28 +98,28 @@ local function dropOptions(frame, choco)
     end
     cleanName = string.gsub(cleanName, "|r", "")
     cleanName = string.gsub(cleanName, "[%c \127]", "")
-    ChocolateBar:LoadOptions(cleanName)
-    choco.bar:ResetDrag(choco, choco.name)
+    Arcana:LoadOptions(cleanName)
+    plugin.bar:ResetDrag(plugin, plugin.name)
     frame:SetBackdropColor(0.5, 0, 0, 0.5)
 end
 
-local function dropDisable(frame, choco)
-    choco:Hide()
-    ChocolateBar:DisableDataObject(choco.name)
+local function dropDisable(frame, plugin)
+    plugin:Hide()
+    Arcana:DisableDataObject(plugin.name)
     frame:SetBackdropColor(0, 0, 0, 0, 5)
 end
 
 
-function ChocolateBar:SetDropPoins(parent)
+function Arcana:SetDropPoins(parent)
     if not dropPoints then
-        createDropPoint("ChocolateTextDrop", dropText, 0, L["Toggle Text"],
+        createDropPoint("ArcanaTextDrop", dropText, 0, L["Toggle Text"],
             "Interface/ICONS/INV_Inscription_Tradeskill01")
-        createDropPoint("ChocolateCenterDrop", dropOptions, 150, "CB " .. L["Options"], "Interface/Icons/INV_Gizmo_02")
-        createDropPoint("ChocolateDisableDrop", dropDisable, 300, L["Disable Plugin"],
+        createDropPoint("ArcnaCenterDrop", dropOptions, 150, "CB " .. L["Options"], "Interface/Icons/INV_Gizmo_02")
+        createDropPoint("ArcanaDisableDrop", dropDisable, 300, L["Disable Plugin"],
             "Interface/ICONS/Spell_ChargeNEgative")
     end
 
-    local frame = ChocolateBar.dropFrames
+    local frame = Arcana.dropFrames
     frame:ClearAllPoints()
     ---@diagnostic disable-next-line: param-type-mismatch
     frame:SetClampedToScreen(true)
