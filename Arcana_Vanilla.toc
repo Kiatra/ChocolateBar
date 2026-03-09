@@ -10,7 +10,7 @@
 ## X-WoWI-ID: 12326
 ## X-Curse-Project-ID: 17424
 ## SavedVariables: ArcanaDB, ChocolateBarDB, CB_PlayedTime
-## IconTexture: Interface/AddOns/Arcana/pics/ChocolatePiece
+## IconTexture: Interface/AddOns/Arcana/Media/Icons/ArcanaKnowledge
 
 ## Category: Data Broker
 ## Category-deDE: Datenbroker

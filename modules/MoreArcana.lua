@@ -95,8 +95,8 @@ local options = {
 }
 
 
-local Module = ChocolateBar:NewModule("MoreChocolate", {
-    description = "A broker plugin that can toggle the visibility of a specific chocolate bar.",
+local Module = ChocolateBar:NewModule("MoreArcana", {
+    description = "A plugin that can toggle the visibility of a specific Arcana bar.",
     defaults = {
         enabled = true,
     },
@@ -113,11 +113,11 @@ end
 
 function Module:EnableModule()
     if not moreChocolate then
-        moreChocolate = LibStub("LibDataBroker-1.1"):NewDataObject("MoreChocolate", {
+        moreChocolate = LibStub("LibDataBroker-1.1"):NewDataObject("MoreArcana", {
             type    = "launcher",
-            icon    = "Interface\\AddOns\\Arcana\\pics\\ChocolatePiece",
-            label   = "MoreChocolate",
-            text    = "MoreChocolate",
+            icon    = "Interface\\AddOns\\Arcana\\Media\\Icons\\ArcanaKnowledge",
+            label   = "MoreArcana",
+            text    = "MoreArcana",
 
             OnClick = function(_, btn)
                 if btn == "LeftButton" then
