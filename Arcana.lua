@@ -1,3 +1,12 @@
+-- -- ✧──────────────────────────────────────────────✧
+--  Arcana
+--  Arcana.lua
+--
+--  The knowledge (plugin) magic
+--
+--  Made with love by Kiatra ♡
+--  Soooory for all the bugs and taints over the many years :D
+-- ✧──────────────────────────────────────────────✧
 local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("Arcana")
 local LSM = LibStub("LibSharedMedia-3.0")
 local ChocolatePiece = ChocolateBar.ChocolatePiece

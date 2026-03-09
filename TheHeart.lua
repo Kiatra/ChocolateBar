@@ -1,3 +1,27 @@
+-- ✧────────────────────────────────────────────────────✧
+--  Arcana
+--  TheHeart.lua
+--
+--  The not-so-dark heart of Arcana.
+--  A little bit of logic, a little bit of magic.
+--
+--  Made with love by Kiatra ♡
+--
+--  Special thanks to/for:
+-- ✧────────────────────────────────────────────────────✧
+--  the WoW addon community
+--  for years of shared knowledge and inspiration.
+--
+-- ✧────────────────────────────────────────────────────✧
+--  Rosa for the trust in us making
+--      magic happen responsibly.
+--
+--  The love I had in me from Katrin
+--  Ray for the fun we had creating in school.
+--  Alundira/Alexwild for seeing me before I was me.
+-- ✧────────────────────────────────────────────────────✧
+--  Everyone who submitted a friendly bug report ;)
+-- ✧────────────────────────────────────────────────────✧
 local LibStub, broker, LSM = LibStub, LibStub("LibDataBroker-1.1"), LibStub("LibSharedMedia-3.0")
 local ChocolateBar = LibStub("AceAddon-3.0"):NewAddon("Arcana", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("Arcana")
@@ -153,12 +177,12 @@ end
 
 --migrate textures
 local pathMap = {
-    ["Interface\\AddOns\\Arcana\\pics\\chocolatebar"]    = "Interface\\AddOns\\Arcana\\Media\\ArcanaBar",
-    ["Interface\\AddOns\\Arcana\\pics\\chocolatbarGray"] = "Interface\\AddOns\\Arcana\\Media\\ArcanaBarGray",
-    ["Interface\\AddOns\\Arcana\\pics\\Gloss"]           = "Interface\\AddOns\\Arcana\\Media\\Gloss",
-    ["Interface\\AddOns\\Arcana\\pics\\DarkBottom"]      = "Interface\\AddOns\\Arcana\\Media\\DarkBottom",
-    ["Interface\\AddOns\\Arcana\\pics\\Titan"]           = "Interface\\AddOns\\Arcana\\Media\\Titan",
-    ["Interface\\AddOns\\Arcana\\pics\\Tribal"]          = "Interface\\AddOns\\Arcana\\Media\\Tribal",
+    ["Interface\\AddOns\\Arcana\\pics\\chocolatebar"]          = "Interface\\AddOns\\Arcana\\Media\\ArcanaBar",
+    ["Interface\\AddOns\\Arcana\\pics\\chocolatbarGray"]       = "Interface\\AddOns\\Arcana\\Media\\ArcanaBarGray",
+    ["Interface\\AddOns\\Arcana\\pics\\Gloss"]                 = "Interface\\AddOns\\Arcana\\Media\\Gloss",
+    ["Interface\\AddOns\\Arcana\\pics\\DarkBottom"]            = "Interface\\AddOns\\Arcana\\Media\\DarkBottom",
+    ["Interface\\AddOns\\Arcana\\pics\\Titan"]                 = "Interface\\AddOns\\Arcana\\Media\\Titan",
+    ["Interface\\AddOns\\Arcana\\pics\\Tribal"]                = "Interface\\AddOns\\Arcana\\Media\\Tribal",
     ["Interface\\AddOns\\ChocloateBar\\pics\\chocolatebar"]    = "Interface\\AddOns\\Arcana\\Media\\ArcanaBar",
     ["Interface\\AddOns\\ChocloateBar\\pics\\chocolatbarGray"] = "Interface\\AddOns\\Arcana\\Media\\ArcanaBarGray",
     ["Interface\\AddOns\\ChocloateBar\\pics\\Gloss"]           = "Interface\\AddOns\\Arcana\\Media\\Gloss",

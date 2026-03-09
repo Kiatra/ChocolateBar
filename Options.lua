@@ -1,3 +1,12 @@
+-- -- ✧─────────────────────────────────────-----─────────✧
+--  Arcana
+--  Options.lua
+--
+--  Overblown ace options tables, fun!
+--
+--  Made with love by Kiatra ♡
+--  Forgetting to to close the brackes is even more fun!
+-- ✧───────────────────────────────────────--------───────✧
 local LibStub = LibStub
 local ChocolateBar = LibStub("AceAddon-3.0"):GetAddon("Arcana")
 local AceCfgDlg = LibStub("AceConfigDialog-3.0")
@@ -7,7 +16,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale("Arcana")
 local LSM = LibStub("LibSharedMedia-3.0")
 local _G, pairs, string = _G, pairs, string
 local db, moreChocolate
-local addonName = ... or "LALALA"
+local addonName = ...
 ---@diagnostic disable-next-line: undefined-field
 local GetAddOnMetadata = _G.GetAddOnMetadata or _G.C_AddOns.GetAddOnMetadata;
 local version = GetAddOnMetadata(addonName, "Version") or "unknown";
