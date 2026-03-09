@@ -183,8 +183,8 @@ function ChocolateBar:AddonLoaded()
     local _, categoryID = AceCfgDlg:AddToBlizOptions("Arcana", "Arcana")
     self.BlizzardOptionsCategoryID = categoryID
 
-    LSM:Register("statusbar", "ChocolateBar Gold", "Interface\\AddOns\\Arcana\\pics\\chocolatebar")
-    LSM:Register("statusbar", "ChocolateBar Gray", "Interface\\AddOns\\Arcana\\pics\\chocolatebargray")
+    LSM:Register("statusbar", "Arcana Gold", "Interface\\AddOns\\Arcana\\Media\\ArcanaBar")
+    LSM:Register("statusbar", "Arcana Gray", "Interface\\AddOns\\Arcana\\Meida\\ArcanaBarGray")
     LSM:Register("statusbar", "Tooltip", "Interface\\Tooltips\\UI-Tooltip-Background")
     LSM:Register("statusbar", "Solid", "Interface\\Buttons\\WHITE8X8")
     LSM:Register("statusbar", "Gloss", "Interface\\AddOns\\Arcana\\pics\\Gloss")
@@ -757,4 +757,9 @@ end
 function ChocolateBar:UpdateDB(data)
     db = data
     Chocolate:UpdateDB(db)
+end
+
+--helper API
+function ChocolateBar:GetLabelColor()
+    return db and db.labelColor or { r = 1, g = 0.82, b = 0, a = 1 }
 end
