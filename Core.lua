@@ -151,6 +151,32 @@ local function migrateBarNames(db)
     end
 end
 
+--migrate textures
+local pathMap = {
+    ["Interface\\AddOns\\Arcana\\pics\\chocolatebar"]    = "Interface\\AddOns\\Arcana\\Media\\ArcanaBar",
+    ["Interface\\AddOns\\Arcana\\pics\\chocolatbarGray"] = "Interface\\AddOns\\Arcana\\Media\\ArcanaBarGray",
+    ["Interface\\AddOns\\Arcana\\pics\\Gloss"]           = "Interface\\AddOns\\Arcana\\Media\\Gloss",
+    ["Interface\\AddOns\\Arcana\\pics\\DarkBottom"]      = "Interface\\AddOns\\Arcana\\Media\\DarkBottom",
+    ["Interface\\AddOns\\Arcana\\pics\\Titan"]           = "Interface\\AddOns\\Arcana\\Media\\Titan",
+    ["Interface\\AddOns\\Arcana\\pics\\Tribal"]          = "Interface\\AddOns\\Arcana\\Media\\Tribal",
+    ["Interface\\AddOns\\ChocloateBar\\pics\\chocolatebar"]    = "Interface\\AddOns\\Arcana\\Media\\ArcanaBar",
+    ["Interface\\AddOns\\ChocloateBar\\pics\\chocolatbarGray"] = "Interface\\AddOns\\Arcana\\Media\\ArcanaBarGray",
+    ["Interface\\AddOns\\ChocloateBar\\pics\\Gloss"]           = "Interface\\AddOns\\Arcana\\Media\\Gloss",
+    ["Interface\\AddOns\\ChocloateBar\\pics\\DarkBottom"]      = "Interface\\AddOns\\Arcana\\Media\\DarkBottom",
+    ["Interface\\AddOns\\ChocloateBar\\pics\\Titan"]           = "Interface\\AddOns\\Arcana\\Media\\Titan",
+    ["Interface\\AddOns\\ChocloateBar\\pics\\Tribal"]          = "Interface\\AddOns\\Arcana\\Media\\Tribal",
+}
+
+local function migrateTexturePaths(tbl)
+    for k, v in pairs(tbl) do
+        if type(v) == "table" then
+            migrateTexturePaths(v)
+        elseif k == "texture" and type(v) == "string" then
+            tbl[k] = pathMap[v] or v
+        end
+    end
+end
+
 --------
 -- Ace3 callbacks
 --------
@@ -176,6 +202,8 @@ function ChocolateBar:AddonLoaded()
     self.db = LibStub("AceDB-3.0"):New("ArcanaDB", defaults, "Default")
     self.db.RegisterCallback(self, "OnDatabaseShutdown", "OnDatabaseShutdown")
 
+    migrateTexturePaths(ArcanaDB)
+
     self:RegisterChatCommand("Arcana", "ChatCommand")
     db = self.db.profile
 
@@ -187,10 +215,10 @@ function ChocolateBar:AddonLoaded()
     LSM:Register("statusbar", "Arcana Gray", "Interface\\AddOns\\Arcana\\Meida\\ArcanaBarGray")
     LSM:Register("statusbar", "Tooltip", "Interface\\Tooltips\\UI-Tooltip-Background")
     LSM:Register("statusbar", "Solid", "Interface\\Buttons\\WHITE8X8")
-    LSM:Register("statusbar", "Gloss", "Interface\\AddOns\\Arcana\\pics\\Gloss")
-    LSM:Register("statusbar", "DarkBottom", "Interface\\AddOns\\Arcana\\pics\\DarkBottom")
-    LSM:Register("background", "Titan", "Interface\\AddOns\\Arcana\\pics\\Titan")
-    LSM:Register("background", "Tribal", "Interface\\AddOns\\Arcana\\pics\\Tribal")
+    LSM:Register("statusbar", "Gloss", "Interface\\AddOns\\Arcana\\Media\\Gloss")
+    LSM:Register("statusbar", "DarkBottom", "Interface\\AddOns\\Arcana\\Media\\DarkBottom")
+    LSM:Register("background", "Titan", "Interface\\AddOns\\Arcana\\Media\\Titan")
+    LSM:Register("background", "Tribal", "Interface\\AddOns\\Arcana\\Media\\Tribal")
 
     self:RegisterEvent("PLAYER_REGEN_DISABLED", "OnEnterCombat")
     self:RegisterEvent("PLAYER_REGEN_ENABLED", "OnLeaveCombat")
