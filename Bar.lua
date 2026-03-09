@@ -147,18 +147,9 @@ function Bar:UpdateColors(db)
     self:SetBackdropColor(color.r, color.g, color.b, color.a)
 end
 
-local function texturePathMigration(path)
-    if path == "Interface\\AddOns\\Arcana\\pics\\chocolatebar" then
-        path = "Interface\\AddOns\\Arcana\\pics\\ArcanaBar"
-    elseif path == "Interface\\AddOns\\Arcana\\pics\\chocolatbarGray" then
-        path = "Interface\\AddOns\\Arcana\\pics\\ArcanaBarGray"
-    end
-    return path
-end
-
 function Bar:UpdateTexture(db)
     local bg = {
-        bgFile = texturePathMigration(db.background.texture),
+        bgFile = db.background.texture,
         edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
         tile = db.background.tile,
         tileSize = db.background.tileSize,
