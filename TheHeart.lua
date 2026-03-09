@@ -86,8 +86,8 @@ local defaults = {
         fontSize = 12,
         labelColor = { r = 1, g = 0.82, b = 0, a = 1 },
         background = {
-            textureName = "Arcana Gray",
-            texture = "Interface\\AddOns\\Arcana\\Media\\ArcanaBarGray",
+            textureName = "Arcana Gold",
+            texture = "Interface\\AddOns\\Arcana\\Media\\ArcanaBar",
             borderTexture = "Tooltip-Border",
             color = { r = 0.38, g = 0.36, b = 0.4, a = .94, },
             borderColor = { r = 0, g = 0, b = 0, a = 0, },

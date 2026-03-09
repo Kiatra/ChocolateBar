@@ -2,13 +2,13 @@
 --  Arcana
 --  Options.lua
 --
---  Overblown ace options tables, fun!
+--  Overblown aceoptions tables, fun!
 --
 --  Made with love by Kiatra ♡
 --  Forgetting to to close the brackes is even more fun!
 -- ✧───────────────────────────────────────--------───────✧
-local LibStub = LibStub
-local Arcana = LibStub("AceAddon-3.0"):GetAddon("Arcana")
+local libStub = LibStub
+local Arcana = libStub("AceAddon-3.0"):GetAddon("Arcana")
 local AceCfgDlg = LibStub("AceConfigDialog-3.0")
 local Drag = Arcana.Drag
 local broker = LibStub("LibDataBroker-1.1")
@@ -20,6 +20,8 @@ local addonName = ...
 ---@diagnostic disable-next-line: undefined-field
 local GetAddOnMetadata = _G.GetAddOnMetadata or _G.C_AddOns.GetAddOnMetadata;
 local version = GetAddOnMetadata(addonName, "Version") or "unknown";
+local title = "|TInterface\\AddOns\\Arcana\\Media\\Icons\\ArcanaKnowledge.tga:" ..
+    12 .. ":" .. 12 .. ":0:0|t " .. "Arcana - Quel'dorei Observatory"
 
 local function GetStats()
     local total = 0
@@ -111,100 +113,545 @@ end
 local increment = CreateCounter();
 local opacityTimer = nil
 
+local function getFontOptions()
+    return {
+        fontSize = {
+            type = 'range',
+            order = 2,
+            name = L["Font Size"],
+            desc = L["Font Size"],
+            min = 8,
+            max = 20,
+            step = .5,
+            get = function()
+                return db.fontSize
+            end,
+            set = function(_, value)
+                db.fontSize = value
+                Arcana:UpdatePlugins("updatefont")
+            end,
+        },
+        textcolour = {
+            type = "color",
+            order = 3,
+            name = L["Text color"],
+            desc = L
+                ["Default text color of a plugin. This will not overwrite plugins that use own colors."],
+            hasAlpha = true,
+            get = function()
+                local t = db.textColor or { r = 1, g = 1, b = 1, a = 1 }
+                return t.r, t.g, t.b, t.a
+            end,
+            set = function(_, r, g, b, a)
+                db.textColor = db.textColor or { r = 1, g = 1, b = 1, a = 1 }
+                local t = db.textColor
+                t.r, t.g, t.b, t.a = r, g, b, a
+                Arcana:UpdatePlugins("updateSettings")
+            end,
+        },
+        labelColor = {
+            type = "color",
+            order = 3,
+            name = L["Label color"],
+            desc = L["Default label color of a plugin."],
+            hasAlpha = true,
+            get = function()
+                local t = db.labelColor or { r = 1, g = 0.82, b = 0, a = 1 }
+                return t.r, t.g, t.b, t.a
+            end,
+            set = function(_, r, g, b, a)
+                db.labelColor = db.labelColor or { r = 1, g = 0.82, b = 0, a = 1 }
+                local t = db.labelColor
+                t.r, t.g, t.b, t.a = r, g, b, a
+                Arcana:UpdatePlugins("updateSettings")
+            end,
+        },
+        iconcolour = {
+            type = "toggle",
+            order = 4,
+            name = L["Desaturated Icons"],
+            desc = L
+                ["Show icons in gray scale mode (This will not affect icons embedded in the text of a plugin)."],
+            get = function()
+                return db.desaturated
+            end,
+            set = function(_, vale)
+                db.desaturated = vale
+                for name, _ in broker:DataObjectIterator() do
+                    if db.objSettings[name] then
+                        if db.objSettings[name].enabled then
+                            local plugin = Arcana:GetPlugin(name)
+                            if plugin then
+                                plugin:Update(plugin, "iconR", nil)
+                            end
+                        end
+                    end
+                end
+            end,
+        },
+        forceColor = {
+            type = 'toggle',
+            width = "double",
+            order = 9,
+            name = L["Force Text Color"],
+            desc = L["Remove custom colors from plugins."],
+            get = function()
+                return db.forceColor
+            end,
+            set = function(_, value)
+                db.forceColor = value
+                for name, obj in broker:DataObjectIterator() do
+                    if db.objSettings[name] then
+                        if db.objSettings[name].enabled then
+                            local plugin = Arcana:GetPlugin(name)
+                            if plugin then
+                                plugin:Update(plugin, "text", obj.text)
+                            end
+                        end
+                    end
+                end
+            end,
+        },
+    }
+end
+
+local function getCombatOptions()
+    return {
+        hidetooltip = {
+            type = 'toggle',
+            order = 1,
+            name = L["Disable Tooltips"],
+            desc = L["Disable Tooltips"],
+            get = function()
+                return db.combathidetip
+            end,
+            set = function(_, value)
+                db.combathidetip = value
+            end,
+        },
+        hidebars = {
+            type = 'toggle',
+            order = 2,
+            name = L["Hide Bars"],
+            desc = L["Hide Bars"],
+            get = function()
+                return db.combathidebar
+            end,
+            set = function(_, value)
+                db.combathidebar = value
+            end,
+        },
+        disablebar = {
+            type = 'toggle',
+            order = 2,
+            name = L["Disable Clicking"],
+            desc = L["Disable Clicking"],
+            get = function()
+                return db.combatdisbar
+            end,
+            set = function(_, value)
+                db.combatdisbar = value
+            end,
+        },
+        disableoptons = {
+            type = 'toggle',
+            order = 2,
+            name = L["Disable Options"],
+            desc = L["Disable options dialog on right click"],
+            get = function()
+                return db.disableoptons
+            end,
+            set = function(_, value)
+                db.disableoptons = value
+            end,
+        },
+        combatopacity = {
+            type = 'range',
+            order = 3,
+            name = L["Opacity"],
+            desc = L["Set the opacity of the bars during combat. Set to 100% to disable."],
+            min = 0,
+            max = 1,
+            step = 0.001,
+            bigStep = 0.05,
+            isPercent = true,
+            get = function()
+                return db.combatopacity
+            end,
+            set = function(_, value)
+                if value > 1 then
+                    value = 1
+                elseif value < 0.01 then
+                    value = 0.001
+                end
+                db.combatopacity = value
+                for _, bar in pairs(Arcana:GetBars()) do
+                    bar.tempHide = bar:GetAlpha()
+                    bar:SetAlpha(db.combatopacity)
+                end
+                Arcana:CancelTimer(opacityTimer)
+                opacityTimer = Arcana:ScheduleTimer(function(plugin)
+                    for _, bar in pairs(Arcana:GetBars()) do
+                        bar:SetAlpha(bar.settings.opacity)
+                    end
+                end, 2)
+            end,
+        },
+    }
+end
+
+local function getTextureOptions()
+    return {
+        textureStatusbar = {
+            type = 'select',
+            dialogControl = 'LSM30_Statusbar',
+            values = AceGUIWidgetLSMlists and AceGUIWidgetLSMlists.statusbar or {},
+            order = 1,
+            name = L["StatusBar Texture"],
+            desc = L["Note: Some LibSharedMedia provided textures may be provided by other addons."],
+            get = function()
+                return db.background.textureName
+            end,
+            set = function(_, value)
+                db.background.texture = LSM:Fetch("statusbar", value)
+                db.background.textureName = value
+                db.background.tile = false
+                Arcana:UpdateBarOptions("UpdateTexture")
+            end,
+        },
+        colour = {
+            type = "color",
+            order = 5,
+            name = L["Texture Color/Alpha"],
+            desc = L["Texture Color/Alpha"],
+            hasAlpha = true,
+            get = function(_)
+                local t = db.background.color
+                return t.r, t.g, t.b, t.a
+            end,
+            set = function(_, r, g, b, a)
+                local t = db.background.color
+                t.r, t.g, t.b, t.a = r, g, b, a
+                Arcana:UpdateBarOptions("UpdateColors")
+            end,
+        },
+        bordercolour = {
+            type = "color",
+            order = 6,
+            name = L["Border Color/Alpha"],
+            desc = L["Border Color/Alpha"],
+            hasAlpha = true,
+            get = function()
+                local t = db.background.borderColor
+                return t.r, t.g, t.b, t.a
+            end,
+            set = function(_, r, g, b, a)
+                local t = db.background.borderColor
+                t.r, t.g, t.b, t.a = r, g, b, a
+                Arcana:UpdateBarOptions("UpdateColors")
+            end,
+        }
+    }
+end
+
+local function getAdvancedTextureOptions()
+    return {
+        textureBackground = {
+            type = 'select',
+            dialogControl = 'LSM30_Background',
+            values = AceGUIWidgetLSMlists and AceGUIWidgetLSMlists.background or {},
+            order = 2,
+            name = L["Background Texture"],
+            desc = L["Some of the textures may depend on other addons."],
+            get = function()
+                return db.background.textureName
+            end,
+            set = function(_, value)
+                db.background.texture = LSM:Fetch("background", value)
+                db.background.textureName = value
+                db.background.tile = true
+                local t = db.background.color
+                t.r, t.g, t.b, t.a = 1, 1, 1, 1
+                Arcana:UpdateBarOptions("UpdateTexture")
+            end,
+        },
+        textureTile = {
+            type = 'toggle',
+            order = 3,
+            name = L["Tile"],
+            desc = L["Tile the Texture. Disable to stretch the Texture."],
+            get = function()
+                return db.background.tile
+            end,
+            set = function(_, value)
+                db.background.tile = value
+                Arcana:UpdateBarOptions("UpdateTexture")
+            end,
+        },
+        textureTileSize = {
+            type = 'range',
+            order = 4,
+            name = L["Tile Size"],
+            desc = L["Adjust the size of the tiles."],
+            min = 1,
+            max = 256,
+            step = 1,
+            bigStep = 5,
+            isPercent = false,
+            get = function()
+                return db.background.tileSize
+            end,
+            set = function(_, value)
+                if value > 256 then
+                    value = 256
+                elseif value < 1 then
+                    value = 1
+                end
+                db.background.tileSize = value
+                Arcana:UpdateBarOptions("UpdateTexture")
+            end,
+        }
+    }
+end
+
+local function getPluginOptions()
+    return {
+        stats = {
+            inline = true,
+            name = L["Plugin Statistics"],
+            type = "group",
+            order = 1,
+            args = {
+                stats = {
+                    order = 1,
+                    type = "description",
+                    name = GetStats,
+                },
+            },
+        },
+        quickconfig = {
+            inline = true,
+            name = L["Quick Config"],
+            type = "group",
+            order = 2,
+            args = {
+                enableAll = {
+                    type = 'execute',
+                    order = 3,
+                    name = L["Enable All"],
+                    desc = L["Get back my plugins!"],
+                    func = EnableAll,
+                },
+                disableAll = {
+                    type = 'execute',
+                    order = 4,
+                    name = L["Disable All"],
+                    desc = L["Disable all plugins."],
+                    func = DisableAll,
+                },
+                disableLauncher = {
+                    type = 'execute',
+                    order = 5,
+                    name = L["Disable all Launchers"],
+                    desc = L["Disable all the bad guy's:)"],
+                    func = DisableLauncher,
+                },
+            },
+        },
+        defaults = {
+            inline = true,
+            name = L["Defaults"],
+            type = "group",
+            order = 3,
+            args = {
+                label = {
+                    order = 0,
+                    type = "description",
+                    name = L["Automatically disable new plugins of type:"],
+                },
+                dataobjects = {
+                    type = 'toggle',
+                    order = 1,
+                    name = L["Data Source"],
+                    desc = L
+                        ["If enabled new plugins of type data source will automatically be disabled."],
+                    get = function()
+                        return db.autodissource
+                    end,
+                    set = function(_, value)
+                        db.autodissource = value
+                    end,
+                },
+                launchers = {
+                    type = 'toggle',
+                    order = 2,
+                    name = L["Launcher"],
+                    desc = L["If enabled new plugins of type launcher will automatically be disabled."],
+                    get = function()
+                        return db.autodislauncher
+                    end,
+                    set = function(_, value)
+                        db.autodislauncher = value
+                    end,
+                },
+            },
+        },
+        placeholder = {
+            inline = true,
+            name = L["Placeholder"],
+            type = "group",
+            order = 4,
+            args = {
+                label = {
+                    order = 0,
+                    type = "description",
+                    name = L["A placeholder is a plugin with no text that you can put between plugins."] ..
+                        "\n" ..
+                        L["Tipp: Set the width behavior to fixed and adjust the the max text width to scale the placeholder."],
+                },
+                newPlaceholder = {
+                    type = 'execute',
+                    order = -1,
+                    name = L["Create Placeholder"],
+                    desc = L["Creates a new plugin to use as a placeholder."],
+                    func = createPlaceholder,
+                },
+            },
+        },
+        --@debug@
+        debug = {
+            type = 'toggle',
+            order = 30,
+            name = "Debug",
+            desc = "This one is for me, not for you :P",
+            get = function()
+                return Arcana.db.char.debug
+            end,
+            set = function(_, value)
+                Arcana.db.char.debug = value
+            end,
+        },
+        --@end-debug@
+    }
+end
+
 local aceoptions = {
-    name = "|TInterface\\AddOns\\Arcana\\Media\\Icons\\ArcanaKnowledge.tga:" ..
-        12 .. ":" .. 12 .. ":0:0|t " .. "Arcana - Quel'dorei Observatory",
+    name = title,
     handler = Arcana,
     type = 'group',
-    --childGroups = "tab",
+    childGroups = "tab",
     desc = "Arcana - Quel'dorei Observatory",
     args = {
-        text1 = {
+        version = {
             order = 1,
             type = "description",
             name = version,
         },
-        news = {
-            name = L["Whats New & Info"],
+        newsAndPlugins = {
+            name = L["Info & Plugins"],
             type = "group",
             order = 0,
             args = {
-                info = {
-                    order = increment(),
-                    type = "header",
-                    name = L["Info"],
-                },
-                infoText = {
-                    order = increment(),
-                    type = "description",
-                    name = L
-                        ["The Quel'dorei became scattered across the world. To preserve the fragments of arcana they gathered from many sources, they maintain observatories where this knowledge is kept in careful order."]
-                },
-                infoTextPlugins = {
-                    order = increment(),
-                    type = "description",
-                    name = L
-                        ["You can add plugins to Arcana via the data-broker category in the curseforge app or the link below."],
+                infoAndNews = {
+                    name = L["Whats New & Info"],
+                    type = "group",
+                    order = 1,
+                    args = {
+                        info = {
+                            name = L["Info"],
+                            type = "group",
+                            inline = true,
+                            order = 0,
+                            args = {
+                                infoText = {
+                                    order = increment(),
+                                    type = "description",
+                                    name = L
+                                        ["The Quel'dorei became scattered across the world. To preserve the fragments of arcana they gathered from many sources, they maintain observatories where this knowledge is kept in careful order."]
+                                },
+                                infoTextPlugins = {
+                                    order = increment(),
+                                    type = "description",
+                                    name = L
+                                        ["You can add plugins to Arcana via the data-broker category in the curseforge app or the link below."],
+                                },
+                                plugins = {
+                                    order = increment(),
+                                    type = "execute",
+                                    name = L["Search for plugins here"],
+                                    func = function()
+                                        showURLPopup(
+                                            "https://www.curseforge.com/wow/search?sortBy=popularity&class=addons&categories=data-broker&search=plugin");
+                                    end,
+                                    width = 1.5,
+                                }
+                            }
+                        },
+                        news = {
+                            name = L["Whats New"],
+                            type = "group",
+                            inline = true,
+                            order = 0,
+                            args = {
+                                header26March7 = {
+                                    order = increment(),
+                                    type = "header",
+                                    name = L["2026 March 7"],
+                                },
+                                text26March7 = {
+                                    order = increment(),
+                                    type = "description",
+                                    name =
+                                        L["Added option to set the opacity of the bars."],
+                                },
+                                header26March7_2 = {
+                                    order = increment(),
+                                    type = "header",
+                                    name = L["2026 March 7"],
+                                },
+                                text26March7_2 = {
+                                    order = increment(),
+                                    type = "description",
+                                    name =
+                                        L
+                                        ["Added module to automatically migrate ChocolateBar profiles to Arcana."],
+                                },
+                                header26March6 = {
+                                    order = increment(),
+                                    type = "header",
+                                    name = L["2026 March 6"],
+                                },
+                                text26March6 = {
+                                    order = increment(),
+                                    type = "description",
+                                    name =
+                                        L["2026 March 6 - News"],
+                                },
+                                header26March5 = {
+                                    order = increment(),
+                                    type = "header",
+                                    name = L["2026 March 5"],
+                                },
+                                text26March5 = {
+                                    order = increment(),
+                                    type = "description",
+                                    name = L
+                                        ["TBC Anniversary:\nThe upper row action bars will now also be moved up. Reset them in edit mode and reload the UI."]
+                                }
+                            }
+                        }
+                    }
                 },
                 plugins = {
-                    order = increment(),
-                    type = "execute",
-                    name = L["Search for plugins here"],
-                    func = function()
-                        showURLPopup(
-                            "https://www.curseforge.com/wow/search?sortBy=popularity&class=addons&categories=data-broker&search=plugin");
-                    end,
-                    width = 1.5,
-                },
-                header26March7 = {
-                    order = increment(),
-                    type = "header",
-                    name = L["2026 March 7"],
-                },
-                text26March7 = {
-                    order = increment(),
-                    type = "description",
-                    name =
-                        L["Added option to set the opacity of the bars."],
-                },
-                header26March7_2 = {
-                    order = increment(),
-                    type = "header",
-                    name = L["2026 March 7"],
-                },
-                text26March7_2 = {
-                    order = increment(),
-                    type = "description",
-                    name =
-                        L
-                        ["Added module to automatically migrate ChocolateBar profiles to Arcana."],
-                },
-                header26March6 = {
-                    order = increment(),
-                    type = "header",
-                    name = L["2026 March 6"],
-                },
-                text26March6 = {
-                    order = increment(),
-                    type = "description",
-                    name =
-                        L["2026 March 6 - News"],
-                },
-                header26March5 = {
-                    order = increment(),
-                    type = "header",
-                    name = L["2026 March 5"],
-                },
-                text26March5 = {
-                    order = increment(),
-                    type = "description",
-                    name = L
-                        ["TBC Anniversary:\nThe upper row action bars will now also be moved up. Reset them in edit mode and reload the UI."]
-                },
+                    name = L["All Plugins"],
+                    type = "group",
+                    order = -1,
+                    args = getPluginOptions()
+                }
             }
         },
-        lookAndFeel = {
-            name = L["Look and Feel"],
+        general = {
+            name = L["General"],
             type = "group",
             order = 1,
             args = {
@@ -212,7 +659,7 @@ local aceoptions = {
                     inline = true,
                     name = L["General"],
                     type = "group",
-                    order = 3,
+                    order = 1,
                     args = {
                         locked = {
                             type = 'toggle',
@@ -265,21 +712,45 @@ local aceoptions = {
                                 Arcana:ToggleOrderHallCommandBar()
                             end,
                         },
-                        --[[
-							adjustCenter = {
-								type = 'toggle',
-								order = 5,
-								width = "double",
-								name = L["Update Center Position"],
-								desc = L["Always adjust the center group based on the current width of the plugins. Disable this to align the center group based only on the number of plugins."],
-								get = function(info, value)
-										return db.adjustCenter
-								end,
-								set = function(info, value)
-										db.adjustCenter = value
-										Arcana:UpdateBarOptions("UpdateBar")
-								end,
-							},]] --
+                        barRightClick = {
+                            type = 'select',
+                            values = {
+                                NONE = L["none"],
+                                OPTIONS = L["Arcana Options"],
+                                BLIZZ = L["Blizzard Options"]
+                            },
+                            order = 16,
+                            name = L["Bar Right Click"],
+                            desc = L["Select the action when right clicking on a bar."],
+                            get = function()
+                                return db.barRightClick
+                            end,
+                            set = function(_, value)
+                                db.barRightClick = value
+                            end,
+                        },
+                    },
+                },
+                combat = {
+                    name = L["In Combat"],
+                    type = "group",
+                    inline = true,
+                    order = 1,
+                    args = getCombatOptions()
+                }
+            },
+        },
+        lookAndTexture = {
+            name = L["Look & Texture"],
+            type = "group",
+            order = 4,
+            args = {
+                general = {
+                    inline = true,
+                    name = L["General"],
+                    type = "group",
+                    order = 1,
+                    args = {
                         gap = {
                             type = 'range',
                             order = 10,
@@ -374,373 +845,29 @@ local aceoptions = {
                                 Arcana:UpdateBarOptions("UpdateStrata")
                             end,
                         },
-                        barRightClick = {
-                            type = 'select',
-                            values = {
-                                NONE = L["none"],
-                                OPTIONS = L["Arcana Options"],
-                                BLIZZ = L["Blizzard Options"]
-                            },
-                            order = 16,
-                            name = L["Bar Right Click"],
-                            desc = L["Select the action when right clicking on a bar."],
-                            get = function()
-                                return db.barRightClick
-                            end,
-                            set = function(_, value)
-                                db.barRightClick = value
-                            end,
-                        },
-                        --colorizedDragging = {
-                        --	type = 'toggle',
-                        --	order = 12,
-                        --	name = L["Colorized Dragging"],
-                        --	desc = L["Colorize frames during drag & drop."],
-                        --	get = function(info, value)
-                        --			return db.colorizedDragging
-                        --	end,
-                        --	set = function(info, value)
-                        --	-		db.colorizedDragging = value
-                        --	end,
-                        --},
-                    },
+                    }
                 },
-                defaults = {
+                textures = {
                     inline = true,
-                    name = L["Defaults"],
+                    name = L["Textures"],
+                    type = "group",
+                    order = 2,
+                    args = getTextureOptions()
+                },
+                advanced = {
+                    inline = true,
+                    name = L["Advanced Textures"],
+                    type = "group",
+                    order = 3,
+                    args = getAdvancedTextureOptions()
+                },
+                font = {
+                    inline = true,
+                    name = L["Font"],
                     type = "group",
                     order = 4,
-                    args = {
-                        label = {
-                            order = 0,
-                            type = "description",
-                            name = L["Automatically disable new plugins of type:"],
-                        },
-                        dataobjects = {
-                            type = 'toggle',
-                            order = 1,
-                            name = L["Data Source"],
-                            desc = L["If enabled new plugins of type data source will automatically be disabled."],
-                            get = function()
-                                return db.autodissource
-                            end,
-                            set = function(_, value)
-                                db.autodissource = value
-                            end,
-                        },
-                        launchers = {
-                            type = 'toggle',
-                            order = 2,
-                            name = L["Launcher"],
-                            desc = L["If enabled new plugins of type launcher will automatically be disabled."],
-                            get = function()
-                                return db.autodislauncher
-                            end,
-                            set = function(_, value)
-                                db.autodislauncher = value
-                            end,
-                        },
-                    },
+                    args = getFontOptions()
                 },
-                combat = {
-                    --inline = true,
-                    name = L["In Combat"],
-                    type = "group",
-                    order = 0,
-                    args = {
-                        combat = {
-                            inline = true,
-                            name = L["In Combat"],
-                            type = "group",
-                            order = 0,
-                            args = {
-                                hidetooltip = {
-                                    type = 'toggle',
-                                    order = 1,
-                                    name = L["Disable Tooltips"],
-                                    desc = L["Disable Tooltips"],
-                                    get = function()
-                                        return db.combathidetip
-                                    end,
-                                    set = function(_, value)
-                                        db.combathidetip = value
-                                    end,
-                                },
-                                hidebars = {
-                                    type = 'toggle',
-                                    order = 2,
-                                    name = L["Hide Bars"],
-                                    desc = L["Hide Bars"],
-                                    get = function()
-                                        return db.combathidebar
-                                    end,
-                                    set = function(_, value)
-                                        db.combathidebar = value
-                                    end,
-                                },
-                                disablebar = {
-                                    type = 'toggle',
-                                    order = 2,
-                                    name = L["Disable Clicking"],
-                                    desc = L["Disable Clicking"],
-                                    get = function()
-                                        return db.combatdisbar
-                                    end,
-                                    set = function(_, value)
-                                        db.combatdisbar = value
-                                    end,
-                                },
-                                disableoptons = {
-                                    type = 'toggle',
-                                    order = 2,
-                                    name = L["Disable Options"],
-                                    desc = L["Disable options dialog on right click"],
-                                    get = function()
-                                        return db.disableoptons
-                                    end,
-                                    set = function(_, value)
-                                        db.disableoptons = value
-                                    end,
-                                },
-                                combatopacity = {
-                                    type = 'range',
-                                    order = 3,
-                                    name = L["Opacity"],
-                                    desc = L["Set the opacity of the bars during combat. Set to 100% to disable."],
-                                    min = 0,
-                                    max = 1,
-                                    step = 0.001,
-                                    bigStep = 0.05,
-                                    isPercent = true,
-                                    get = function()
-                                        return db.combatopacity
-                                    end,
-                                    set = function(_, value)
-                                        if value > 1 then
-                                            value = 1
-                                        elseif value < 0.01 then
-                                            value = 0.001
-                                        end
-                                        db.combatopacity = value
-                                        for _, bar in pairs(Arcana:GetBars()) do
-                                            bar.tempHide = bar:GetAlpha()
-                                            bar:SetAlpha(db.combatopacity)
-                                        end
-                                        Arcana:CancelTimer(opacityTimer)
-                                        opacityTimer = Arcana:ScheduleTimer(function(plugin)
-                                            for _, bar in pairs(Arcana:GetBars()) do
-                                                bar:SetAlpha(bar.settings.opacity)
-                                            end
-                                        end, 2)
-                                    end,
-                                },
-                            },
-                        },
-                    },
-                },
-                fontAndTextures = {
-                    name = L["Fonts and Textures"],
-                    type = "group",
-                    order = 4,
-                    args = {
-                        textures = {
-                            inline = true,
-                            name = L["Textures"],
-                            type = "group",
-                            order = 2,
-                            args = {
-                                colour = {
-                                    type = "color",
-                                    order = 5,
-                                    name = L["Texture Color/Alpha"],
-                                    desc = L["Texture Color/Alpha"],
-                                    hasAlpha = true,
-                                    get = function(_)
-                                        local t = db.background.color
-                                        return t.r, t.g, t.b, t.a
-                                    end,
-                                    set = function(_, r, g, b, a)
-                                        local t = db.background.color
-                                        t.r, t.g, t.b, t.a = r, g, b, a
-                                        Arcana:UpdateBarOptions("UpdateColors")
-                                    end,
-                                },
-                                bordercolour = {
-                                    type = "color",
-                                    order = 6,
-                                    name = L["Border Color/Alpha"],
-                                    desc = L["Border Color/Alpha"],
-                                    hasAlpha = true,
-                                    get = function()
-                                        local t = db.background.borderColor
-                                        return t.r, t.g, t.b, t.a
-                                    end,
-                                    set = function(_, r, g, b, a)
-                                        local t = db.background.borderColor
-                                        t.r, t.g, t.b, t.a = r, g, b, a
-                                        Arcana:UpdateBarOptions("UpdateColors")
-                                    end,
-                                },
-                                textureTile = {
-                                    type = 'toggle',
-                                    order = 3,
-                                    name = L["Tile"],
-                                    desc = L["Tile the Texture. Disable to stretch the Texture."],
-                                    get = function()
-                                        return db.background.tile
-                                    end,
-                                    set = function(_, value)
-                                        db.background.tile = value
-                                        Arcana:UpdateBarOptions("UpdateTexture")
-                                    end,
-                                },
-                                textureTileSize = {
-                                    type = 'range',
-                                    order = 4,
-                                    name = L["Tile Size"],
-                                    desc = L["Adjust the size of the tiles."],
-                                    min = 1,
-                                    max = 256,
-                                    step = 1,
-                                    bigStep = 5,
-                                    isPercent = false,
-                                    get = function()
-                                        return db.background.tileSize
-                                    end,
-                                    set = function(_, value)
-                                        if value > 256 then
-                                            value = 256
-                                        elseif value < 1 then
-                                            value = 1
-                                        end
-                                        db.background.tileSize = value
-                                        Arcana:UpdateBarOptions("UpdateTexture")
-                                    end,
-                                },
-                            },
-                        },
-                        font = {
-                            inline = true,
-                            name = L["Font"],
-                            type = "group",
-                            order = 1,
-                            args = {
-                                fontSize = {
-                                    type = 'range',
-                                    order = 2,
-                                    name = L["Font Size"],
-                                    desc = L["Font Size"],
-                                    min = 8,
-                                    max = 20,
-                                    step = .5,
-                                    get = function()
-                                        return db.fontSize
-                                    end,
-                                    set = function(_, value)
-                                        db.fontSize = value
-                                        Arcana:UpdatePlugins("updatefont")
-                                    end,
-                                },
-                                textcolour = {
-                                    type = "color",
-                                    order = 3,
-                                    name = L["Text color"],
-                                    desc = L
-                                        ["Default text color of a plugin. This will not overwrite plugins that use own colors."],
-                                    hasAlpha = true,
-                                    get = function()
-                                        local t = db.textColor or { r = 1, g = 1, b = 1, a = 1 }
-                                        return t.r, t.g, t.b, t.a
-                                    end,
-                                    set = function(_, r, g, b, a)
-                                        db.textColor = db.textColor or { r = 1, g = 1, b = 1, a = 1 }
-                                        local t = db.textColor
-                                        t.r, t.g, t.b, t.a = r, g, b, a
-                                        Arcana:UpdatePlugins("updateSettings")
-                                    end,
-                                },
-                                labelColor = {
-                                    type = "color",
-                                    order = 3,
-                                    name = L["Label color"],
-                                    desc = L["Default label color of a plugin."],
-                                    hasAlpha = true,
-                                    get = function()
-                                        local t = db.labelColor or { r = 1, g = 0.82, b = 0, a = 1 }
-                                        return t.r, t.g, t.b, t.a
-                                    end,
-                                    set = function(_, r, g, b, a)
-                                        db.labelColor = db.labelColor or { r = 1, g = 0.82, b = 0, a = 1 }
-                                        local t = db.labelColor
-                                        t.r, t.g, t.b, t.a = r, g, b, a
-                                        Arcana:UpdatePlugins("updateSettings")
-                                    end,
-                                },
-                                iconcolour = {
-                                    type = "toggle",
-                                    order = 4,
-                                    name = L["Desaturated Icons"],
-                                    desc = L
-                                        ["Show icons in gray scale mode (This will not affect icons embedded in the text of a plugin)."],
-                                    get = function()
-                                        return db.desaturated
-                                    end,
-                                    set = function(_, vale)
-                                        db.desaturated = vale
-                                        for name, _ in broker:DataObjectIterator() do
-                                            if db.objSettings[name] then
-                                                if db.objSettings[name].enabled then
-                                                    local plugin = Arcana:GetPlugin(name)
-                                                    if plugin then
-                                                        plugin:Update(plugin, "iconR", nil)
-                                                    end
-                                                end
-                                            end
-                                        end
-                                    end,
-                                },
-                                forceColor = {
-                                    type = 'toggle',
-                                    width = "double",
-                                    order = 9,
-                                    name = L["Force Text Color"],
-                                    desc = L["Remove custom colors from plugins."],
-                                    get = function()
-                                        return db.forceColor
-                                    end,
-                                    set = function(_, value)
-                                        db.forceColor = value
-                                        for name, obj in broker:DataObjectIterator() do
-                                            if db.objSettings[name] then
-                                                if db.objSettings[name].enabled then
-                                                    local plugin = Arcana:GetPlugin(name)
-                                                    if plugin then
-                                                        plugin:Update(plugin, "text", obj.text)
-                                                    end
-                                                end
-                                            end
-                                        end
-                                    end,
-                                },
-                            },
-                        },
-                    },
-                },
-                --@debug@
-                debug = {
-                    type = 'toggle',
-                    --width = "half",
-                    order = 30,
-                    name = "Debug",
-                    desc = "This one is for me, not for you :P",
-                    get = function()
-                        return Arcana.db.char.debug
-                    end,
-                    set = function(_, value)
-                        Arcana.db.char.debug = value
-                    end,
-                },
-                --@end-debug@
             },
         },
         bars = {
@@ -758,15 +885,8 @@ local aceoptions = {
                         local name = Arcana:AddBar()
                         Arcana:AddBarOptions(name)
                     end,
-                },
-                newPlaceholder = {
-                    type = 'execute',
-                    order = 0,
-                    name = L["Create Placeholder"],
-                    desc = L["Create New Placeholder"],
-                    func = createPlaceholder,
-                },
-            },
+                }
+            }
         },
         moduleOptions = {
             name = L["Modules"],
@@ -778,108 +898,18 @@ local aceoptions = {
                     order = 1,
                     name = L
                         ["Modules are buildin plugins that can be enabled or disabled here. Disabled plugins will not be loaded."]
-                },
-            },
-        },
-        plugins = {
-            name = L["Plugins"],
-            type = "group",
-            order = -1,
-            args = {
-                stats = {
-                    inline = true,
-                    name = L["Plugin Statistics"],
-                    type = "group",
-                    order = 1,
-                    args = {
-                        stats = {
-                            order = 1,
-                            type = "description",
-                            name = GetStats,
-                        },
-                    },
-                },
-                quickconfig = {
-                    inline = true,
-                    name = L["Quick Config"],
-                    type = "group",
-                    order = 2,
-                    args = {
-                        enableAll = {
-                            type = 'execute',
-                            order = 3,
-                            name = L["Enable All"],
-                            desc = L["Get back my plugins!"],
-                            func = EnableAll,
-                        },
-                        disableAll = {
-                            type = 'execute',
-                            order = 4,
-                            name = L["Disable All"],
-                            desc = L["Disable all plugins."],
-                            func = DisableAll,
-                        },
-                        disableLauncher = {
-                            type = 'execute',
-                            order = 5,
-                            name = L["Disable all Launchers"],
-                            desc = L["Disable all the bad guy's:)"],
-                            func = DisableLauncher,
-                        },
-                    },
-                },
-            },
-        },
-    },
-}
-
-aceoptions.args.lookAndFeel.args.fontAndTextures.args.textures.args.textureStatusbar = {
-    type = 'select',
-    dialogControl = 'LSM30_Statusbar',
-    values = AceGUIWidgetLSMlists and AceGUIWidgetLSMlists.statusbar or {},
-    order = 1,
-    name = L["Background Texture"],
-    desc = L["Some of the textures may depend on other addons."],
-    get = function()
-        return db.background.textureName
-    end,
-    set = function(_, value)
-        db.background.texture = LSM:Fetch("statusbar", value)
-        db.background.textureName = value
-        db.background.tile = false
-        Arcana:UpdateBarOptions("UpdateTexture")
-    end,
-}
-
-aceoptions.args.lookAndFeel.args.fontAndTextures.args.textures.args.background1 = {
-    inline = true,
-    name = L["Advanced Textures"],
-    type = "group",
-    order = 3,
-    args = {
-        textureBackground = {
-            type = 'select',
-            dialogControl = 'LSM30_Background',
-            values = AceGUIWidgetLSMlists and AceGUIWidgetLSMlists.background or {},
-            order = 2,
-            name = L["Background Texture"],
-            desc = L["Some of the textures may depend on other addons."],
-            get = function()
-                return db.background.textureName
-            end,
-            set = function(_, value)
-                db.background.texture = LSM:Fetch("background", value)
-                db.background.textureName = value
-                db.background.tile = true
-                local t = db.background.color
-                t.r, t.g, t.b, t.a = 1, 1, 1, 1
-                Arcana:UpdateBarOptions("UpdateTexture")
-            end,
+                }
+            }
         }
     }
 }
 
-aceoptions.args.lookAndFeel.args.fontAndTextures.args.font.args.font = {
+--aceoptions.args.lookAndTexture.args.textures.args.
+
+--aceoptions.args.lookAndTexture.args.
+--}
+
+aceoptions.args.lookAndTexture.args.font.args.font = {
     type = 'select',
     dialogControl = 'LSM30_Font',
     values = AceGUIWidgetLSMlists and AceGUIWidgetLSMlists.font or {},
@@ -896,7 +926,7 @@ aceoptions.args.lookAndFeel.args.fontAndTextures.args.font.args.font = {
     end,
 }
 
-local arcanaOptions = aceoptions.args.plugins.args
+local pluginOptions = aceoptions.args.newsAndPlugins.args.plugins.args
 local barOptions = aceoptions.args.bars.args
 local moduleOptions = aceoptions.args.moduleOptions.args
 Arcana.optionsTable = aceoptions
@@ -904,11 +934,11 @@ Arcana.optionsTable = aceoptions
 -- placeholder options
 local function removePlaceholder(info)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     db.placeholderNames[cleanName] = nil
     print(db.placeholderNames)
     Arcana:DisableDataObject(name)
-    arcanaOptions[cleanName] = nil
+    pluginOptions[cleanName] = nil
 end
 
 local placeholderOptions = {
@@ -936,7 +966,7 @@ local placeholderOptions = {
 local function addPlaceholderOption(cleanName)
     for k, _ in pairs(db.placeholderNames) do
         if cleanName == k then
-            table.insert(arcanaOptions[cleanName].args, placeholderOptions)
+            table.insert(pluginOptions[cleanName].args, placeholderOptions)
         end
     end
 end
@@ -1263,8 +1293,8 @@ end
 -----
 local function GetName(info)
     local cleanName = info[#info]
-    local name = arcanaOptions[cleanName].desc
-    --local icon = arcanaOptions[cleanName].icon
+    local name = pluginOptions[cleanName].desc
+    --local icon = pluginOptions[cleanName].icon
     local dataobj = broker:GetDataObjectByName(name)
     if (not db.objSettings[name].enabled) then
         -- disabled
@@ -1282,20 +1312,20 @@ end
 
 local function GetType(info)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     return (broker:GetDataObjectByName(name).type == "data source" and L["Type"] .. ": " .. L["Data Source"] .. "\n") or
         L["Type"] .. ": " .. L["Launcher"] .. "\n"
 end
 
 local function GetAlignment(info)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     return db.objSettings[name].align
 end
 
 local function SetAlignment(info, value)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     db.objSettings[name].align = value
     local plugin = Arcana:GetPlugin(name)
     db.objSettings[name].index = 500
@@ -1307,7 +1337,7 @@ end
 
 local function SetEnabled(info, value)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     if value then
         local obj = broker:GetDataObjectByName(name)
         Arcana:EnableDataObject(name, obj)
@@ -1318,7 +1348,7 @@ end
 
 local function GetEnabled(info)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     return db.objSettings[name].enabled
 end
 
@@ -1328,98 +1358,98 @@ end
 
 local function GetIcon(info)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     return db.objSettings[name].showIcon
 end
 
 local function SetIcon(info, value)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     db.objSettings[name].showIcon = value
     Arcana:AttributeChanged(nil, name, "updateSettings", value)
 end
 
 local function GetCustomLabel(info)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     return db.objSettings[name].customLabel
 end
 
 local function SetCustomLabel(info, value)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     db.objSettings[name].customLabel = value
     Arcana:AttributeChanged(nil, name, "updateSettings", value)
 end
 
 local function GetDisableTooltip(info)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     return db.objSettings[name].disableTooltip
 end
 
 local function SetDisableTooltip(info, value)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     db.objSettings[name].disableTooltip = value
     Arcana:AttributeChanged(nil, name, "updateSettings", value)
 end
 
 local function GetLabel(info)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     return db.objSettings[name].showLabel
 end
 
 local function SetLabel(info, value)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     db.objSettings[name].showLabel = value
     Arcana:AttributeChanged(nil, name, "updateSettings", value)
 end
 
 local function GetText(info)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     return db.objSettings[name].showText
 end
 
 local function SetText(info, value)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     db.objSettings[name].showText = value
     Arcana:AttributeChanged(nil, name, "updateSettings", value)
 end
 
 local function GetTextOffset(info)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     return db.objSettings[name].textOffset or db.textOffset
 end
 
 local function SetTextOffset(info, value)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     db.objSettings[name].textOffset = value
     Arcana:AttributeChanged(nil, name, "updateSettings", value)
 end
 
 local function GetWidth(info)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     return db.objSettings[name].width
 end
 
 local function SetWidth(info, value)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     db.objSettings[name].width = value
     Arcana:AttributeChanged(nil, name, "updateSettings", value)
 end
 
 local function GetWidthBehavior(info)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     if not db.objSettings[name].widthBehavior and db.objSettings[name].width == 0 then
         return "free"
     else
@@ -1429,21 +1459,21 @@ end
 
 local function SetWidthBehavior(info, value)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     db.objSettings[name].widthBehavior = value
     Arcana:AttributeChanged(nil, name, "updateSettings", value)
 end
 
 local function IsDisabledTextWidth(info)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     return true and (db.objSettings[name].widthBehavior == "free" or not db.objSettings[name].widthBehavior) or false
 end
 
 local function GetIconImage(info, name)
     if info then
         local cleanName = info[#info]
-        name = arcanaOptions[cleanName].desc
+        name = pluginOptions[cleanName].desc
     end
     local obj = broker:GetDataObjectByName(name)
     if obj and obj.icon then
@@ -1454,7 +1484,7 @@ end
 
 local function GetIconCoords(info)
     local cleanName = info[#info]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     local obj = broker:GetDataObjectByName(name)
     if obj and obj.iconCoords then
         return obj.iconCoords
@@ -1463,26 +1493,26 @@ end
 
 local function IsDisabledIcon(info)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     local obj = broker:GetDataObjectByName(name)
     return not (obj and obj.icon) --return true if there is no icon
 end
 
 local function IsDisabledSetTextOffset(info)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     return not db.objSettings[name].textOffset
 end
 
 local function IsEnabledSetTextOffset(info)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     return db.objSettings[name].textOffset
 end
 
 local function SetEnabledSetTextOffset(info, value)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     local settings = db.objSettings[name]
     if settings.textOffset then
         settings.textOffset = nil
@@ -1494,7 +1524,7 @@ end
 
 local function SetEnabledOverwriteIconSize(info, value)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     local settings = db.objSettings[name]
     if settings.iconSize then
         settings.iconSize = nil
@@ -1506,7 +1536,7 @@ end
 
 local function SetCustomIconSize(info, value)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     if value > 1 then
         value = 1
     elseif value < 0.01 then
@@ -1518,32 +1548,32 @@ end
 
 local function GetCustomIconSize(info)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     return db.objSettings[name].iconSize or db.iconSize
 end
 
 local function IsEnabledOvwerwriteIconSize(info)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     return db.objSettings[name].iconSize
 end
 
 local function IsDisabledOvwerwriteIconSize(info)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     return not db.objSettings[name].iconSize
 end
 
 
 local function GetHeaderName(info)
     local cleanName = info[#info - 1]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     return "|T" .. GetIconImage(nil, name) .. ":18|t " .. name
 end
 
 local function ShowPluginOnBar(info)
     local cleanName = info[#info - 2]
-    local name = arcanaOptions[cleanName].desc
+    local name = pluginOptions[cleanName].desc
     local plugin = Arcana:GetPlugin(name)
     if plugin then
         plugin.blinkTimerCount = 0
@@ -1591,11 +1621,8 @@ function Arcana:RegisterOptions(data, _, modules)
     self.db.RegisterCallback(self, "OnProfileCopied", "OnProfileChanged")
     self.db.RegisterCallback(self, "OnProfileReset", "OnProfileChanged")
 
-    AceCfgDlg:SelectGroup("Arcana", "plugins")
-    AceCfgDlg:SelectGroup("Arcana", "bars")
-    AceCfgDlg:SelectGroup("Arcana", "general")
-    AceCfgDlg:SelectGroup("Arcana", "lookAndFeel")
-    AceCfgDlg:SelectGroup("Arcana", "news")
+    AceCfgDlg:SelectGroup("Arcana", "newsAndPlugins", "plugins")
+    AceCfgDlg:SelectGroup("Arcana", "newsAndPlugins", "news")
 
     for name, module in pairs(modules) do
         self:AddModuleOptions(name, module.options)
@@ -1763,7 +1790,7 @@ function Arcana:RemoveBarOptions(name)
 end
 
 function Arcana:RemovePluginOptions(cleanName)
-    arcanaOptions[cleanName] = nil
+    pluginOptions[cleanName] = nil
 end
 
 local alignments         = { left = L["Left"], center = L["Center"], right = L["Right"] }
@@ -1788,7 +1815,7 @@ function Arcana:AddObjectOptions(name, obj)
     cleanName = string.gsub(cleanName, "[%c \127]", "")
 
     --use cleanName of name because aceconfig does not like some characters in the plugin names
-    arcanaOptions[cleanName] = {
+    pluginOptions[cleanName] = {
         --name = GetObjectText,
         name = GetName,
         desc = name,
@@ -1968,9 +1995,9 @@ function Arcana:AddObjectOptions(name, obj)
 end
 
 function Arcana:AddCustomPluginOptions(pluginName, customOptions)
-    for cleanName, _ in pairs(arcanaOptions) do
+    for cleanName, _ in pairs(pluginOptions) do
         if cleanName == pluginName then
-            table.insert(arcanaOptions[cleanName].args, customOptions)
+            table.insert(pluginOptions[cleanName].args, customOptions)
         end
     end
 end
