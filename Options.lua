@@ -112,7 +112,8 @@ local increment = CreateCounter();
 local opacityTimer = nil
 
 local aceoptions = {
-    name = "Arcana - Quel'dorei Observatory",
+    name = "|TInterface\\AddOns\\Arcana\\Media\\Icons\\ArcanaKnowledge.tga:" ..
+        12 .. ":" .. 12 .. ":0:0|t " .. "Arcana - Quel'dorei Observatory",
     handler = ChocolateBar,
     type = 'group',
     --childGroups = "tab",

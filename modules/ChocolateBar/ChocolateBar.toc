@@ -9,7 +9,7 @@
 ## RequiredDeps: Arcana
 ## Group: Arcana
 ## SavedVariables: ChocolateBarDB
-## IconTexture: Interface/AddOns/Arcana/pics/ChocolatePiece
+## IconTexture: Interface/AddOns/Arcana/Media/Icons/ArcanaKnowledge
 
 ## Category: Data Broker
 ## Category-deDE: Datenbroker

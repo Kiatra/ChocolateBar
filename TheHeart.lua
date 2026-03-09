@@ -7,7 +7,7 @@
 --
 --  Made with love by Kiatra ♡
 --
---  Special thanks to/for:
+--  Special thanks to:
 -- ✧────────────────────────────────────────────────────✧
 --  the WoW addon community
 --  for years of shared knowledge and inspiration.
@@ -16,7 +16,6 @@
 --  Rosa for the trust in us making
 --      magic happen responsibly.
 --
---  The love I had in me from Katrin
 --  Ray for the fun we had creating in school.
 --  Alundira/Alexwild for seeing me before I was me.
 -- ✧────────────────────────────────────────────────────✧
