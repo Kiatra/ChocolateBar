@@ -2,7 +2,13 @@ local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
 local L = AceLocale:NewLocale("Arcana", "enUS", true)
 if not L then return end
 
+L["StatusBar Texture"] = true
+L["Note: Some LibSharedMedia provided textures may be provided by other addons."] = true
+L["Look & Texture"] = true
+L["A placeholder is a plugin with no text that you can put between plugins."] = true
 L["Mouseover Opacity"] = true
+L["Info & Plugins"] = true
+L["All Plugins"] = true
 L["Set the opacity of the the bars when the mouse is over a bar."] = true
 L["Set the opacity of the the bars. You can set the alpha of the bar background unter textures."] = true
 L["Added option to set the opacity of the bars."] = true
@@ -28,7 +34,7 @@ Thank you all for using the mod for all those years!
 The old name was around for a while... and while I liked the old funny name for me it was time to move on.
 ]]
 
-
+L["Whats New"] = true
 L["Whats New & Info"] = true
 L["2026 March 5"] = true
 L["TBC Anniversary:\nThe upper row action bars will now also be moved up. Reset them in edit mode and reload the UI."] = true
