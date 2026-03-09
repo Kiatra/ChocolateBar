@@ -88,8 +88,6 @@ function Bar:New(name, settings, database)
     ---@diagnostic disable-next-line: undefined-field
     frame:UpdateTexture(db)
     ---@diagnostic disable-next-line: undefined-field
-    frame:UpdateTexture(db)
-    ---@diagnostic disable-next-line: undefined-field
     frame:UpdateColors(db)
     ---@diagnostic disable-next-line: undefined-field
     frame:UpdateStrata(db)
@@ -149,20 +147,24 @@ function Bar:UpdateColors(db)
     self:SetBackdropColor(color.r, color.g, color.b, color.a)
 end
 
-function Bar:UpdateTexture(db)
-    --local background = LSM:Fetch("statusbar", db.background.texture)
+local function texturePathMigration(path)
+    if path == "Interface\\AddOns\\Arcana\\pics\\chocolatebar" then
+        path = "Interface\\AddOns\\Arcana\\pics\\ArcanaBar"
+    elseif path == "Interface\\AddOns\\Arcana\\pics\\chocolatbarGray" then
+        path = "Interface\\AddOns\\Arcana\\pics\\ArcanaBarGray"
+    end
+    return path
+end
 
+function Bar:UpdateTexture(db)
     local bg = {
-        bgFile = db.background.texture,
+        bgFile = texturePathMigration(db.background.texture),
         edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
         tile = db.background.tile,
         tileSize = db.background.tileSize,
         edgeSize = db.background.edgeSize,
         insets = { left = 0, right = 0, top = 0, bottom = 0 }
     }
-    --db.barSettings[name].align == "bottom" then
-
-    --bg.bgFile = background
     self:SetBackdrop(bg);
     self:UpdateColors(db)
 end
