@@ -4,11 +4,17 @@ local dropPoints
 local _G = _G
 local Drag = Arcana.Drag
 
+local dropFramesWidth = 300
+local dropFramesHeight = 200
+local dropPointWidth = 100
+local dropPointHeigth = 100
+local textureHeight = 10 --guess
+
 local function createDropPoint(name, dropfunc, offx, text, texture)
     if not Arcana.dropFrames then
         local dropFrames = CreateFrame("Frame", nil, _G.UIParent, BackdropTemplateMixin and "BackdropTemplate")
-        dropFrames:SetWidth(420)
-        dropFrames:SetHeight(200)
+        dropFrames:SetWidth(dropFramesWidth)
+        dropFrames:SetHeight(dropFramesHeight)
         Arcana.dropFrames = dropFrames
         dropFrames:SetBackdrop({
             bgFile = "Interface\\ACHIEVEMENTFRAME\\UI-Achievement-Parchment-Horizontal-Desaturated",
@@ -22,17 +28,17 @@ local function createDropPoint(name, dropfunc, offx, text, texture)
         ---@diagnostic disable-next-line: param-type-mismatch, inject-field
         dropFrames.text = dropFrames:CreateFontString(nil, nil, "GameFontHighlight")
         ---@diagnostic disable-next-line: param-type-mismatch
-        dropFrames.text:SetPoint("CENTER", 0, -40)
+        dropFrames.text:SetPoint("CENTER", 0, -60)
         ---@diagnostic disable-next-line: undefined-field
         dropFrames.text:SetFormattedText("|T%s:%d|t%s", "Interface\\FriendsFrame\\InformationIcon", 16,
             " " .. L["Drop a Plugin onto any of the icons above."])
     end
     local frame = CreateFrame("Frame", name, Arcana.dropFrames, BackdropTemplateMixin and "BackdropTemplate")
-    frame:SetWidth(100)
-    frame:SetHeight(100)
+    frame:SetWidth(dropPointWidth)
+    frame:SetHeight(dropPointHeigth)
     frame:SetFrameStrata("DIALOG")
     ---@diagnostic disable-next-line: param-type-mismatch
-    frame:SetPoint("TOPLEFT", offx + 10, -10)
+    frame:SetPoint("TOPLEFT", offx, -40)
 
     frame:SetBackdrop({
         bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
@@ -47,17 +53,16 @@ local function createDropPoint(name, dropfunc, offx, text, texture)
     frame:SetBackdropBorderColor(0.4, 0.4, 0.4)
     frame:SetBackdropColor(0, 0, 0, 0.5)
 
-    local tex = frame:CreateTexture()
-    tex:SetWidth(50)
-    tex:SetHeight(50)
-    tex:SetTexture(texture)
+    local iconTexture = frame:CreateTexture()
+    iconTexture:SetWidth(50)
+    iconTexture:SetHeight(50)
+    iconTexture:SetTexture(texture)
     ---@diagnostic disable-next-line: param-type-mismatch
-    tex:SetPoint("TOPLEFT", 25, -35)
-
+    iconTexture:SetPoint("CENTER", 0, 0) --icons in center
     ---@diagnostic disable-next-line: inject-field, param-type-mismatch
     frame.text = frame:CreateFontString(nil, nil, "GameFontHighlight")
     ---@diagnostic disable-next-line: param-type-mismatch
-    frame.text:SetPoint("CENTER", 0, 30)
+    frame.text:SetPoint("CENTER", 0, 60) --text above drop points
     frame.text:SetText(text)
 
 
@@ -77,15 +82,6 @@ end
 --------
 -- drop points functions
 --------
-local function dropText(_, plugin)
-    local name = plugin.name
-    local db = Arcana.db.profile
-    db.objSettings[name].showText = not db.objSettings[name].showText
-    Arcana:AttributeChanged(nil, name, "updateSettings", db.objSettings[name].showText)
-    plugin.bar:ResetDrag(plugin, name)
-    --frame:SetBackdropColor(0,0,0,1)
-end
-
 local function dropOptions(frame, plugin)
     local obj = plugin.obj
     local name = obj.name
@@ -112,10 +108,14 @@ end
 
 function Arcana:SetDropPoins(parent)
     if not dropPoints then
-        createDropPoint("ArcanaTextDrop", dropText, 0, L["Toggle Text"],
-            "Interface/ICONS/INV_Inscription_Tradeskill01")
-        createDropPoint("ArcnaCenterDrop", dropOptions, 150, "CB " .. L["Options"], "Interface/Icons/INV_Gizmo_02")
-        createDropPoint("ArcanaDisableDrop", dropDisable, 300, L["Disable Plugin"],
+        local x = (dropFramesWidth - dropPointWidth * 2) / 3
+
+        --createDropPoint("ArcanaTextDrop", dropText, 0, L["Toggle Text"],
+        --    "Interface/ICONS/INV_Inscription_Tradeskill01")
+        createDropPoint("ArcnaCenterDrop", dropOptions, x, L["Plugin Options"],
+            "Interface/Icons/INV_Gizmo_02")
+        createDropPoint("ArcanaDisableDrop", dropDisable, x * 2 + dropPointWidth, L
+            ["Disable Plugin"],
             "Interface/ICONS/Spell_ChargeNEgative")
     end
 
