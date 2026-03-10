@@ -34,6 +34,7 @@ Thank you all for using the mod for all those years!
 The old name was around for a while... and while I liked the old funny name for me it was time to move on.
 ]]
 
+L["Plugin Options"] = true
 L["Whats New"] = true
 L["Whats New & Info"] = true
 L["2026 March 5"] = true

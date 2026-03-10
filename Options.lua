@@ -1631,10 +1631,8 @@ function Arcana:RegisterOptions(data, _, modules)
 end
 
 function Arcana:OpenOptions(_, _, input, pluginName, _, blizzard)
-    --local AceCfgDlg = LibStub("AceConfigDialog-3.0")
-
     if pluginName then
-        AceCfgDlg:SelectGroup("Arcana", "plugins", pluginName)
+        AceCfgDlg:SelectGroup("Arcana", "newsAndPlugins", "plugins", pluginName)
     end
 
     if blizzard then
