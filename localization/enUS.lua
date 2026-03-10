@@ -5,6 +5,12 @@ if not L then return end
 -- -- ✧─────────────────────────────────────-----─────────✧
 -- News
 -- -- ✧─────────────────────────────────────-----─────────✧
+L["news.6.header"] = "2026 March 10"
+L["news.6.text"] = "Profile migration module is now load on demand and not longer required."
+
+L["news.5.header"] = "2026 March 9"
+L["news.5.text"] = "Cleaner options layout."
+
 L["news.4.header"] = "2026 March 7"
 L["news.4.text"] = "Added option to set the opacity of the bars."
 

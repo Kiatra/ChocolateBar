@@ -93,10 +93,9 @@ end
 
 function module:NewPlaceholder(name)
     local placeholder = LibStub("LibDataBroker-1.1"):NewDataObject(name, {
-        type    = "data source",
-        label   = name,
-        text    = "",
-        OnClick = onRightClick,
+        type  = "data source",
+        label = name,
+        text  = "",
     })
     return placeholder
 end
