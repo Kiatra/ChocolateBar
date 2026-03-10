@@ -24,10 +24,10 @@
 local LibStub, broker, LSM = LibStub, LibStub("LibDataBroker-1.1"), LibStub("LibSharedMedia-3.0")
 local Arcana = LibStub("AceAddon-3.0"):NewAddon("Arcana", "AceConsole-3.0", "AceEvent-3.0", "AceTimer-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("Arcana")
-local _G, pairs, ipairs, table, string, tostring = _G, pairs, ipairs, table, string, tostring
-local select, strjoin, CreateFrame = select, strjoin, CreateFrame
 
-local _, _, _, tocversion = GetBuildInfo()
+local _G, pairs, ipairs, table, tostring = _G, pairs, ipairs, table, tostring
+local select, strjoin, CreateFrame = select, strjoin, CreateFrame
+local LoadAddOn = LoadAddOn or C_AddOns.LoadAddOn
 
 local addonVersion = C_AddOns.GetAddOnMetadata("Arcana", "Version")
 
@@ -45,9 +45,9 @@ local arcanaBars = {}
 local pluginObjects = {}
 local db --reference to Arcana.db.profile
 
---------
+-- ✧────────────────────────────────────────────────────✧
 -- utility functions
---------
+-- ✧────────────────────────────────────────────────────✧
 local function debug(...)
     if Arcana.db and Arcana.db.char.debug then
         local s = "CB:"
@@ -128,81 +128,36 @@ local defaults = {
     }
 }
 
--- global DB name migration helpers
+-- ✧────────────────────────────────────────────────────✧
+-- Load Migration Plugin if required
+--   otherwise initialize Arcana
+-- ✧────────────────────────────────────────────────────✧
 local function HasData(tbl)
     return type(tbl) == "table" and next(tbl) ~= nil
 end
 
 local f = CreateFrame("Frame")
 f:RegisterEvent("ADDON_LOADED")
-f:SetScript("OnEvent", function(_, event, addon)
-    if addon == "ChocolateBar" then
-        Arcana:AddonLoaded()
+f:SetScript("OnEvent", function(_, _, addon)
+    if addon == "Arcana" then
+        if HasData(ArcanaDB) then
+            -- set to go
+            Arcana:Initialize()
+        else
+            -- lets cast some magic
+            local loaded, reason = LoadAddOn("ChocolateBar")
+            if not loaded then print("|cff88ccffArcana Debug|r Failed to load ChocolateBar Migration:", reason) end
+        end
+    elseif addon == "ChocolateBar" then
+        local ArcanaMigrate = LibStub("AceAddon-3.0"):GetAddon("ArcanaMigrate")
+        ArcanaDB = ArcanaMigrate:MigareDB() --set golbal ArcanaDB based on oldDB
+        Arcana:Initialize()
     end
 end)
 
--- bar name migration helpers
-local function barNameIsDeprecated(name)
-    if name:match("^ChocolateBar%d+$") then
-        return true
-    end
-end
-
-local function convertDeprecatedBarName(name)
-    local n = name:match("^ChocolateBar(%d+)$")
-    if n then
-        return "Arcana" .. n
-    end
-end
-
-local function migrateBarNames(db)
-    local barSettings = db.barSettings
-    local toRename = {}
-    -- collect
-    for oldName, settings in pairs(barSettings) do
-        local newName = convertDeprecatedBarName(oldName)
-        if newName and newName ~= oldName then
-            toRename[#toRename + 1] = { oldName, newName, settings }
-        end
-    end
-    -- apply
-    for _, item in ipairs(toRename) do
-        local oldName, newName, settings = item[1], item[2], item[3]
-        barSettings[newName] = settings
-        barSettings[oldName] = nil
-        settings.barName = newName
-    end
-end
-
---migrate textures
-local pathMap = {
-    ["Interface\\AddOns\\Arcana\\pics\\chocolatebar"]          = "Interface\\AddOns\\Arcana\\Media\\ArcanaBar",
-    ["Interface\\AddOns\\Arcana\\pics\\chocolatbarGray"]       = "Interface\\AddOns\\Arcana\\Media\\ArcanaBarGray",
-    ["Interface\\AddOns\\Arcana\\pics\\Gloss"]                 = "Interface\\AddOns\\Arcana\\Media\\Gloss",
-    ["Interface\\AddOns\\Arcana\\pics\\DarkBottom"]            = "Interface\\AddOns\\Arcana\\Media\\DarkBottom",
-    ["Interface\\AddOns\\Arcana\\pics\\Titan"]                 = "Interface\\AddOns\\Arcana\\Media\\Titan",
-    ["Interface\\AddOns\\Arcana\\pics\\Tribal"]                = "Interface\\AddOns\\Arcana\\Media\\Tribal",
-    ["Interface\\AddOns\\ChocloateBar\\pics\\chocolatebar"]    = "Interface\\AddOns\\Arcana\\Media\\ArcanaBar",
-    ["Interface\\AddOns\\ChocloateBar\\pics\\chocolatbarGray"] = "Interface\\AddOns\\Arcana\\Media\\ArcanaBarGray",
-    ["Interface\\AddOns\\ChocloateBar\\pics\\Gloss"]           = "Interface\\AddOns\\Arcana\\Media\\Gloss",
-    ["Interface\\AddOns\\ChocloateBar\\pics\\DarkBottom"]      = "Interface\\AddOns\\Arcana\\Media\\DarkBottom",
-    ["Interface\\AddOns\\ChocloateBar\\pics\\Titan"]           = "Interface\\AddOns\\Arcana\\Media\\Titan",
-    ["Interface\\AddOns\\ChocloateBar\\pics\\Tribal"]          = "Interface\\AddOns\\Arcana\\Media\\Tribal",
-}
-
-local function migrateTexturePaths(tbl)
-    for k, v in pairs(tbl) do
-        if type(v) == "table" then
-            migrateTexturePaths(v)
-        elseif k == "texture" and type(v) == "string" then
-            tbl[k] = pathMap[v] or v
-        end
-    end
-end
-
---------
+-- ✧────────────────────────────────────────────────────✧
 -- Ace3 callbacks
---------
+-- ✧────────────────────────────────────────────────────✧
 --- we want to load after old DB was loead from the old name of the addon for the migration
 --[[
 function Arcana:OnInitialize()
@@ -210,23 +165,9 @@ function Arcana:OnInitialize()
 end
 ]]
 
---OnInitialize
-function Arcana:AddonLoaded()
-    local oldDB = ChocolateBarDB
-    if oldDB then
-        if HasData(oldDB) then
-            if not oldDB.arcanaMigrated then
-                ArcanaDB = oldDB
-                oldDB.arcanaMigrated = true
-                print("|cff88ccffArcana|r ", "Doing profile migration...")
-            end
-        end
-    end
-
+function Arcana:Initialize()
     self.db = LibStub("AceDB-3.0"):New("ArcanaDB", defaults, "Default")
     self.db.RegisterCallback(self, "OnDatabaseShutdown", "OnDatabaseShutdown")
-
-    migrateTexturePaths(ArcanaDB)
 
     self:RegisterChatCommand("Arcana", "ChatCommand")
     db = self.db.profile
@@ -253,7 +194,7 @@ function Arcana:AddonLoaded()
         self:RegisterEvent("PET_BATTLE_CLOSE", "OnPetBattleOver")
     end
 
-    self:RegisterEvent("ADDON_LOADED", function(event, addonName)
+    self:RegisterEvent("ADDON_LOADED", function(_, addonName)
         if self[addonName] then self[addonName](self) end
     end)
 
@@ -263,11 +204,9 @@ function Arcana:AddonLoaded()
         self.db.profile.fixedStrata = true
     end
 
-    migrateBarNames(db)
     --now creating stored bars
     local barSettings = db.barSettings
     for k, v in pairs(barSettings) do
-        local name = v.barName
         self:AddBar(k, v, true) --force no anchor update
     end
     self:AnchorBars()
@@ -296,7 +235,7 @@ end
 
 function Arcana:EnableModules()
     -- itaret modules list and call each enable fuction
-    for name, module in pairs(Arcana.modules) do
+    for name, _ in pairs(Arcana.modules) do
         if db.moduleSettings[name].enabled then
             Arcana:EnableModule(name)
         end
@@ -396,7 +335,7 @@ function Arcana:Blizzard_OrderHallUI()
 end
 
 function Arcana:UpdateJostle()
-    for name, bar in pairs(arcanaBars) do
+    for _, bar in pairs(arcanaBars) do
         bar:UpdateJostle(db)
     end
 end
@@ -420,10 +359,10 @@ function Arcana:ToggleOrderHallCommandBar()
 end
 
 function Arcana:OnDisable()
-    for name, obj in broker:DataObjectIterator() do
+    for name, _ in broker:DataObjectIterator() do
         if pluginObjects[name] then pluginObjects[name]:Hide() end
     end
-    for k, v in pairs(arcanaBars) do
+    for _, v in pairs(arcanaBars) do
         v:Hide()
     end
     broker.UnregisterCallback(self, "LibDataBroker_DataObjectCreated")
@@ -435,20 +374,20 @@ function Arcana:OnEnterWorld()
     Arcana:UpdateOptions(arcanaBars)
 end
 
-function Arcana:OnPetBattleOpen(...)
+function Arcana:OnPetBattleOpen()
     self.InCombat = true
     if db.petBattleHideBars then
-        for name, bar in pairs(arcanaBars) do
+        for _, bar in pairs(arcanaBars) do
             bar.petHide = bar:IsShown()
             bar:Hide()
         end
     end
 end
 
-function Arcana:OnPetBattleOver(...)
+function Arcana:OnPetBattleOver()
     self.InCombat = false
     if db.petBattleHideBars then
-        for name, bar in pairs(arcanaBars) do
+        for _, bar in pairs(arcanaBars) do
             if bar.petHide then
                 bar:Show()
                 bar:UpdateJostle(db)
@@ -461,7 +400,7 @@ function Arcana:OnEnterCombat()
     self.InCombat = true
     local combatHideAllBars = db.combathidebar
     local combatOpacityAllBars = db.combatopacity
-    for name, bar in pairs(arcanaBars) do
+    for _, bar in pairs(arcanaBars) do
         local settings = bar.settings
         if combatHideAllBars or settings.hideBarInCombat then
             bar.tempHide = bar:IsShown()
@@ -477,7 +416,7 @@ function Arcana:OnLeaveCombat()
     self.InCombat = false
     local combatHideAllBars = db.combathidebar
     local combatOpacityAllBars = db.combatopacity
-    for name, bar in pairs(arcanaBars) do
+    for _, bar in pairs(arcanaBars) do
         local settings = bar.settings
         if combatHideAllBars or settings.hideBarInCombat then
             if bar.tempHide then
@@ -494,7 +433,7 @@ end
 --------
 -- LDB callbacks
 --------
-function Arcana:LibDataBroker_DataObjectCreated(event, name, obj, noupdate)
+function Arcana:LibDataBroker_DataObjectCreated(_, name, obj, noupdate)
     if not db then return end
 
     local t = obj.type
@@ -555,12 +494,6 @@ function Arcana:EnableDataObject(name, obj, noupdate)
 
     plugin:Show()
 
-    --addon name migration
-    if barNameIsDeprecated(barName) then
-        barName = convertDeprecatedBarName(barName)
-        settings.barName = barName --store new bar name in the plugin settings
-    end
-
     local bar = arcanaBars[barName]
     if bar then
         bar:AddArcanaPiece(plugin, name, noupdate)
@@ -584,7 +517,7 @@ function Arcana:DisableDataObject(name)
     end
 end
 
-function Arcana:AttributeChanged(event, name, key, value)
+function Arcana:AttributeChanged(_, name, key, value)
     local settings = db.objSettings[name]
     if not settings.enabled then
         return
@@ -595,7 +528,7 @@ end
 
 -- disable autohide for all bars during drag and drop
 function Arcana:TempDisAutohide(value)
-    for name, bar in pairs(arcanaBars) do
+    for _, bar in pairs(arcanaBars) do
         if value then
             bar.tempHide = bar.autohide
             bar.autohide = false
@@ -635,7 +568,7 @@ local function getFreeBarName()
     local name
     for i = 1, 100 do
         name = "Arcana" .. i
-        for k, v in pairs(arcanaBars) do
+        for _, v in pairs(arcanaBars) do
             if name == v:GetName() then
                 used = true
             end
@@ -648,13 +581,13 @@ local function getFreeBarName()
 end
 
 function Arcana:UpdatePlugins(key, val)
-    for name, plugin in pairs(pluginObjects) do
+    for _, plugin in pairs(pluginObjects) do
         plugin:Update(plugin, key, val)
     end
 end
 
 function Arcana:ExecuteforAllPlugins(func, ...)
-    for name, plugin in pairs(pluginObjects) do
+    for _, plugin in pairs(pluginObjects) do
         func(plugin, ...)
     end
 end
@@ -680,7 +613,7 @@ function Arcana:AddBar(name, settings, noupdate)
 end
 
 function Arcana:UpdateBars(updateindex)
-    for k, v in pairs(arcanaBars) do
+    for _, v in pairs(arcanaBars) do
         v:UpdateBar(updateindex)
         v:UpdateAutoHide(db)
     end
@@ -691,7 +624,7 @@ function Arcana:AnchorBars()
     local temptop = {}
     local tempbottom = {}
 
-    for k, v in pairs(arcanaBars) do
+    for _, v in pairs(arcanaBars) do
         local settings = v.settings
         local index = settings.index or 500
         if settings.align == "top" then
@@ -730,7 +663,6 @@ function Arcana:AnchorBars()
         relative = bar
     end
 
-    local relative = nil
     for i, v in ipairs(tempbottom) do
         local bar = v[1]
         bar:ClearAllPoints()
@@ -754,12 +686,12 @@ function tablelength(T)
     return count
 end
 
-function onRightClick(self)
+local function onRightClick(self)
     self:GetParent():OnMouseUp("RightButton")
 end
 
 function Arcana:CreateSavePlaceholdes()
-    for name, v in pairs(db.placeholderNames) do
+    for name, _ in pairs(db.placeholderNames) do
         Arcana:NewPlaceholder(name)
     end
 end

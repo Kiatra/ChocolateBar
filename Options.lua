@@ -546,6 +546,7 @@ local function BuildNewsArgs()
         if i then
             i = tonumber(i)
             if i > max then
+                ---@diagnostic disable-next-line: cast-local-type
                 max = i
             end
         end
@@ -895,11 +896,6 @@ local aceoptions = {
         }
     }
 }
-
---aceoptions.args.lookAndTexture.args.textures.args.
-
---aceoptions.args.lookAndTexture.args.
---}
 
 aceoptions.args.lookAndTexture.args.font.args.font = {
     type = 'select',
