@@ -131,6 +131,23 @@ local function getFontOptions()
                 Arcana:UpdatePlugins("updatefont")
             end,
         },
+        fontOutline = {
+            type = 'select',
+            order = 2.5,
+            name = L["Font Outline"],
+            desc = L["Font Outline"],
+            values = {
+                [""] = L["None"],
+                ["OUTLINE"] = L["Outline"],
+                ["THICKOUTLINE"] = L["Thick Outline"],
+                ["MONOCHROME,OUTLINE"] = L["Monochrome Outline"],
+            },
+            get = function() return db.fontOutline end,
+            set = function(_, value)
+                db.fontOutline = value
+                Arcana:UpdatePlugins("updatefont")
+            end,
+        },
         textcolour = {
             type = "color",
             order = 3,
