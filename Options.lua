@@ -535,6 +535,44 @@ local function getPluginOptions()
     }
 end
 
+local function BuildNewsArgs()
+    local args = {}
+    local order = 1
+
+    -- find highest index
+    local max = 0
+    for key in pairs(L) do
+        local i = key:match("^news%.(%d+)%.header$")
+        if i then
+            i = tonumber(i)
+            if i > max then
+                max = i
+            end
+        end
+    end
+
+    -- newest → oldest
+    for i = max, 1, -1 do
+        if rawget(L, "news." .. i .. ".header") then
+            args["header" .. i] = {
+                order = order,
+                type = "header",
+                name = L["news." .. i .. ".header"],
+            }
+            order = order + 1
+
+            args["text" .. i] = {
+                order = order,
+                type = "description",
+                name = L["news." .. i .. ".text"],
+            }
+            order = order + 1
+        end
+    end
+
+    return args
+end
+
 local aceoptions = {
     name = title,
     handler = Arcana,
@@ -592,53 +630,7 @@ local aceoptions = {
                             type = "group",
                             inline = true,
                             order = 0,
-                            args = {
-                                header26March7 = {
-                                    order = increment(),
-                                    type = "header",
-                                    name = L["2026 March 7"],
-                                },
-                                text26March7 = {
-                                    order = increment(),
-                                    type = "description",
-                                    name =
-                                        L["Added option to set the opacity of the bars."],
-                                },
-                                header26March7_2 = {
-                                    order = increment(),
-                                    type = "header",
-                                    name = L["2026 March 7"],
-                                },
-                                text26March7_2 = {
-                                    order = increment(),
-                                    type = "description",
-                                    name =
-                                        L
-                                        ["Added module to automatically migrate ChocolateBar profiles to Arcana."],
-                                },
-                                header26March6 = {
-                                    order = increment(),
-                                    type = "header",
-                                    name = L["2026 March 6"],
-                                },
-                                text26March6 = {
-                                    order = increment(),
-                                    type = "description",
-                                    name =
-                                        L["2026 March 6 - News"],
-                                },
-                                header26March5 = {
-                                    order = increment(),
-                                    type = "header",
-                                    name = L["2026 March 5"],
-                                },
-                                text26March5 = {
-                                    order = increment(),
-                                    type = "description",
-                                    name = L
-                                        ["TBC Anniversary:\nThe upper row action bars will now also be moved up. Reset them in edit mode and reload the UI."]
-                                }
-                            }
+                            args = BuildNewsArgs()
                         }
                     }
                 },
