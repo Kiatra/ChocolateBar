@@ -84,6 +84,7 @@ local defaults = {
         moreBarDelay = 4,
         fontPath = " ",
         fontSize = 12,
+        fontOutline = "",
         labelColor = { r = 1, g = 0.82, b = 0, a = 1 },
         background = {
             textureName = "Arcana Gold",
