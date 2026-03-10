@@ -1,6 +1,32 @@
 local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
-local L = AceLocale:NewLocale("Arcana", "enUS", true)
+local L = AceLocale:NewLocale("Arcana", "enUS", true, true)
 if not L then return end
+
+-- -- ✧─────────────────────────────────────-----─────────✧
+-- News
+-- -- ✧─────────────────────────────────────-----─────────✧
+L["news.4.header"] = "2026 March 7"
+L["news.4.text"] = "Added option to set the opacity of the bars."
+
+L["news.3.header"] = "2026 March 7"
+L["news.3.text"] =
+"TBC Anniversary:\nThe upper row action bars will now also be moved up. Reset them in edit mode and reload the UI."
+
+L["news.2.header"] = "2026 March 6"
+L["news.2.text"] = [[
+New name, Arcana!
+
+Remember to take all things in moderation, even World of Warcraft and especially chocolate! ;-)
+
+Thank you all for using the mod for all those years!
+The old name was around for a while... and while I liked the old funny name for me it was time to move on.
+]]
+
+L["news.1.header"] = "2026 March 5"
+L["news.1.text"] =
+"TBC Anniversary:\nThe upper row action bars will now also be moved up. Reset them in edit mode and reload the UI."
+-- -- ✧─────────────────────────────────────-----─────────✧
+
 
 L["StatusBar Texture"] = true
 L["Note: Some LibSharedMedia provided textures may be provided by other addons."] = true
@@ -14,7 +40,6 @@ L["Set the opacity of the the bars. You can set the alpha of the bar background 
 L["Added option to set the opacity of the bars."] = true
 L["Opening Arcana only options during combat."] = true
 
-L["2026 March 7"] = true
 L["Added module to automatically migrate ChocolateBar profiles to Arcana."] = true
 L["Info"] = true
 L["Search for plugins here"] = true
@@ -24,21 +49,9 @@ L["Removes the selected Bar."] = true
 L["The Quel'dorei became scattered across the world. To preserve the fragments of arcana they gathered from many sources, they maintain observatories where this knowledge is kept in careful order."] = true
 L["You can add plugins to Arcana via the data-broker category in the curseforge app or the link below."] = true
 
-L["2026 March 6"] = true
-L["2026 March 6 - News"] = [[
-New name, Arcana!
-
-Remember to take all things in moderation, even World of Warcraft and especially chocolate! ;-)
-
-Thank you all for using the mod for all those years!
-The old name was around for a while... and while I liked the old funny name for me it was time to move on.
-]]
-
 L["Plugin Options"] = true
 L["Whats New"] = true
 L["Whats New & Info"] = true
-L["2026 March 5"] = true
-L["TBC Anniversary:\nThe upper row action bars will now also be moved up. Reset them in edit mode and reload the UI."] = true
 
 L["Modules are buildin plugins that can be enabled or disabled here. Disabled plugins will not be loaded."] = true
 L["Shows the played time for all characters. You need to login with each character first."] = true
