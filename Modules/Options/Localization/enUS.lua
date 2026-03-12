@@ -35,7 +35,7 @@ L["news.1.text"] =
 "TBC Anniversary:\nThe upper row action bars will now also be moved up. Reset them in edit mode and reload the UI."
 -- -- ✧─────────────────────────────────────-----─────────✧
 
-
+L["combat.openoption"] = "Opening Arcana only options during combat."
 L["group.arcanaPices"] = "All Arcana Pieces"
 
 L["StatusBar Texture"] = true

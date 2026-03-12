@@ -87,7 +87,6 @@ local function dropOptions(frame, arcnaPiece)
     local name = obj.name
     local label = obj.label
     local cleanName = Arcana:GetCleanName(name)
-    Arcana:Debug("dropOptions: ", cleanName)
     Arcana:LoadOptions(cleanName)
     arcnaPiece.bar:ResetDrag(arcnaPiece, arcnaPiece.name)
     frame:SetBackdropColor(0.5, 0, 0, 0.5)

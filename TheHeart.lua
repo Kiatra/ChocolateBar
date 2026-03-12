@@ -35,12 +35,13 @@ Arcana.Bar = {}
 Arcana.ArcanaPiece = {}
 Arcana.Drag = {}
 Arcana.modules = {}
+Arcana.arcanaBars = {}
 
 local Drag = Arcana.Drag
 local ArcanaPiece = Arcana.ArcanaPiece
 local Bar = Arcana.Bar
 
-local arcanaBars = {}
+local arcanaBars = Arcana.arcanaBars
 local arcanaPieces = {}
 local db --reference to Arcana.db.profile
 
@@ -157,10 +158,9 @@ end)
 -- ✧────────────────────────────────────────────────────✧
 -- Ace3 callbacks
 -- ✧────────────────────────────────────────────────────✧
---- we want to load after old DB was loead from the old name of the addon for the migration
 --[[
 function Arcana:OnInitialize()
-    print("|cff88ccffArcana Debug|r", "OnInitialize")
+    --- we want to use Initialize() for now as we do some migration magic above
 end
 ]]
 
@@ -173,11 +173,6 @@ function Arcana:Initialize()
     self.db.RegisterCallback(self, "OnProfileChanged", "OnProfileChanged")
     self.db.RegisterCallback(self, "OnProfileCopied", "OnProfileChanged")
     self.db.RegisterCallback(self, "OnProfileReset", "OnProfileChanged")
-
-
-    --local AceCfgDlg = LibStub("AceConfigDialog-3.0")
-    --local _, categoryID = AceCfgDlg:AddToBlizOptions("Arcana", "Arcana")
-    --self.BlizzardOptionsCategoryID = categoryID
 
     LSM:Register("statusbar", "Arcana Gold", "Interface\\AddOns\\Arcana\\Media\\ArcanaBar")
     LSM:Register("statusbar", "Arcana Gray", "Interface\\AddOns\\Arcana\\Meida\\ArcanaBarGray")
@@ -214,67 +209,18 @@ function Arcana:Initialize()
     end
     self:AnchorBars()
 
-    --[[
-    local panel = CreateFrame("Frame")
-    panel.title = panel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge") ---@diagnostic disable-line: inject-field
-    panel.title:SetPoint("TOPLEFT", 16, -16) ---@diagnostic disable-line: param-type-mismatch
-    panel.title:SetText("Arcana")
-
-    panel.status = panel:CreateFontString(nil, "ARTWORK", "GameFontHighlight") ---@diagnostic disable-line: inject-field
-    panel.status:SetPoint("TOPLEFT", panel.title, "BOTTOMLEFT", 0, -8) ---@diagnostic disable-line: param-type-mismatch
-    panel.status:SetText("Loading options...")
-
-    panel:SetScript("OnShow", function(panelSelf)
-        --local AceAddon = LibStub("AceAddon-3.0")
-        --local ArcanaOptions = AceAddon:GetAddon("ArcanaOptions", true)
-        if not IsAddOnLoaded("Arcana-Options") then
-            local loaded, reason = LoadAddOn("Arcana-Options")
-            if not loaded then print("|cff88ccffArcana|r Failed to load Arcana-Options:", reason) end
-            print("|cff88ccffArcana|r Arcana-Options loaded")
-            --lets get the addon again after loading
-            --ArcanaOptions = AceAddon:GetAddon("ArcanaOptions", true)
-            panelSelf.title:Hide()
-            panelSelf.status:Hide()
-
-            --local AceCfgDlg = LibStub("AceConfigDialog-3.0")
-            --local _, categoryID = AceCfgDlg:AddToBlizOptions("Arcana", "Arcana")
-            --self.BlizzardOptionsCategoryID = categoryID
-            --
-            --Arcana:RegisterOptions(db, arcanaBars, self.modules)
-            --Arcana:OpenOptions()
-            --Arcana:OpenOptions(arcanaBars, db, input, pluginName, nil)
-            --
-            ArcanaOptions_PopulateOptionsPanel(panelSelf, arcanaBars, db, input, pluginName)
-        else
-            ArcanaOptions_PopulateOptionsPanel(panelSelf, arcanaBars, db, input, pluginName)
-            --Arcana:RegisterOptions(db, arcanaBars, self.modules)
-            --Arcana:OpenOptions()
-            --Arcana:OpenOptions(arcanaBars, db, input, pluginName, nil)
-        end
-    end)
-
-    local category = Settings.RegisterCanvasLayoutCategory(panel, "Arcana")
-    Settings.RegisterAddOnCategory(category)
-    ]]
-
     local AceConfig = LibStub("AceConfig-3.0")
     local AceConfigDialog = LibStub("AceConfigDialog-3.0")
-    --local AceAddon = LibStub("AceAddon-3.0")
-    local cachedOptions
 
+    -- adds stub in blizz options
     AceConfig:RegisterOptionsTable("Arcana", function()
-        if not cachedOptions then
-            if not IsAddOnLoaded("Arcana-Options") then
-                local success, reason = LoadAddOn("Arcana-Options")
-                if not success then
-                    print("|cff88ccffArcana|r Failed to load Arcana-Options: " .. reason)
-                end
+        if not IsAddOnLoaded("Arcana-Options") then
+            local success, reason = LoadAddOn("Arcana-Options")
+            if not success then
+                print("|cff88ccffArcana|r Failed to load Arcana-Options: " .. reason)
             end
-
-            --local ArcanaOptions = LibStub("AceAddon-3.0"):GetAddon("ArcanaOptions")
-            cachedOptions = Arcana:BuildArcanaOptions()
         end
-        return cachedOptions
+        return Arcana:BuildArcanaOptions()
     end)
 
     local _, categoryID = AceConfigDialog:AddToBlizOptions("Arcana", "Arcana")
@@ -314,10 +260,6 @@ end
 
 function Arcana:EnableModule(name)
     Arcana.modules[name]:EnableModule()
-
-    --local subModuleOptions = Arcana:GetAceOptions().args.moduleOptions.args[name].args
-    --subModuleOptions.Options = Arcana.modules[name].optionsExtended
-
     -- in case the module was enabled in this seesion before but was disabled we need to enable it again
     local obj = broker:GetDataObjectByName(name)
     if obj then
@@ -406,7 +348,6 @@ end
 
 function Arcana:UpdateJostle()
     for _, bar in pairs(arcanaBars) do
-        Arcana:Debug("UpdateJostle", bar)
         bar:UpdateJostle(db)
     end
 end
@@ -467,7 +408,6 @@ function Arcana:OnEnterCombat()
     local combatHideAllBars = db.combathidebar
     local combatOpacityAllBars = db.combatopacity
     for _, bar in pairs(arcanaBars) do
-        Arcana:Debug("OnEnterCombat", bar)
         local settings = bar.settings
         if combatHideAllBars or settings.hideBarInCombat then
             bar.tempHide = bar:IsShown()
@@ -668,7 +608,6 @@ function Arcana:AddBar(name, settings, noupdate)
     local bar = Bar:New(name, settings, db)
     Drag:RegisterFrame(bar)
     arcanaBars[name] = bar
-    Arcana:Debug("Added bar", name, arcanaBars[name])
     settings.barName = name
     if not noupdate then
         self:AnchorBars()
@@ -794,27 +733,14 @@ end
 
 function Arcana:LoadOptions(pluginName, input)
     if not IsAddOnLoaded("Arcana-Options") then
-        Arcana:Log("Loading Options")
         local success, reason = LoadAddOn("Arcana-Options")
         if success then
-            Arcana:RegisterOptions(db, _, self.modules)
-            for name, obj in broker:DataObjectIterator() do
-                Arcana:AddObjectOptions(name, obj)
-            end
-
-            for name, _ in pairs(self.modules) do
-                local subModuleOptions = Arcana:GetAceOptions().args.moduleOptions.args[name].args
-                subModuleOptions.Options = Arcana.modules[name].optionsExtended
-            end
-
-            for name, _ in pairs(arcanaBars) do
-                Arcana:AddBarOptions(name)
-            end
+            Arcana:Log("Loading Options")
         else
             Arcana:Log("Failed to load Arcana-Options: " .. reason)
         end
     end
-    Arcana:OpenOptions(pluginName, input)
+    Arcana:OpenOptions(pluginName)
 end
 
 function Arcana:UpdateDB(data)
