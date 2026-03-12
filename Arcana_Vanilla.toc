@@ -1,6 +1,6 @@
 ## Interface: @toc-version-classic@
 #@debug@
-## Interface: 11508, 11507, 30405, 38000, 40402, 50503, 50502
+## Interface: 11508, 11507
 #@end-debug@
 ## Title: Arcana — Quel'dorei Observatory
 ## Notes: A display for broker plugins. Formerly ChocolateBar.
