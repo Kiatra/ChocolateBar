@@ -33,4 +33,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: addon-package
-          path: .release/Arcana/*.zip
+          path: .release/**/*.zip
