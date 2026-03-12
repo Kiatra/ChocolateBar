@@ -624,9 +624,11 @@ end
 
 -- sort and anchor all bars
 function Arcana:AnchorBars()
+    -- sort bars by index into two lists, then anchor them top to bottom
     local temptop = {}
     local tempbottom = {}
 
+    -- fill temptop and tempbottom with bars, anchor free floating bars
     for _, v in pairs(arcanaBars) do
         local settings = v.settings
         local index = settings.index or 500
@@ -635,6 +637,7 @@ function Arcana:AnchorBars()
         elseif settings.align == "bottom" then
             table.insert(tempbottom, { v, index })
         else
+            -- anchor free floating bars
             v:ClearAllPoints()
             if settings.barPoint and settings.barOffx and settings.barOffy then
                 v:SetPoint(settings.barPoint, "UIParent", settings.barOffx, settings.barOffy)
@@ -645,16 +648,17 @@ function Arcana:AnchorBars()
             end
         end
     end
+    -- sort both lists by index
     table.sort(temptop, function(a, b) return a[2] < b[2] end)
     table.sort(tempbottom, function(a, b) return a[2] < b[2] end)
 
-    local yoff = 0
+    -- anchor top bars
     local relative = nil
     for i, v in ipairs(temptop) do
         local bar = v[1]
         bar:ClearAllPoints()
         if (relative) then
-            bar:SetPoint("TOPLEFT", relative, "BOTTOMLEFT", 0, -yoff)
+            bar:SetPoint("TOPLEFT", relative, "BOTTOMLEFT", 0, 0)
             bar:SetPoint("RIGHT", relative, "RIGHT", 0, 0);
         else
             bar:SetPoint("TOPLEFT", -1, 1);
@@ -666,11 +670,13 @@ function Arcana:AnchorBars()
         relative = bar
     end
 
+    -- anchor bottom bars
+    relative = nil
     for i, v in ipairs(tempbottom) do
         local bar = v[1]
         bar:ClearAllPoints()
         if (relative) then
-            bar:SetPoint("BOTTOMLEFT", relative, "TOPLEFT", 0, -yoff)
+            bar:SetPoint("BOTTOMLEFT", relative, "TOPLEFT", 0, 0)
             bar:SetPoint("RIGHT", relative, "RIGHT", 0, 0);
         else
             bar:SetPoint("BOTTOMLEFT", -1, 0);
