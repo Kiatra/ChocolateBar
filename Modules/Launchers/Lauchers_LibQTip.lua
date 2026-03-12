@@ -27,15 +27,6 @@ dataobj = ldb:NewDataObject(addonName, {
     label   = "Launchers",
     text    = "Launchers",
     OnClick = function(self, button, ...)
-        if button == "RightButton" then
-            if IsModifierKeyDown() then
-                mainmenu(self, button, ...)
-            elseif dataobj.OpenOptions then
-                dataobj:OpenOptions()
-            end
-        else
-            _G.ToggleCharacter("PaperDollFrame")
-        end
         LibQTip:Release(tooltip)
         tooltip = nil
     end

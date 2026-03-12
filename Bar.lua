@@ -12,17 +12,7 @@ local db
 function Bar:OnMouseUp(button)
     if (db.combathidebar or self.settings.hideBarInCombat) and Arcana.InCombat then return end
     if button == "RightButton" then
-        if db.disableoptons and Arcana.InCombat then return end
-        if db.barRightClick == "OPTIONS" then
-            Arcana:LoadOptions()
-        elseif db.barRightClick == "BLIZZ" then
-            if InCombatLockdown() then
-                Arcana:LoadOptions()
-                print("|cff88ccffArcana|r", L["Opening Arcana only options during combat."])
-            else
-                Arcana:LoadOptions(nil, nil, true)
-            end
-        end
+        Arcana:LoadOptions()
     else
         if db.moreBar == self:GetName() then
             self:Hide()
@@ -51,7 +41,7 @@ function Bar:New(name, settings, database)
     db = database
     local frame = CreateFrame("Frame", name, _G.UIParent, BackdropTemplateMixin and "BackdropTemplate")
     ---@diagnostic disable-next-line: inject-field
-    frame.pluginList = {} --create list of plugin pluginList in the bar
+    frame.arcanaPices = {} --create list of arcanaPices in the bar
 
     -- add class methods to frame object
     for k, v in pairs(Bar) do
@@ -133,9 +123,9 @@ function Bar:UpdateHeight(db)
     local height = db.height
     self.height = height
     self:SetHeight(height)
-    Arcana:UpdatePlugins("updateSettings")
+    Arcana:UpdateArcanaPieces("updateSettings")
     db.fontSize = height - 8
-    Arcana:UpdatePlugins("updatefont")
+    Arcana:UpdateArcanaPieces("updatefont")
     self:UpdateJostle(db)
 end
 
@@ -161,7 +151,7 @@ function Bar:UpdateTexture(db)
 end
 
 function Bar:ResetDrag(plugin, name)
-    self.pluginList[name] = plugin
+    self.arcanaPices[name] = plugin
     self.dummy:Hide()
     self.dummy = nil
     plugin:SetAlpha(1)
@@ -170,12 +160,12 @@ end
 
 -- add some plugin to a bar
 function Bar:AddArcanaPiece(plugin, name, noupdate)
-    local pluginList = self.pluginList
-    if pluginList[name] then
+    local arcanaPices = self.arcanaPices
+    if arcanaPices[name] then
         return
     end
 
-    pluginList[name] = plugin
+    arcanaPices[name] = plugin
     plugin:SetParent(self)
     plugin.bar = self
 
@@ -196,18 +186,18 @@ end
 
 -- reamove given plugin from a Arcana
 function Bar:RemoveArcanaPiece(name)
-    self.pluginList = self.pluginList or {}
-    local plugin = self.pluginList[name]
+    self.arcanaPices = self.arcanaPices or {}
+    local plugin = self.arcanaPices[name]
     if plugin then
         plugin:Hide()
-        self.pluginList[name] = nil
+        self.arcanaPices[name] = nil
         self:UpdateBar()
     end
 end
 
 function Bar:HideAll()
     self:SetAlpha(0)
-    for k, v in pairs(self.pluginList) do
+    for k, v in pairs(self.arcanaPices) do
         v.text:Hide()
         if v.icon then
             v.icon:Hide()
@@ -218,7 +208,7 @@ end
 function Bar:ShowAll()
     self:SetAlpha(self.settings.opacity or 1)
     local settings
-    for k, v in pairs(self.pluginList) do
+    for k, v in pairs(self.arcanaPices) do
         settings = v.settings
         --v:Show()
         if settings.showText then
@@ -268,14 +258,14 @@ local function SortList(list, side)
     return temp
 end
 
-function Bar:GetPluginAtCursor()
+function Bar:GetArcanaPiceAtCursor()
     local s = self:GetEffectiveScale()
     local x, y = GetCursorPosition()
 
     if not s and x and y then return end
 
     x = x / s
-    for _, v in pairs(self.pluginList) do
+    for _, v in pairs(self.arcanaPices) do
         if v and x > v:GetLeft() and x < v:GetRight() then --plugin found
             if x < v:GetLeft() + v:GetWidth() / 2 then
                 return v, "left"
@@ -352,11 +342,11 @@ local function createDummy(self, plugin, name)
 
     dummy.settings.index = plugin.settings.index
     dummy.settings.align = plugin.settings.align
-    self.pluginList[name] = dummy --replace original with dummy to free the original
+    self.arcanaPices[name] = dummy --replace original with dummy to free the original
 end
 
 function Bar:UpdateDragPlugin()
-    local plugin, side, align = self:GetPluginAtCursor()
+    local plugin, side, align = self:GetArcanaPiceAtCursor()
     self.pointer = self.pointer or Arcana:GetPointer(self)
     local pointer = self.pointer
 
@@ -395,7 +385,7 @@ function Bar:UpdateDragPlugin()
 end
 
 function Bar:Drag(name)
-    local plugin = self.pluginList[name]
+    local plugin = self.arcanaPices[name]
     plugin:SetAlpha(0.8)
     --if plugin.OnLeave then plugin:OnLeave() end
     createDummy(self, plugin, name)
@@ -415,10 +405,10 @@ function Bar:Drop(plugin, pos)
     if oldbar == self then -- same bar
         self.dummy:Hide()
         self.dummy = nil
-        self.pluginList[plugin.obj.name] = plugin --replace dummy with original
-    else                                          -- cross bars
-        oldbar.pluginList[plugin.obj.name] = nil  --remove from oldbar
-        oldbar.dummy:Hide()
+        self.arcanaPices[plugin.obj.name] = plugin --replace dummy with original
+    else                                           -- cross bars
+        oldbar.arcanaPices[plugin.obj.name] = nil  --remove from oldbar
+        if oldbar.dummy then oldbar.dummy:Hide() end
         oldbar.dummy = nil
         oldbar:UpdateBar(true)
         self:AddArcanaPiece(plugin, plugin.obj.name)
@@ -431,14 +421,14 @@ function Bar:LoseFocus(name)
 end
 
 function Bar:GetFocus(name)
-    local plugin = Arcana:GetPlugin(name)
+    local plugin = Arcana:GetArcanaPice(name)
     Arcana:GetPointer(self)
 end
 
--- rearange all plugins pluginList in a given bar
+-- rearange all plugins arcanaPices in a given bar
 -- called only when plugins are added, removed or moved
 function Bar:UpdateBar(updateindex)
-    local plugins = self.pluginList
+    local plugins = self.arcanaPices
     -- set left plugins
     local tempList = SortList(plugins, "left")
     self.pluginMostLeft = tempList[#tempList] and tempList[#tempList][1]

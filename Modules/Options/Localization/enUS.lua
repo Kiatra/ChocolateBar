@@ -1,12 +1,14 @@
 local AceLocale = LibStub:GetLibrary("AceLocale-3.0")
-local L = AceLocale:NewLocale("Arcana", "enUS", true, true)
+local L = AceLocale:NewLocale("Arcana-Options", "enUS", true, true)
 if not L then return end
 
 -- -- ✧─────────────────────────────────────-----─────────✧
 -- News
 -- -- ✧─────────────────────────────────────-----─────────✧
+L["news.7.header"] = "2026 March 12"
+L["news.7.text"] = "Options are now load on demand\nAdded pull requst from clicketz to add font outline options."
 L["news.6.header"] = "2026 March 10"
-L["news.6.text"] = "Profile migration module is now load on demand and not longer required."
+L["news.6.text"] = "Profile migration module is now load on demand and no longer required."
 
 L["news.5.header"] = "2026 March 9"
 L["news.5.text"] = "Cleaner options layout."
@@ -33,6 +35,8 @@ L["news.1.text"] =
 "TBC Anniversary:\nThe upper row action bars will now also be moved up. Reset them in edit mode and reload the UI."
 -- -- ✧─────────────────────────────────────-----─────────✧
 
+L["combat.openoption"] = "Opening Arcana only options during combat."
+L["group.arcanaPices"] = "All Arcana Pieces"
 
 L["StatusBar Texture"] = true
 L["Note: Some LibSharedMedia provided textures may be provided by other addons."] = true
