@@ -1,8 +1,8 @@
 package-as: Arcana
 
 move-folders:
-    Arcana/modules/ChocolateBar: ChocolateBar
-    Arcana/modules/Options: Arcana-Options
+    Arcana/Modules/ChocolateBar: ChocolateBar
+    Arcana/Modules/Options: Arcana-Options
 
 externals:
   libs/LibStub:
