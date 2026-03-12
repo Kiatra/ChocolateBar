@@ -1,0 +1,26 @@
+## Interface: @toc-version-midnight@, @toc-version-retail@, @toc-version-mists@, @toc-version-cata@, @toc-version-wrath@, @toc-version-bcc@, @toc-version-classic@
+#@debug@
+Interface: 11508, 11507, 30405, 38000, 40402, 50503, 50502, 120000
+#@end-debug@
+## Title: Arcana: ChocolateBar Profile Migration
+## Notes: A stub with the old folder and toc name for profile migration. Makes WoW also load ChocolateBarDB from ChocolateBar.lua in the SavedVariables folder under WTF if present.
+## Author: Kiatra - https://github.com/Kiatra/Arcana
+## Version: @project-version@
+## RequiredDeps: Arcana
+## Group: Arcana
+## SavedVariables: ChocolateBarDB
+## IconTexture: Interface/AddOns/Arcana/Media/Icons/ArcanaKnowledge
+## LoadOnDemand: 1
+
+## Category: Data Broker
+## Category-deDE: Datenbroker
+## Category-esES: Intermediario de Datos
+## Category-esMX: Intermediario de Datos
+## Category-frFR: Courtier de Données
+## Category-itIT: Data Broker
+## Category-ptBR: Corretor de Dados
+## Category-ruRU: Посредник данных
+## Category-zhCN: 数据管理
+## Category-zhTW: 資料管理
+
+ChocolateBar_Migration.lua

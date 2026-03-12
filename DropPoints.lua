@@ -31,7 +31,7 @@ local function createDropPoint(name, dropfunc, offx, text, texture)
         dropFrames.text:SetPoint("CENTER", 0, -60)
         ---@diagnostic disable-next-line: undefined-field
         dropFrames.text:SetFormattedText("|T%s:%d|t%s", "Interface\\FriendsFrame\\InformationIcon", 16,
-            " " .. L["Drop a Plugin onto any of the icons above."])
+            " " .. L["drop.infoText"])
     end
     local frame = CreateFrame("Frame", name, Arcana.dropFrames, BackdropTemplateMixin and "BackdropTemplate")
     frame:SetWidth(dropPointWidth)
@@ -82,26 +82,19 @@ end
 --------
 -- drop points functions
 --------
-local function dropOptions(frame, plugin)
-    local obj = plugin.obj
+local function dropOptions(frame, arcnaPiece)
+    local obj = arcnaPiece.obj
     local name = obj.name
     local label = obj.label
-    local cleanName
-    if label then
-        cleanName = string.gsub(label, "|c........", "")
-    else
-        cleanName = string.gsub(name, "|c........", "")
-    end
-    cleanName = string.gsub(cleanName, "|r", "")
-    cleanName = string.gsub(cleanName, "[%c \127]", "")
+    local cleanName = Arcana:GetCleanName(name)
     Arcana:LoadOptions(cleanName)
-    plugin.bar:ResetDrag(plugin, plugin.name)
+    arcnaPiece.bar:ResetDrag(arcnaPiece, arcnaPiece.name)
     frame:SetBackdropColor(0.5, 0, 0, 0.5)
 end
 
-local function dropDisable(frame, plugin)
-    plugin:Hide()
-    Arcana:DisableDataObject(plugin.name)
+local function dropDisable(frame, arcnaPiece)
+    arcnaPiece:Hide()
+    Arcana:DisableDataObject(arcnaPiece.name)
     frame:SetBackdropColor(0, 0, 0, 0, 5)
 end
 
@@ -109,13 +102,10 @@ end
 function Arcana:SetDropPoins(parent)
     if not dropPoints then
         local x = (dropFramesWidth - dropPointWidth * 2) / 3
-
-        --createDropPoint("ArcanaTextDrop", dropText, 0, L["Toggle Text"],
-        --    "Interface/ICONS/INV_Inscription_Tradeskill01")
-        createDropPoint("ArcnaCenterDrop", dropOptions, x, L["Plugin Options"],
+        createDropPoint("ArcnaCenterDrop", dropOptions, x, L["drop.options"],
             "Interface/Icons/INV_Gizmo_02")
         createDropPoint("ArcanaDisableDrop", dropDisable, x * 2 + dropPointWidth, L
-            ["Disable Plugin"],
+            ["drop.disable"],
             "Interface/ICONS/Spell_ChargeNEgative")
     end
 

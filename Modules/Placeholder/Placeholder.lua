@@ -76,7 +76,7 @@ local options = {
 
 module = Arcana:NewModule("Placeholder", nil, options)
 
-local function addPlaceholderOptionsToPlugins()
+local function addPlaceholderOptionsToOptions()
     for name, _ in pairs(placeholderNames) do
         Arcana:AddCustomPluginOptions(name, placeholderPluginOptions)
     end
@@ -101,5 +101,5 @@ function module:NewPlaceholder(name)
 end
 
 function module:OnOpenOptions()
-    addPlaceholderOptionsToPlugins()
+    addPlaceholderOptionsToOptions()
 end

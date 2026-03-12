@@ -24,7 +24,7 @@ function Module:EnableModule()
     if not dataobj then
         dataobj = LibStub("LibDataBroker-1.1"):NewDataObject(addonName, {
             type  = "data source",
-            label = addonName,
+            label = "Player",
             text  = volumeText,
         })
     end
@@ -39,12 +39,12 @@ function Module:EnableModule()
                 local position = C_Map.GetPlayerMapPosition(map, "player")
                 if position then
                     local x, y = position:GetXY()
-                    dataobj.text = string.format("Player: %.1f X, %.1f Y", x * 100, y * 100)
+                    dataobj.text = string.format("%.1f X, %.1f Y", x * 100, y * 100)
                 else
-                    dataobj.text = "Player: Instance"
+                    dataobj.text = "Instance"
                 end
             else
-                dataobj.text = "Player: Instance"
+                dataobj.text = "Instance"
             end
 
             time = 0

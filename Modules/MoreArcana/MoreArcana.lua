@@ -8,6 +8,8 @@ local bar
 local L = LibStub("AceLocale-3.0"):GetLocale("Arcana")
 local wipe, pairs = wipe, pairs
 local moreArcana
+local openIcon = "Interface\\AddOns\\Arcana\\Media\\Icons\\ArcanaBookBlue"
+local moduleName = "MoreArcana"
 
 local function onEnter()
     counter = 0
@@ -29,12 +31,14 @@ end
 
 
 local function GetList()
-    wipe(moreArcana.barNames)
-    moreArcana.barNames.none = L["None"]
+    --if moreArcana or not moreArcana.barNames then
+    --    wipe(moreArcana.barNames)
+    --end
+    local barNames = { none = L["None"] }
     for k, _ in pairs(Arcana:GetBars()) do
-        moreArcana.barNames[k] = k
+        barNames[k] = k
     end
-    return moreArcana.barNames
+    return barNames
 end
 
 ---@diagnostic disable-next-line: inject-field
@@ -43,6 +47,7 @@ function Timer:OnUpdate(elapsed)
     if counter >= delay and bar and not Arcana.dragging then
         bar:Hide()
         counter = 0
+        moreArcana.icon = "Interface\\AddOns\\Arcana\\Media\\Icons\\ArcanaBookBlue"
         Timer:SetScript("OnUpdate", nil)
     end
 end
@@ -95,7 +100,7 @@ local options = {
 }
 
 
-local Module = Arcana:NewModule("MoreArcana", {
+local Module = Arcana:NewModule(moduleName, {
     description = "A plugin that can toggle the visibility of a specific Arcana bar.",
     defaults = {
         enabled = true,
@@ -112,10 +117,11 @@ function Module:DisableModule()
 end
 
 function Module:EnableModule()
+    Arcana:Debug("MoreArcana:EnableModule")
     if not moreArcana then
         moreArcana = LibStub("LibDataBroker-1.1"):NewDataObject("MoreArcana", {
             type    = "launcher",
-            icon    = "Interface\\AddOns\\Arcana\\Media\\Icons\\ArcanaKnowledge",
+            icon    = "Interface\\AddOns\\Arcana\\Media\\Icons\\ArcanaBookBlue",
             label   = "MoreArcana",
             text    = "MoreArcana",
 
@@ -125,21 +131,24 @@ function Module:EnableModule()
                         if bar:IsShown() then
                             bar:Hide()
                             Timer:SetScript("OnUpdate", nil)
+                            moreArcana.icon = "Interface\\AddOns\\Arcana\\Media\\Icons\\ArcanaBookBlue"
                         else
                             bar:Show()
+                            moreArcana.icon = "Interface\\AddOns\\Arcana\\Media\\Icons\\ArcanaKnowledge"
                             if delay > 0 then
                                 Timer:SetScript("OnUpdate", Timer.OnUpdate)
                             end
                         end
                     end
-                else
-                    InterfaceOptionsFrame_OpenToCategory("Arcana");
                 end
             end,
         })
-
-        moreArcana.barNames = { none = "none" }
         moreArcana.SetBar = setBar
-        moreArcana.OnEnter = onEnter
+        --moreArcana.OnEnter = onEnter
+    end
+
+    if Arcana.GetAceOptions then
+        local subModuleOptions = Arcana:GetAceOptions().args.moduleOptions.args[moduleName].args
+        subModuleOptions.Options = Arcana.modules[moduleName].optionsExtended
     end
 end

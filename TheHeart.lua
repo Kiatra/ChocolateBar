@@ -28,43 +28,43 @@ local L = LibStub("AceLocale-3.0"):GetLocale("Arcana")
 local _G, pairs, ipairs, table, tostring = _G, pairs, ipairs, table, tostring
 local select, strjoin, CreateFrame = select, strjoin, CreateFrame
 local LoadAddOn = LoadAddOn or C_AddOns.LoadAddOn
-
-local addonVersion = C_AddOns.GetAddOnMetadata("Arcana", "Version")
+local IsAddOnLoaded = IsAddOnLoaded or C_AddOns.IsAddOnLoaded
 
 Arcana.Jostle = {}
 Arcana.Bar = {}
 Arcana.ArcanaPiece = {}
 Arcana.Drag = {}
 Arcana.modules = {}
+Arcana.arcanaBars = {}
 
 local Drag = Arcana.Drag
 local ArcanaPiece = Arcana.ArcanaPiece
 local Bar = Arcana.Bar
 
-local arcanaBars = {}
-local pluginObjects = {}
+local arcanaBars = Arcana.arcanaBars
+local arcanaPieces = {}
 local db --reference to Arcana.db.profile
 
 -- ✧────────────────────────────────────────────────────✧
 -- utility functions
 -- ✧────────────────────────────────────────────────────✧
-local function debug(...)
+function Arcana:Debug(...)
     if Arcana.db and Arcana.db.char.debug then
-        local s = "CB:"
-        for i = 1, select("#", ...) do
-            local x = select(i, ...)
-            s = strjoin(" ", s, tostring(x))
-        end
-        print("|cff88ccffArcana Debug|r", s)
+        self:Log("|cfffffd88Arcana Debug|r", ...)
     end
 end
 
-function Arcana:Debug(...)
-    debug(self, ...)
+function Arcana:Info(...)
+    self:Log("|cff88ccffArcana Info|r", ...)
 end
 
-function Arcana:Log(...)
-    debug(self, ...)
+function Arcana:Log(prefix, ...)
+    local s = prefix or "|cff88ccffArcana Log|r"
+    for i = 1, select("#", ...) do
+        local x = select(i, ...)
+        s = strjoin(" ", s, tostring(x))
+    end
+    print(s)
 end
 
 local defaults = {
@@ -147,7 +147,7 @@ f:SetScript("OnEvent", function(_, _, addon)
         else
             -- lets cast some magic
             local loaded, reason = LoadAddOn("ChocolateBar")
-            if not loaded then print("|cff88ccffArcana Debug|r Failed to load ChocolateBar Migration:", reason) end
+            if not loaded then print("|cff88ccffArcana|r Failed to load ChocolateBar Migration:", reason) end
         end
     elseif addon == "ChocolateBar" then
         local ArcanaMigrate = LibStub("AceAddon-3.0"):GetAddon("ArcanaMigrate")
@@ -159,23 +159,21 @@ end)
 -- ✧────────────────────────────────────────────────────✧
 -- Ace3 callbacks
 -- ✧────────────────────────────────────────────────────✧
---- we want to load after old DB was loead from the old name of the addon for the migration
 --[[
 function Arcana:OnInitialize()
-    print("|cff88ccffArcana Debug|r", "OnInitialize")
+    --- we want to use Initialize() for now as we do some migration magic above
 end
 ]]
 
 function Arcana:Initialize()
     self.db = LibStub("AceDB-3.0"):New("ArcanaDB", defaults, "Default")
-    self.db.RegisterCallback(self, "OnDatabaseShutdown", "OnDatabaseShutdown")
 
     self:RegisterChatCommand("Arcana", "ChatCommand")
     db = self.db.profile
 
-    local AceCfgDlg = LibStub("AceConfigDialog-3.0")
-    local _, categoryID = AceCfgDlg:AddToBlizOptions("Arcana", "Arcana")
-    self.BlizzardOptionsCategoryID = categoryID
+    self.db.RegisterCallback(self, "OnProfileChanged", "OnProfileChanged")
+    self.db.RegisterCallback(self, "OnProfileCopied", "OnProfileChanged")
+    self.db.RegisterCallback(self, "OnProfileReset", "OnProfileChanged")
 
     LSM:Register("statusbar", "Arcana Gold", "Interface\\AddOns\\Arcana\\Media\\ArcanaBar")
     LSM:Register("statusbar", "Arcana Gray", "Interface\\AddOns\\Arcana\\Meida\\ArcanaBarGray")
@@ -212,9 +210,31 @@ function Arcana:Initialize()
     end
     self:AnchorBars()
 
-    Arcana:RegisterOptions(db, arcanaBars, self.modules)
+    local AceConfig = LibStub("AceConfig-3.0")
+    local AceConfigDialog = LibStub("AceConfigDialog-3.0")
+
+    -- adds stub in blizz options
+    AceConfig:RegisterOptionsTable("Arcana", function()
+        if not IsAddOnLoaded("Arcana-Options") then
+            local success, reason = LoadAddOn("Arcana-Options")
+            if not success then
+                print("|cff88ccffArcana|r Failed to load Arcana-Options: " .. reason)
+            end
+        end
+        return Arcana:BuildArcanaOptions()
+    end)
+
+    local _, categoryID = AceConfigDialog:AddToBlizOptions("Arcana", "Arcana")
+    self.BlizzardOptionsCategoryID = categoryID
+
     Arcana:EnableModules()
     Arcana:CreateSavePlaceholdes()
+end
+
+function Arcana:OnProfileChanged(_, database)
+    if Arcana.OptionsOnProfileChanged then
+        Arcana:OptionsOnProfileChanged(_, database)
+    end
 end
 
 function Arcana:OnEnable()
@@ -230,10 +250,6 @@ function Arcana:OnEnable()
     end
 end
 
-function Arcana:OnDatabaseShutdown()
-    ArcanaDB.addonVersion = addonVersion
-end
-
 function Arcana:EnableModules()
     -- itaret modules list and call each enable fuction
     for name, _ in pairs(Arcana.modules) do
@@ -245,10 +261,6 @@ end
 
 function Arcana:EnableModule(name)
     Arcana.modules[name]:EnableModule()
-
-    local subModuleOptions = Arcana:GetAceOptions().args.moduleOptions.args[name].args
-    subModuleOptions.Options = Arcana.modules[name].optionsExtended
-
     -- in case the module was enabled in this seesion before but was disabled we need to enable it again
     local obj = broker:GetDataObjectByName(name)
     if obj then
@@ -304,7 +316,7 @@ function Arcana:NewModule(name, values)
             enabled = {
                 type = 'toggle',
                 order = 1,
-                name = L["Enabled"],
+                name = L["module.enabled"],
                 desc = "Toggle enable/disable this Module.",
                 get = GetModuleEnabled,
                 set = SetModuleEnabled,
@@ -341,11 +353,6 @@ function Arcana:UpdateJostle()
     end
 end
 
-function Arcana:isNewInstall()
-    local lastversion = ArcanaDB.addonVersion or ""
-    return lastversion < C_AddOns.GetAddOnMetadata("Arcana", "Version") and true or false
-end
-
 function Arcana:ToggleOrderHallCommandBar()
     ---@diagnostic disable-next-line: undefined-field
     local orderHallCommandBar = _G.OrderHallCommandBar
@@ -361,7 +368,7 @@ end
 
 function Arcana:OnDisable()
     for name, _ in broker:DataObjectIterator() do
-        if pluginObjects[name] then pluginObjects[name]:Hide() end
+        if arcanaPieces[name] then arcanaPieces[name]:Hide() end
     end
     for _, v in pairs(arcanaBars) do
         v:Hide()
@@ -370,9 +377,9 @@ function Arcana:OnDisable()
 end
 
 function Arcana:OnEnterWorld()
-    self:UpdatePlugins("resizeFrame")
+    self:UpdateArcanaPieces("resizeFrame")
     self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-    Arcana:UpdateOptions(arcanaBars)
+    --Arcana:UpdateOptions(arcanaBars)
 end
 
 function Arcana:OnPetBattleOpen()
@@ -431,9 +438,9 @@ function Arcana:OnLeaveCombat()
     end
 end
 
---------
+-- ✧────────────────────────────────────────────────────✧
 -- LDB callbacks
---------
+-- ✧────────────────────────────────────────────────────✧
 function Arcana:LibDataBroker_DataObjectCreated(_, name, obj, noupdate)
     if not db then return end
 
@@ -490,20 +497,18 @@ function Arcana:EnableDataObject(name, obj, noupdate)
     end
     obj.name = name
 
-    local plugin = pluginObjects[name] or ArcanaPiece:New(name, obj, settings, db)
-    pluginObjects[name] = plugin
+    local arcanaPiece = arcanaPieces[name] or ArcanaPiece:New(name, obj, settings, db)
+    arcanaPieces[name] = arcanaPiece
 
-    plugin:Show()
+    arcanaPiece:Show()
 
     local bar = arcanaBars[barName]
     if bar then
-        bar:AddArcanaPiece(plugin, name, noupdate)
+        bar:AddArcanaPiece(arcanaPiece, name, noupdate)
     else
-        arcanaBars["Arcana1"]:AddArcanaPiece(plugin, name, noupdate)
+        arcanaBars["Arcana1"]:AddArcanaPiece(arcanaPiece, name, noupdate)
     end
     broker.RegisterCallback(self, "LibDataBroker_AttributeChanged_" .. name, "AttributeChanged")
-
-    Arcana:AddObjectOptions(name, obj)
 end
 
 function Arcana:DisableDataObject(name)
@@ -523,7 +528,7 @@ function Arcana:AttributeChanged(_, name, key, value)
     if not settings.enabled then
         return
     end
-    local plugin = pluginObjects[name]
+    local plugin = arcanaPieces[name]
     plugin:Update(plugin, key, value, name)
 end
 
@@ -543,13 +548,15 @@ function Arcana:TempDisAutohide(value)
     end
 end
 
+-- The created plugin mixin
+-- that holds the injected functions of the frame
 -- returns nil if the plugin is disabled
-function Arcana:GetPlugin(name)
-    return pluginObjects[name]
+function Arcana:GetArcanaPice(name)
+    return arcanaPieces[name]
 end
 
 function Arcana:GetArcanas()
-    return pluginObjects
+    return arcanaPieces
 end
 
 function Arcana:GetBar(name)
@@ -558,10 +565,6 @@ end
 
 function Arcana:GetBars()
     return arcanaBars
-end
-
-function Arcana:SetBars(tab)
-    arcanaBars = tab or {}
 end
 
 local function getFreeBarName()
@@ -581,21 +584,21 @@ local function getFreeBarName()
     end
 end
 
-function Arcana:UpdatePlugins(key, val)
-    for _, plugin in pairs(pluginObjects) do
+function Arcana:UpdateArcanaPieces(key, val)
+    for _, plugin in pairs(arcanaPieces) do
         plugin:Update(plugin, key, val)
     end
 end
 
-function Arcana:ExecuteforAllPlugins(func, ...)
-    for _, plugin in pairs(pluginObjects) do
+function Arcana:ExecuteforAllArcanaPices(func, ...)
+    for _, plugin in pairs(arcanaPieces) do
         func(plugin, ...)
     end
 end
 
---------
+-- ✧────────────────────────────────────────────────────✧
 -- Bars Management
---------
+-- ✧────────────────────────────────────────────────────✧
 function Arcana:AddBar(name, settings, noupdate)
     if not name then --find free name
         name = getFreeBarName()
@@ -622,9 +625,11 @@ end
 
 -- sort and anchor all bars
 function Arcana:AnchorBars()
+    -- sort bars by index into two lists, then anchor them top to bottom
     local temptop = {}
     local tempbottom = {}
 
+    -- fill temptop and tempbottom with bars, anchor free floating bars
     for _, v in pairs(arcanaBars) do
         local settings = v.settings
         local index = settings.index or 500
@@ -633,6 +638,7 @@ function Arcana:AnchorBars()
         elseif settings.align == "bottom" then
             table.insert(tempbottom, { v, index })
         else
+            -- anchor free floating bars
             v:ClearAllPoints()
             if settings.barPoint and settings.barOffx and settings.barOffy then
                 v:SetPoint(settings.barPoint, "UIParent", settings.barOffx, settings.barOffy)
@@ -643,16 +649,17 @@ function Arcana:AnchorBars()
             end
         end
     end
+    -- sort both lists by index
     table.sort(temptop, function(a, b) return a[2] < b[2] end)
     table.sort(tempbottom, function(a, b) return a[2] < b[2] end)
 
-    local yoff = 0
+    -- anchor top bars
     local relative = nil
     for i, v in ipairs(temptop) do
         local bar = v[1]
         bar:ClearAllPoints()
         if (relative) then
-            bar:SetPoint("TOPLEFT", relative, "BOTTOMLEFT", 0, -yoff)
+            bar:SetPoint("TOPLEFT", relative, "BOTTOMLEFT", 0, 0)
             bar:SetPoint("RIGHT", relative, "RIGHT", 0, 0);
         else
             bar:SetPoint("TOPLEFT", -1, 1);
@@ -664,11 +671,13 @@ function Arcana:AnchorBars()
         relative = bar
     end
 
+    -- anchor bottom bars
+    relative = nil
     for i, v in ipairs(tempbottom) do
         local bar = v[1]
         bar:ClearAllPoints()
         if (relative) then
-            bar:SetPoint("BOTTOMLEFT", relative, "TOPLEFT", 0, -yoff)
+            bar:SetPoint("BOTTOMLEFT", relative, "TOPLEFT", 0, 0)
             bar:SetPoint("RIGHT", relative, "RIGHT", 0, 0);
         else
             bar:SetPoint("BOTTOMLEFT", -1, 0);
@@ -679,12 +688,6 @@ function Arcana:AnchorBars()
         --end
         relative = bar
     end
-end
-
-function tablelength(T)
-    local count = 0
-    for _ in pairs(T) do count = count + 1 end
-    return count
 end
 
 local function onRightClick(self)
@@ -728,15 +731,23 @@ function Arcana:GetPointer(parent)
     return pointer
 end
 
---------
+--✧────────────────────────────────────────────────────✧
 -- option functions
---------
+--✧────────────────────────────────────────────────────✧
 function Arcana:ChatCommand(input)
-    Arcana:LoadOptions(nil, input)
+    Arcana:LoadOptions(_, input)
 end
 
-function Arcana:LoadOptions(pluginName, input, blizzard)
-    Arcana:OpenOptions(arcanaBars, db, input, pluginName, nil, blizzard)
+function Arcana:LoadOptions(pluginName, input)
+    if not IsAddOnLoaded("Arcana-Options") then
+        local success, reason = LoadAddOn("Arcana-Options")
+        if success then
+            Arcana:Log("Loading Options")
+        else
+            Arcana:Log("Failed to load Arcana-Options: " .. reason)
+        end
+    end
+    Arcana:OpenOptions(pluginName)
 end
 
 function Arcana:UpdateDB(data)
@@ -747,4 +758,11 @@ end
 --helper API
 function Arcana:GetLabelColor()
     return db and db.labelColor or { r = 1, g = 0.82, b = 0, a = 1 }
+end
+
+function Arcana:GetCleanName(name)
+    local cleanName = string.gsub(name, "|c........", "")
+    cleanName = string.gsub(cleanName, "|r", "")
+    cleanName = string.gsub(cleanName, "[%c \127]", "")
+    return cleanName
 end
