@@ -1,6 +1,6 @@
 ## Interface: @toc-version-midnight@, @toc-version-retail@, @toc-version-mists@, @toc-version-cata@, @toc-version-wrath@, @toc-version-bcc@, @toc-version-classic@
 #@debug@
-Interface: 11508, 11507, 30405, 38000, 40402, 50503, 50502, 120000
+## Interface: 11508, 11507, 30405, 38000, 40402, 50503, 50502, 120000
 #@end-debug@
 ## Title: Arcana: ChocolateBar Profile Migration
 ## Notes: A stub with the old folder and toc name for profile migration. Makes WoW also load ChocolateBarDB from ChocolateBar.lua in the SavedVariables folder under WTF if present.
