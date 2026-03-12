@@ -24,10 +24,6 @@ jobs:
           CF_API_KEY: ${{ github.event_name == 'release' && secrets.CF_API_KEY || '' }}
           WOWI_API_TOKEN: ${{ github.event_name == 'release' && secrets.WOWI_API_TOKEN || '' }}
           
-      - name: List release files
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        run: find .release -type f
-        
       - name: Upload package
         if: ${{ github.event_name == 'workflow_dispatch' }}
         uses: actions/upload-artifact@v4
