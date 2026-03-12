@@ -173,7 +173,17 @@ local updaters = {
     end,
 
     updatefont     = function(self)
-        self.text:SetFont(db.fontPath, db.fontSize)
+        self.text:SetFont(db.fontPath, db.fontSize, db.fontOutline)
+
+        -- disable default font shadow if outline is enabled
+        if db.fontOutline ~= "" then
+            self.text:SetShadowColor(0, 0, 0, 0)
+            self.text:SetShadowOffset(0, 0)
+        else
+            self.text:SetShadowColor(0, 0, 0, 1)
+            self.text:SetShadowOffset(1, -1)
+        end
+
         resizeFrame(self)
     end,
     updateSettings = SettingsUpdater,
@@ -392,7 +402,18 @@ function ArcanaPiece:New(name, obj, settings, database)
     ---@diagnostic disable-next-line: inject-field, param-type-mismatch
     arcanaPiece.text = arcanaPiece:CreateFontString(nil, nil, "GameFontHighlight")
     ---@diagnostic disable-next-line: missing-parameter
-    arcanaPiece.text:SetFont(db.fontPath, db.fontSize)
+
+    arcanaPiece.text:SetFont(db.fontPath, db.fontSize, db.fontOutline)
+
+    -- disable default font shadow if outline is enabled
+    if db.fontOutline ~= "" then
+        arcanaPiece.text:SetShadowColor(0, 0, 0, 0)
+        arcanaPiece.text:SetShadowOffset(0, 0)
+    else
+        arcanaPiece.text:SetShadowColor(0, 0, 0, 1)
+        arcanaPiece.text:SetShadowOffset(1, -1)
+    end
+
     arcanaPiece.text:SetJustifyH("LEFT")
 
     if isLauncherAndHasNoText(obj) then
