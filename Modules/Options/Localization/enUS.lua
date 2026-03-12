@@ -45,10 +45,10 @@ L["group.arcanaPices"] = "All Arcana Pieces"
 L["StatusBar Texture"] = true
 L["Note: Some LibSharedMedia provided textures may be provided by other addons."] = true
 L["Look & Texture"] = true
-L["A placeholder is a plugin with no text that you can put between plugins."] = true
+L["A placeholder is a arcana pice with no text that you can put between arcana pices."] = true
 L["Mouseover Opacity"] = true
-L["Info & Plugins"] = true
-L["All Plugins"] = true
+L["Info & Arcana Pices"] = true
+L["All Arcana Pice"] = true
 L["Set the opacity of the the bars when the mouse is over a bar."] = true
 L["Set the opacity of the the bars. You can set the alpha of the bar background unter textures."] = true
 L["Added option to set the opacity of the bars."] = true
@@ -56,32 +56,35 @@ L["Opening Arcana only options during combat."] = true
 
 L["Added module to automatically migrate ChocolateBar profiles to Arcana."] = true
 L["Info"] = true
-L["Search for plugins here"] = true
+L["arcanapices.search"] = "Search for plugins here"
 L["CTRL-C to copy"] = true
-L["Disable all plugins."] = true
+L["Disable all arcana pices."] = true
 L["Removes the selected Bar."] = true
-L["The Quel'dorei became scattered across the world. To preserve the fragments of arcana they gathered from many sources, they maintain observatories where this knowledge is kept in careful order."] = true
-L["You can add plugins to Arcana via the data-broker category in the curseforge app or the link below."] = true
+L["infoandnews.infoText"] =
+"The Quel'dorei became scattered across the world. To preserve the fragments of arcana they gathered from many sources, they maintain observatories where this knowledge is kept in careful order."
+L["infoandnews.adding.arcanapices"] =
+"You can add parcana pieces/plugins to Arcana via the data-broker category in the curseforge app or the link below."
 
-L["Plugin Options"] = true
+
+L["Arcana Pice Options"] = true
 L["Whats New"] = true
 L["Whats New & Info"] = true
 
-L["Modules are buildin plugins that can be enabled or disabled here. Disabled plugins will not be loaded."] = true
+L["Modules are buildin arcana pices that can be enabled or disabled here. Disabled arcana pices will not be loaded."] = true
 L["Shows the played time for all characters. You need to login with each character first."] = true
-L["Use your scroll wheel over this plugin to adjust the master volume."] = true
-L["Use your scroll wheel over this plugin to adjust the sound volume."] = true
-L["Use your scroll wheel over this plugin to adjust the music volume."] = true
+L["Use your scroll wheel over this arcana pice to adjust the master volume."] = true
+L["Use your scroll wheel over this arcana pice to adjust the sound volume."] = true
+L["Use your scroll wheel over this arcana pice to adjust the music volume."] = true
 L["Shows player coordinates"] = true
 
 L["Disable Tooltip"] = true
-L["Only show tooltip of this plugin when a modifier (shift, alt, ctrl) is held."] = true
+L["Only show tooltip of this arcana pice when a modifier (shift, alt, ctrl) is held."] = true
 
 L["Label color"] = true
-L["Default label color of a plugin."] = true
+L["Default label color of a arcana pice."] = true
 
 L["Custom Label"] = true
-L["Change the label of this plugin."] = true
+L["Change the label of this arcana pice."] = true
 L["Show Label"] = true
 L["Colorized Dragging"] = true
 L["Colorize frames during drag & drop."] = true
@@ -92,14 +95,14 @@ L["Removes all placeholders"] = true
 L["Modules"] = true
 
 --dropPoints
-L["Drop a Plugin onto any of the icons above."] = true
+L["Drop a Arcana Pice onto any of the icons above."] = true
 
 -- placeholder
-L["Creates a new plugin to use as a placeholder."] = true
+L["Creates a new arcana pice to use as a placeholder."] = true
 L["Tipp: Set the width behavior to fixed and adjust the the max text width to scale the placeholder."] = true
 L["Placeholder Options"] = true
 L["Highlight"] = true
-L["Temporarily highlights the position of the plugin on the bar."] = true
+L["Temporarily highlights the position of the arcana pice on the bar."] = true
 L["Remove Placeholder"] = true
 L["Remove this Placeholder"] = true
 L["Placeholder"] = true
@@ -112,7 +115,7 @@ L["Hide Order Hall Bar"] = true
 L["Hides the command bar displayed at the Class/Order Hall."] = true
 
 L["Desaturated Icons"] = true
-L["Show icons in gray scale mode (This will not affect icons embedded in the text of a plugin)."] = true
+L["Show icons in gray scale mode (This will not affect icons embedded in the text of a arcana pice)."] = true
 
 L["Free"] = true
 L["Fixed"] = true
@@ -122,13 +125,13 @@ L["Fixed/Max Text Width"] = true
 L["Set fixed or max width for the text."] = true
 
 L["Width Behavior"] = true
-L["How should the plugin width adapt to the text?"] = true
+L["How should the arcana pice width adapt to the text?"] = true
 
 L["Hide Bars in Pet Battle"] = true
 L["Hide Bars during a Pet Battle."] = true
 
 L["Force Text Color"] = true
-L["Remove custom colors from plugins."] = true
+L["Remove custom colors from arcana pices."] = true
 
 L["Hide In Combat"] = true
 L["Hide this bar during combat."] = true
@@ -147,7 +150,7 @@ L["Texture Color/Alpha"] = true
 L["Border Color/Alpha"] = true
 
 L["Update Center Position"] = true
-L["Always adjust the center group based on the current width of the plugins. Disable this to align the center group based only on the number of plugins."] = true
+L["Always adjust the center group based on the current width of the arcana pices. Disable this to align the center group based only on the number of arcana pices."] = true
 L["Options"] = true
 L["Alignment"] = true
 L["Left"] = true
@@ -186,17 +189,17 @@ L["Outline"] = true
 L["Thick Outline"] = true
 L["Monochrome Outline"] = true
 L["Toggle Text"] = true
-L["Disable Plugin"] = true
+L["Disable Arcana Pice"] = true
 L["Look and Feel"] = true
 L["Defaults"] = true
 L["Launcher"] = true
-L["Automatically disable new plugins of type:"] = true
-L["If enabled new plugins of type launcher will automatically be disabled."] = true
-L["If enabled new plugins of type data source will automatically be disabled."] = true
+L["Automatically disable new arcana pices of type:"] = true
+L["If enabled new arcana pices of type launcher will automatically be disabled."] = true
+L["If enabled new arcana pices of type data source will automatically be disabled."] = true
 L["Text color"] = true
-L["Default text color of a plugin. This will not overwrite plugins that use own colors."] = true
-L["Lock Plugins"] = true
-L["Hold alt key to drag a plugin."] = true
+L["Default text color of an arcana pice. This will not overwrite arcana pices that use own colors."] = true
+L["Lock Arcana Pices"] = true
+L["Hold alt key to drag a arcana pice."] = true
 L["Move Minimap, Bags and other Frames"] = true
 L["Moves Minimap, Bags and other frames above/below visible Bars. \n\nDisable this if you have issues and use WoW's \"Edit Mode\" instead to place the frames away from the Bars."] = true
 L["Disable Tooltips"] = true
@@ -204,14 +207,14 @@ L["Hide Bars"] = true
 L["Disable Clicking"] = true
 L["Bar Size"] = true
 L["Gap"] = true
-L["Set the gap between the plugins."] = true
+L["Set the gap between the arcana pieces."] = true
 L["Bar Strata"] = true
 L["Background Texture"] = true
 L["Debug"] = true
 L["Create Bar"] = true
 L["Create New Bar"] = true
 L["Enable All"] = true
-L["Get back my plugins!"] = true
+L["Get back my arcana pices!"] = true
 L["Disable All"] = true
 L["Disable all Launchers"] = true
 L["Disable all the bad guy's:)"] = true
@@ -224,7 +227,7 @@ L["Enabled"] = true
 L["Show Text"] = true
 L["Show Icon"] = true
 L["Quick Config"] = true
-L["Plugin Statistics"] = true
+L["Arcana Pice Statistics"] = true
 L["Bars"] = true
 L["Bar Settings"] = true
 L["In Combat"] = true
@@ -233,9 +236,9 @@ L["Disabled"] = true
 L["Total"] = true
 L["Data Source"] = true
 L["Other"] = true
-L["Plugins"] = true
+L["Arcana Pices"] = true
 
-L["A broker plugin to toggle a bar."] = true
+L["A broker arcana pice to toggle a bar."] = true
 L["Select Bar"] = true
 L["Delay"] = true
 L["Set seconds until bar will hide."] = true

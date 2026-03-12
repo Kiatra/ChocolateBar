@@ -46,7 +46,6 @@ ArcanaPiece.lua
 Bar.lua
 DropPoints.lua
 
-Modules\Placeholder\Placeholder.lua
 Modules\MoreArcana\MoreArcana.lua
 
 Modules\PlayedTime\PlayedTime_Loc.lua

@@ -8,7 +8,8 @@ local bar
 local L = LibStub("AceLocale-3.0"):GetLocale("Arcana")
 local wipe, pairs = wipe, pairs
 local moreArcana
-local openIcon = "Interface\\AddOns\\Arcana\\Media\\Icons\\ArcanaBookBlue"
+local closedIcon = "Interface\\AddOns\\Arcana\\Media\\Icons\\ArcanaBookBlue"
+local openIcon = "Interface\\AddOns\\Arcana\\Media\\Icons\\ArcanaKnowledge"
 local moduleName = "MoreArcana"
 
 local function onEnter()
@@ -31,9 +32,6 @@ end
 
 
 local function GetList()
-    --if moreArcana or not moreArcana.barNames then
-    --    wipe(moreArcana.barNames)
-    --end
     local barNames = { none = L["None"] }
     for k, _ in pairs(Arcana:GetBars()) do
         barNames[k] = k
@@ -47,7 +45,7 @@ function Timer:OnUpdate(elapsed)
     if counter >= delay and bar and not Arcana.dragging then
         bar:Hide()
         counter = 0
-        moreArcana.icon = "Interface\\AddOns\\Arcana\\Media\\Icons\\ArcanaBookBlue"
+        moreArcana.icon = closedIcon
         Timer:SetScript("OnUpdate", nil)
     end
 end
@@ -117,24 +115,22 @@ function Module:DisableModule()
 end
 
 function Module:EnableModule()
-    Arcana:Debug("MoreArcana:EnableModule")
     if not moreArcana then
         moreArcana = LibStub("LibDataBroker-1.1"):NewDataObject("MoreArcana", {
             type    = "launcher",
-            icon    = "Interface\\AddOns\\Arcana\\Media\\Icons\\ArcanaBookBlue",
+            icon    = closedIcon,
             label   = "MoreArcana",
             text    = "MoreArcana",
-
             OnClick = function(_, btn)
                 if btn == "LeftButton" then
                     if bar then
                         if bar:IsShown() then
                             bar:Hide()
                             Timer:SetScript("OnUpdate", nil)
-                            moreArcana.icon = "Interface\\AddOns\\Arcana\\Media\\Icons\\ArcanaBookBlue"
+                            moreArcana.icon = closedIcon
                         else
                             bar:Show()
-                            moreArcana.icon = "Interface\\AddOns\\Arcana\\Media\\Icons\\ArcanaKnowledge"
+                            moreArcana.icon = openIcon
                             if delay > 0 then
                                 Timer:SetScript("OnUpdate", Timer.OnUpdate)
                             end
@@ -144,11 +140,11 @@ function Module:EnableModule()
             end,
         })
         moreArcana.SetBar = setBar
-        --moreArcana.OnEnter = onEnter
     end
 
-    if Arcana.GetAceOptions then
-        local subModuleOptions = Arcana:GetAceOptions().args.moduleOptions.args[moduleName].args
+    local ArcanaOptions = LibStub("AceAddon-3.0"):GetAddon("Arcana-Options", true)
+    if ArcanaOptions then
+        local subModuleOptions = ArcanaOptions:GetAceOptions().args.moduleOptions.args[moduleName].args
         subModuleOptions.Options = Arcana.modules[moduleName].optionsExtended
     end
 end

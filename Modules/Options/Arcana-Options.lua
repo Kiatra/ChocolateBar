@@ -7,36 +7,50 @@
 --  Made with love by Kiatra ♡
 --  Forgetting to to close the brackes is even more fun!
 -- ✧───────────────────────────────────────--------───────✧
-local libStub = LibStub
-local Arcana = libStub("AceAddon-3.0"):GetAddon("Arcana")
+local LibStub = LibStub
+local Arcana = LibStub("AceAddon-3.0"):GetAddon("Arcana")
 local ArcanaOptions = LibStub("AceAddon-3.0"):NewAddon("Arcana-Options")
-local AceCfgDlg = LibStub("AceConfigDialog-3.0")
-local Drag = Arcana.Drag
-local broker = LibStub("LibDataBroker-1.1")
+
+local AceConfigDialog = LibStub("AceConfigDialog-3.0")
+local LibDataBroker = LibStub("LibDataBroker-1.1")
+local LibSharedMedia = LibStub("LibSharedMedia-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("Arcana-Options")
-local LSM = LibStub("LibSharedMedia-3.0")
+
 local _G, pairs, string = _G, pairs, string
 local db, moreArcana
+
+local Drag = Arcana.Drag
 local addonName = ...
+
 ---@diagnostic disable-next-line: undefined-field
 local GetAddOnMetadata = _G.GetAddOnMetadata or _G.C_AddOns.GetAddOnMetadata;
 local version = GetAddOnMetadata(addonName, "Version") or "unknown";
 local title = "|TInterface\\AddOns\\Arcana\\Media\\Icons\\ArcanaKnowledge.tga:" ..
     12 .. ":" .. 12 .. ":0:0|t " .. "Arcana - Quel'dorei Observatory"
 
+--local AceConfig = LibStub("AceConfig-3.0")
+--AceConfig:RegisterOptionsTable("Arcana", aceoptions)
 function ArcanaOptions:OnInitialize()
-    Arcana:RegisterOptions(Arcana.db.profile, _, Arcana.modules)
-    for name, obj in broker:DataObjectIterator() do
-        Arcana:AddObjectOptions(name, obj)
+    self:RegisterOptions(Arcana.db.profile, _, Arcana.modules)
+    for name, obj in LibDataBroker:DataObjectIterator() do
+        self:AddObjectOptions(name, obj)
+    end
+
+    --inject placeholder options into ace3 object options for placeholder objects
+    for placeHolderName, _ in pairs(db.placeholderNames) do
+        local options = self:GetOjectOptions()[placeHolderName].args
+        if options then
+            table.insert(options, self:GetPlaceHolderOptions())
+        end
     end
 
     for name, _ in pairs(Arcana.modules) do
-        local subModuleOptions = Arcana:GetAceOptions().args.moduleOptions.args[name].args
+        local subModuleOptions = self:GetAceOptions().args.moduleOptions.args[name].args
         subModuleOptions.Options = Arcana.modules[name].optionsExtended
     end
 
     for name, _ in pairs(Arcana.arcanaBars) do
-        Arcana:AddBarOptions(name)
+        self:AddBarOptions(name)
     end
 end
 
@@ -44,7 +58,7 @@ local function GetStats()
     local total = 0
     local enabled = 0
     local data = 0
-    for name, obj in broker:DataObjectIterator() do
+    for name, obj in LibDataBroker:DataObjectIterator() do
         local t = obj.type
         if t == "data source" or t == "launcher" then
             total = total + 1
@@ -69,19 +83,19 @@ local function GetStats()
 end
 
 local function EnableAll()
-    for name, obj in LibStub("LibDataBroker-1.1"):DataObjectIterator() do
+    for name, obj in LibDataBroker:DataObjectIterator() do
         Arcana:EnableDataObject(name, obj)
     end
 end
 
 local function DisableAll()
-    for name, _ in LibStub("LibDataBroker-1.1"):DataObjectIterator() do
+    for name, _ in LibDataBroker:DataObjectIterator() do
         Arcana:DisableDataObject(name)
     end
 end
 
 local function DisableLauncher()
-    for name, obj in LibStub("LibDataBroker-1.1"):DataObjectIterator() do
+    for name, obj in LibDataBroker:DataObjectIterator() do
         if obj.type ~= "data source" then
             Arcana:DisableDataObject(name)
         end
@@ -98,7 +112,12 @@ local function createPlaceholder()
     local placeholderNames = db.placeholderNames
     local name = L["Placeholder"] .. tablelength(placeholderNames)
     placeholderNames[name] = true
-    Arcana:AddObjectOptions(name, Arcana:NewPlaceholder(name))
+    ArcanaOptions:AddObjectOptions(name, Arcana:NewPlaceholder(name))
+
+    local options = ArcanaOptions:GetOjectOptions()[name].args
+    if options then
+        table.insert(options, ArcanaOptions:GetPlaceHolderOptions())
+    end
 end
 
 StaticPopupDialogs["ArcanaURLDialog"] = {
@@ -168,15 +187,15 @@ local function getFontOptions()
             get = function() return db.fontOutline end,
             set = function(_, value)
                 db.fontOutline = value
-                Arcana:UpdatePlugins("updatefont")
+                Arcana:UpdateArcanaPieces("updatefont")
             end,
         },
         textcolour = {
             type = "color",
             order = 3,
             name = L["Text color"],
-            desc = L
-                ["Default text color of a plugin. This will not overwrite plugins that use own colors."],
+            desc =
+                L["Default text color of an arcana pice. This will not overwrite arcana pices that use own colors."],
             hasAlpha = true,
             get = function()
                 local t = db.textColor or { r = 1, g = 1, b = 1, a = 1 }
@@ -193,7 +212,7 @@ local function getFontOptions()
             type = "color",
             order = 3,
             name = L["Label color"],
-            desc = L["Default label color of a plugin."],
+            desc = L["Default label color of a arcana pice."],
             hasAlpha = true,
             get = function()
                 local t = db.labelColor or { r = 1, g = 0.82, b = 0, a = 1 }
@@ -210,19 +229,19 @@ local function getFontOptions()
             type = "toggle",
             order = 4,
             name = L["Desaturated Icons"],
-            desc = L
-                ["Show icons in gray scale mode (This will not affect icons embedded in the text of a plugin)."],
+            desc =
+                L["Show icons in gray scale mode (This will not affect icons embedded in the text of a arcana pice)."],
             get = function()
                 return db.desaturated
             end,
             set = function(_, vale)
                 db.desaturated = vale
-                for name, _ in broker:DataObjectIterator() do
+                for name, _ in LibDataBroker:DataObjectIterator() do
                     if db.objSettings[name] then
                         if db.objSettings[name].enabled then
-                            local plugin = Arcana:GetArcanaPice(name)
-                            if plugin then
-                                plugin:Update(plugin, "iconR", nil)
+                            local object = Arcana:GetArcanaPice(name)
+                            if object then
+                                object:Update(object, "iconR", nil)
                             end
                         end
                     end
@@ -234,18 +253,18 @@ local function getFontOptions()
             width = "double",
             order = 9,
             name = L["Force Text Color"],
-            desc = L["Remove custom colors from plugins."],
+            desc = L["Remove custom colors from arcana pices."],
             get = function()
                 return db.forceColor
             end,
             set = function(_, value)
                 db.forceColor = value
-                for name, obj in broker:DataObjectIterator() do
+                for name, obj in LibDataBroker:DataObjectIterator() do
                     if db.objSettings[name] then
                         if db.objSettings[name].enabled then
-                            local plugin = Arcana:GetArcanaPice(name)
-                            if plugin then
-                                plugin:Update(plugin, "text", obj.text)
+                            local object = Arcana:GetArcanaPice(name)
+                            if object then
+                                object:Update(_, "text", obj.text)
                             end
                         end
                     end
@@ -330,7 +349,7 @@ local function getCombatOptions()
                     bar:SetAlpha(db.combatopacity)
                 end
                 Arcana:CancelTimer(opacityTimer)
-                opacityTimer = Arcana:ScheduleTimer(function(plugin)
+                opacityTimer = Arcana:ScheduleTimer(function(_)
                     for _, bar in pairs(Arcana:GetBars()) do
                         bar:SetAlpha(bar.settings.opacity)
                     end
@@ -353,10 +372,10 @@ local function getTextureOptions()
                 return db.background.textureName
             end,
             set = function(_, value)
-                db.background.texture = LSM:Fetch("statusbar", value)
+                db.background.texture = LibSharedMedia:Fetch("statusbar", value)
                 db.background.textureName = value
                 db.background.tile = false
-                Arcana:UpdateBarOptions("UpdateTexture")
+                ArcanaOptions:UpdateBarOptions("UpdateTexture")
             end,
         },
         colour = {
@@ -372,7 +391,7 @@ local function getTextureOptions()
             set = function(_, r, g, b, a)
                 local t = db.background.color
                 t.r, t.g, t.b, t.a = r, g, b, a
-                Arcana:UpdateBarOptions("UpdateColors")
+                ArcanaOptions:UpdateBarOptions("UpdateColors")
             end,
         },
         bordercolour = {
@@ -388,7 +407,7 @@ local function getTextureOptions()
             set = function(_, r, g, b, a)
                 local t = db.background.borderColor
                 t.r, t.g, t.b, t.a = r, g, b, a
-                Arcana:UpdateBarOptions("UpdateColors")
+                ArcanaOptions:UpdateBarOptions("UpdateColors")
             end,
         }
     }
@@ -407,12 +426,12 @@ local function getAdvancedTextureOptions()
                 return db.background.textureName
             end,
             set = function(_, value)
-                db.background.texture = LSM:Fetch("background", value)
+                db.background.texture = LibSharedMedia:Fetch("background", value)
                 db.background.textureName = value
                 db.background.tile = true
                 local t = db.background.color
                 t.r, t.g, t.b, t.a = 1, 1, 1, 1
-                Arcana:UpdateBarOptions("UpdateTexture")
+                ArcanaOptions:UpdateBarOptions("UpdateTexture")
             end,
         },
         textureTile = {
@@ -425,7 +444,7 @@ local function getAdvancedTextureOptions()
             end,
             set = function(_, value)
                 db.background.tile = value
-                Arcana:UpdateBarOptions("UpdateTexture")
+                ArcanaOptions:UpdateBarOptions("UpdateTexture")
             end,
         },
         textureTileSize = {
@@ -448,17 +467,17 @@ local function getAdvancedTextureOptions()
                     value = 1
                 end
                 db.background.tileSize = value
-                Arcana:UpdateBarOptions("UpdateTexture")
+                ArcanaOptions:UpdateBarOptions("UpdateTexture")
             end,
         }
     }
 end
 
-local function getPluginOptions()
+local function getObjectOptions()
     return {
         stats = {
             inline = true,
-            name = L["Plugin Statistics"],
+            name = L["Arcana Pice Statistics"],
             type = "group",
             order = 1,
             args = {
@@ -479,14 +498,14 @@ local function getPluginOptions()
                     type = 'execute',
                     order = 3,
                     name = L["Enable All"],
-                    desc = L["Get back my plugins!"],
+                    desc = L["Get back my arcana pices!"],
                     func = EnableAll,
                 },
                 disableAll = {
                     type = 'execute',
                     order = 4,
                     name = L["Disable All"],
-                    desc = L["Disable all plugins."],
+                    desc = L["Disable all arcana pices."],
                     func = DisableAll,
                 },
                 disableLauncher = {
@@ -507,14 +526,14 @@ local function getPluginOptions()
                 label = {
                     order = 0,
                     type = "description",
-                    name = L["Automatically disable new plugins of type:"],
+                    name = L["Automatically disable new arcana pices of type:"],
                 },
                 dataobjects = {
                     type = 'toggle',
                     order = 1,
                     name = L["Data Source"],
                     desc = L
-                        ["If enabled new plugins of type data source will automatically be disabled."],
+                        ["If enabled new arcana pices of type data source will automatically be disabled."],
                     get = function()
                         return db.autodissource
                     end,
@@ -526,7 +545,7 @@ local function getPluginOptions()
                     type = 'toggle',
                     order = 2,
                     name = L["Launcher"],
-                    desc = L["If enabled new plugins of type launcher will automatically be disabled."],
+                    desc = L["If enabled new arcana pices of type launcher will automatically be disabled."],
                     get = function()
                         return db.autodislauncher
                     end,
@@ -545,7 +564,7 @@ local function getPluginOptions()
                 label = {
                     order = 0,
                     type = "description",
-                    name = L["A placeholder is a plugin with no text that you can put between plugins."] ..
+                    name = L["A placeholder is a arcana pice with no text that you can put between arcana pices."] ..
                         "\n" ..
                         L["Tipp: Set the width behavior to fixed and adjust the the max text width to scale the placeholder."],
                 },
@@ -553,7 +572,7 @@ local function getPluginOptions()
                     type = 'execute',
                     order = -1,
                     name = L["Create Placeholder"],
-                    desc = L["Creates a new plugin to use as a placeholder."],
+                    desc = L["Creates a new arcana pice to use as a placeholder."],
                     func = createPlaceholder,
                 },
             },
@@ -626,8 +645,8 @@ local aceoptions = {
             type = "description",
             name = version,
         },
-        newsAndPlugins = {
-            name = L["Info & Plugins"],
+        newsAndObjects = {
+            name = L["Info & Arcana Pices"],
             type = "group",
             order = 0,
             args = {
@@ -646,18 +665,18 @@ local aceoptions = {
                                     order = increment(),
                                     type = "description",
                                     name = L
-                                        ["The Quel'dorei became scattered across the world. To preserve the fragments of arcana they gathered from many sources, they maintain observatories where this knowledge is kept in careful order."]
+                                        ["infoandnews.infoText"]
                                 },
-                                infoTextPlugins = {
+                                infoTextObjects = {
                                     order = increment(),
                                     type = "description",
                                     name = L
-                                        ["You can add plugins to Arcana via the data-broker category in the curseforge app or the link below."],
+                                        ["infoandnews.adding.arcanapices"],
                                 },
-                                plugins = {
+                                objects = {
                                     order = increment(),
                                     type = "execute",
-                                    name = L["Search for plugins here"],
+                                    name = L["arcanapices.search"],
                                     func = function()
                                         showURLPopup(
                                             "https://www.curseforge.com/wow/search?sortBy=popularity&class=addons&categories=data-broker&search=plugin");
@@ -675,11 +694,11 @@ local aceoptions = {
                         }
                     }
                 },
-                plugins = {
+                objects = {
                     name = L["group.arcanaPices"],
                     type = "group",
                     order = -1,
-                    args = getPluginOptions()
+                    args = getObjectOptions()
                 }
             }
         },
@@ -697,8 +716,8 @@ local aceoptions = {
                         locked = {
                             type = 'toggle',
                             order = 1,
-                            name = L["Lock Plugins"],
-                            desc = L["Hold alt key to drag a plugin."],
+                            name = L["Lock Arcana Pices"],
+                            desc = L["Hold alt key to drag a arcana pice."],
                             get = function()
                                 return db.locked
                             end,
@@ -717,7 +736,7 @@ local aceoptions = {
                             end,
                             set = function(_, value)
                                 db.moveFrames = value
-                                Arcana:UpdateBarOptions("UpdateAutoHide")
+                                ArcanaOptions:UpdateBarOptions("UpdateAutoHide")
                             end,
                         },
                         hideBarsPetBattle = {
@@ -771,7 +790,7 @@ local aceoptions = {
                             type = 'range',
                             order = 10,
                             name = L["Gap"],
-                            desc = L["Set the gap between the plugins."],
+                            desc = L["Set the gap between the arcana pieces."],
                             min = 0,
                             max = 50,
                             step = 1,
@@ -813,7 +832,7 @@ local aceoptions = {
                             end,
                             set = function(_, value)
                                 db.height = value
-                                Arcana:UpdateBarOptions("UpdateHeight")
+                                ArcanaOptions:UpdateBarOptions("UpdateHeight")
                             end,
                         },
                         iconSize = {
@@ -836,7 +855,7 @@ local aceoptions = {
                                     value = 0.001
                                 end
                                 db.iconSize = value
-                                Arcana:UpdateBarOptions("UpdateHeight")
+                                ArcanaOptions:UpdateBarOptions("UpdateHeight")
                             end,
                         },
                         strata = {
@@ -858,7 +877,7 @@ local aceoptions = {
                             end,
                             set = function(_, value)
                                 db.strata = value
-                                Arcana:UpdateBarOptions("UpdateStrata")
+                                ArcanaOptions:UpdateBarOptions("UpdateStrata")
                             end,
                         },
                     }
@@ -899,7 +918,7 @@ local aceoptions = {
                     desc = L["Create New Bar"],
                     func = function()
                         local name = Arcana:AddBar()
-                        Arcana:AddBarOptions(name)
+                        ArcanaOptions:AddBarOptions(name)
                     end,
                 }
             }
@@ -913,7 +932,7 @@ local aceoptions = {
                     type = 'description',
                     order = 1,
                     name = L
-                        ["Modules are buildin plugins that can be enabled or disabled here. Disabled plugins will not be loaded."]
+                        ["Modules are buildin arcana pices that can be enabled or disabled here. Disabled arcana pices will not be loaded."]
                 }
             }
         }
@@ -931,25 +950,30 @@ aceoptions.args.lookAndTexture.args.font.args.font = {
         return db.fontName
     end,
     set = function(_, value)
-        db.fontPath = LSM:Fetch("font", value)
+        db.fontPath = LibSharedMedia:Fetch("font", value)
         db.fontName = value
         Arcana:UpdateArcanaPieces("updatefont")
     end,
 }
 
-local pluginOptions = aceoptions.args.newsAndPlugins.args.plugins.args
+local objectOptions = aceoptions.args.newsAndObjects.args.objects.args
 local barOptions = aceoptions.args.bars.args
 local moduleOptions = aceoptions.args.moduleOptions.args
 Arcana.optionsTable = aceoptions
+
 ---
 -- placeholder options
+function ArcanaOptions:GetOjectOptions()
+    return objectOptions
+end
+
 local function removePlaceholder(info)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
+    local name = objectOptions[cleanName].desc
     db.placeholderNames[cleanName] = nil
     print(db.placeholderNames)
     Arcana:DisableDataObject(name)
-    pluginOptions[cleanName] = nil
+    objectOptions[cleanName] = nil
 end
 
 local placeholderOptions = {
@@ -974,23 +998,19 @@ local placeholderOptions = {
     },
 }
 
-local function addPlaceholderOption(cleanName)
-    for k, _ in pairs(db.placeholderNames) do
-        if cleanName == k then
-            table.insert(pluginOptions[cleanName].args, placeholderOptions)
-        end
-    end
+function ArcanaOptions:GetPlaceHolderOptions()
+    return placeholderOptions
 end
+
 -----
 -- bar option functions
 -----
-
-function Arcana:GetAceOptions()
+function ArcanaOptions:GetAceOptions()
     return aceoptions
 end
 
 -- return the number of bars aligend to align (top or bottom)
-function Arcana:GetNumBars(align)
+function ArcanaOptions:GetNumBars(align)
     local i = 0
     for _, v in pairs(Arcana:GetBars()) do
         if v.settings.align == align then
@@ -1048,8 +1068,8 @@ local function MoveUp(info)
     if bar then
         if db.barSettings[name].align == "bottom" then
             index = index + 1.5
-            if index > (Arcana:GetNumBars("bottom") + 1) then
-                index = Arcana:GetNumBars("top") + 1
+            if index > (ArcanaOptions:GetNumBars("bottom") + 1) then
+                index = ArcanaOptions:GetNumBars("top") + 1
                 SetBarAlign(info, "top")
             end
         elseif db.barSettings[name].align == "top" then
@@ -1073,8 +1093,8 @@ local function MoveDown(info)
             index = index - 1.5
         elseif db.barSettings[name].align == "top" then
             index = index + 1.5
-            if index > (Arcana:GetNumBars("top") + 1) then
-                index = Arcana:GetNumBars("bottom") + 1
+            if index > (ArcanaOptions:GetNumBars("top") + 1) then
+                index = ArcanaOptions:GetNumBars("bottom") + 1
                 SetBarAlign(info, "bottom")
             end
         else
@@ -1132,11 +1152,11 @@ local function setOpacityMouseOver(info, value)
     end
     db.barSettings[name].opacityMouseOver = value
 
-    local bar = Arcana:GetBar(name)
-    bar:SetAlpha(value)
+    local currentBar = Arcana:GetBar(name)
+    currentBar:SetAlpha(value)
 
     Arcana:CancelTimer(opacityTimer)
-    opacityTimer = Arcana:ScheduleTimer(function(plugin)
+    opacityTimer = Arcana:ScheduleTimer(function(_)
         for _, bar in pairs(Arcana:GetBars()) do
             bar:SetAlpha(db.barSettings[name].opacity or 1)
         end
@@ -1177,13 +1197,13 @@ end
 
 local moveBarDummy
 local function OnDragStart(self)
-    self:StartMoving()
-    self.isMoving = true
+    Arcana:StartMoving()
+    Arcana.isMoving = true
 end
 
 local function OnDragStop(self)
-    self:StopMovingOrSizing()
-    self.isMoving = false
+    Arcana:StopMovingOrSizing()
+    Arcana.isMoving = false
 end
 
 local function SetLockedBar(info, value)
@@ -1300,13 +1320,13 @@ local function IsDisabledMoveUp(info)
 end
 
 -----
--- plugin option functions
+-- object option functions
 -----
 local function GetStyledIdentifier(info)
     local cleanName = info[#info]
-    local name = pluginOptions[cleanName].desc
-    --local icon = pluginOptions[cleanName].icon
-    local dataobj = broker:GetDataObjectByName(name)
+    local name = objectOptions[cleanName].desc
+    --local icon = objectOptions[cleanName].icon
+    local dataobj = LibDataBroker:GetDataObjectByName(name)
 
     local styled = ""
     if (not db.objSettings[name].enabled) then
@@ -1328,34 +1348,34 @@ end
 
 local function GetType(info)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
-    return (broker:GetDataObjectByName(name).type == "data source" and L["Type"] .. ": " .. L["Data Source"] .. "\n") or
+    local name = objectOptions[cleanName].desc
+    return (LibDataBroker:GetDataObjectByName(name).type == "data source" and L["Type"] .. ": " .. L["Data Source"] .. "\n") or
         L["Type"] .. ": " .. L["Launcher"] .. "\n"
 end
 
 local function GetAlignment(info)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
+    local name = objectOptions[cleanName].desc
     return db.objSettings[name].align
 end
 
 local function SetAlignment(info, value)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
+    local name = objectOptions[cleanName].desc
     db.objSettings[name].align = value
-    local plugin = Arcana:GetArcanaPice(name)
+    local object = Arcana:GetArcanaPice(name)
     db.objSettings[name].index = 500
-    if plugin and plugin.bar then
-        plugin.bar:UpdateBar(true)
-        --plugin.bar:UpdateBar()
+    if object and object.bar then
+        object.bar:UpdateBar(true)
+        --object.bar:UpdateBar()
     end
 end
 
 local function SetEnabled(info, value)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
+    local name = objectOptions[cleanName].desc
     if value then
-        local obj = broker:GetDataObjectByName(name)
+        local obj = LibDataBroker:GetDataObjectByName(name)
         Arcana:EnableDataObject(name, obj)
     else
         Arcana:DisableDataObject(name)
@@ -1364,7 +1384,7 @@ end
 
 local function GetEnabled(info)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
+    local name = objectOptions[cleanName].desc
     return db.objSettings[name].enabled
 end
 
@@ -1374,98 +1394,98 @@ end
 
 local function GetIcon(info)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
+    local name = objectOptions[cleanName].desc
     return db.objSettings[name].showIcon
 end
 
 local function SetIcon(info, value)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
+    local name = objectOptions[cleanName].desc
     db.objSettings[name].showIcon = value
     Arcana:AttributeChanged(nil, name, "updateSettings", value)
 end
 
 local function GetCustomLabel(info)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
+    local name = objectOptions[cleanName].desc
     return db.objSettings[name].customLabel
 end
 
 local function SetCustomLabel(info, value)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
+    local name = objectOptions[cleanName].desc
     db.objSettings[name].customLabel = value
     Arcana:AttributeChanged(nil, name, "updateSettings", value)
 end
 
 local function GetDisableTooltip(info)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
+    local name = objectOptions[cleanName].desc
     return db.objSettings[name].disableTooltip
 end
 
 local function SetDisableTooltip(info, value)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
+    local name = objectOptions[cleanName].desc
     db.objSettings[name].disableTooltip = value
     Arcana:AttributeChanged(nil, name, "updateSettings", value)
 end
 
 local function GetLabel(info)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
+    local name = objectOptions[cleanName].desc
     return db.objSettings[name].showLabel
 end
 
 local function SetLabel(info, value)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
+    local name = objectOptions[cleanName].desc
     db.objSettings[name].showLabel = value
     Arcana:AttributeChanged(nil, name, "updateSettings", value)
 end
 
 local function GetText(info)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
+    local name = objectOptions[cleanName].desc
     return db.objSettings[name].showText
 end
 
 local function SetText(info, value)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
+    local name = objectOptions[cleanName].desc
     db.objSettings[name].showText = value
     Arcana:AttributeChanged(nil, name, "updateSettings", value)
 end
 
 local function GetTextOffset(info)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
+    local name = objectOptions[cleanName].desc
     return db.objSettings[name].textOffset or db.textOffset
 end
 
 local function SetTextOffset(info, value)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
+    local name = objectOptions[cleanName].desc
     db.objSettings[name].textOffset = value
     Arcana:AttributeChanged(nil, name, "updateSettings", value)
 end
 
 local function GetWidth(info)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
+    local name = objectOptions[cleanName].desc
     return db.objSettings[name].width
 end
 
 local function SetWidth(info, value)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
+    local name = objectOptions[cleanName].desc
     db.objSettings[name].width = value
     Arcana:AttributeChanged(nil, name, "updateSettings", value)
 end
 
 local function GetWidthBehavior(info)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
+    local name = objectOptions[cleanName].desc
     if not db.objSettings[name].widthBehavior and db.objSettings[name].width == 0 then
         return "free"
     else
@@ -1475,23 +1495,23 @@ end
 
 local function SetWidthBehavior(info, value)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
+    local name = objectOptions[cleanName].desc
     db.objSettings[name].widthBehavior = value
     Arcana:AttributeChanged(nil, name, "updateSettings", value)
 end
 
 local function IsDisabledTextWidth(info)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
+    local name = objectOptions[cleanName].desc
     return true and (db.objSettings[name].widthBehavior == "free" or not db.objSettings[name].widthBehavior) or false
 end
 
 local function GetIconImage(info, name)
     if info then
         local cleanName = info[#info]
-        name = pluginOptions[cleanName].desc
+        name = objectOptions[cleanName].desc
     end
-    local obj = broker:GetDataObjectByName(name)
+    local obj = LibDataBroker:GetDataObjectByName(name)
     if obj and obj.icon then
         return obj.icon
     end
@@ -1500,8 +1520,8 @@ end
 
 local function GetIconCoords(info)
     local cleanName = info[#info]
-    local name = pluginOptions[cleanName].desc
-    local obj = broker:GetDataObjectByName(name)
+    local name = objectOptions[cleanName].desc
+    local obj = LibDataBroker:GetDataObjectByName(name)
     if obj and obj.iconCoords then
         return obj.iconCoords
     end
@@ -1509,26 +1529,26 @@ end
 
 local function IsDisabledIcon(info)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
-    local obj = broker:GetDataObjectByName(name)
+    local name = objectOptions[cleanName].desc
+    local obj = LibDataBroker:GetDataObjectByName(name)
     return not (obj and obj.icon) --return true if there is no icon
 end
 
 local function IsDisabledSetTextOffset(info)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
+    local name = objectOptions[cleanName].desc
     return not db.objSettings[name].textOffset
 end
 
 local function IsEnabledSetTextOffset(info)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
+    local name = objectOptions[cleanName].desc
     return db.objSettings[name].textOffset
 end
 
 local function SetEnabledSetTextOffset(info, value)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
+    local name = objectOptions[cleanName].desc
     local settings = db.objSettings[name]
     if settings.textOffset then
         settings.textOffset = nil
@@ -1540,7 +1560,7 @@ end
 
 local function SetEnabledOverwriteIconSize(info, value)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
+    local name = objectOptions[cleanName].desc
     local settings = db.objSettings[name]
     if settings.iconSize then
         settings.iconSize = nil
@@ -1552,132 +1572,114 @@ end
 
 local function SetCustomIconSize(info, value)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
+    local name = objectOptions[cleanName].desc
     if value > 1 then
         value = 1
     elseif value < 0.01 then
         value = 0.001
     end
     db.objSettings[name].iconSize = value
-    Arcana:UpdateBarOptions("UpdateHeight")
+    ArcanaOptions:UpdateBarOptions("UpdateHeight")
 end
 
 local function GetCustomIconSize(info)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
+    local name = objectOptions[cleanName].desc
     return db.objSettings[name].iconSize or db.iconSize
 end
 
 local function IsEnabledOvwerwriteIconSize(info)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
+    local name = objectOptions[cleanName].desc
     return db.objSettings[name].iconSize
 end
 
 local function IsDisabledOvwerwriteIconSize(info)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
+    local name = objectOptions[cleanName].desc
     return not db.objSettings[name].iconSize
 end
 
 
 local function GetHeaderName(info)
     local cleanName = info[#info - 1]
-    local name = pluginOptions[cleanName].desc
+    local name = objectOptions[cleanName].desc
     local nameWithIcon = "|T" .. GetIconImage(nil, name) .. ":18|t " .. name
     return nameWithIcon
 end
 
-local function ShowPluginOnBar(info)
+local function ShowArcanaPiceOnBar(info)
     local cleanName = info[#info - 2]
-    local name = pluginOptions[cleanName].desc
-    local plugin = Arcana:GetArcanaPice(name)
-    if plugin then
-        plugin.blinkTimerCount = 0
+    local name = objectOptions[cleanName].desc
+    local object = Arcana:GetArcanaPice(name)
+    if object then
+        object.blinkTimerCount = 0
 
-        local pointer = Arcana:GetPointer(plugin)
+        local pointer = Arcana:GetPointer(object)
         pointer:ClearAllPoints()
-        pointer:SetPoint("CENTER", plugin, "CENTER", pointer:GetWidth() / 2, 0)
+        pointer:SetPoint("CENTER", object, "CENTER", pointer:GetWidth() / 2, 0)
         pointer:SetAlpha(0)
         pointer:Hide()
         pointer:Show()
-        plugin.timer = Arcana:ScheduleRepeatingTimer(function(plugin)
-            local c = plugin.blinkTimerCount
+        object.timer = Arcana:ScheduleRepeatingTimer(function(obj)
+            local c = obj.blinkTimerCount
             c = c + 1
-            plugin:highlight(1, 0, 0, c % 2)
+            obj:highlight(1, 0, 0, c % 2)
             pointer:SetAlpha(c % 2)
             if c >= 10 then
-                Arcana:CancelTimer(plugin.timer)
-                plugin:highlight(1, 0, 0, 0)
-                pointer:SetAlpha(0)
+                Arcana:CancelTimer(obj.timer)
+                object:highlight(1, 0, 0, 0)
+                obj:SetAlpha(0)
                 pointer:Hide()
             end
-            plugin.blinkTimerCount = c
-        end, 0.1, plugin)
+            obj.blinkTimerCount = c
+        end, 0.1, object)
     end
 end
 
-function Arcana:UpdateOptions(arcanaBars)
-    for name, obj in broker:DataObjectIterator() do
+function ArcanaOptions:UpdateOptions(arcanaBars)
+    for name, obj in LibDataBroker:DataObjectIterator() do
         Arcana:AddObjectOptions(name, obj)
     end
 
     for name, _ in pairs(arcanaBars) do
-        Arcana:AddBarOptions(name)
+        self:AddBarOptions(name)
     end
 end
 
-local AceConfig = LibStub("AceConfig-3.0")
-local AceConfigDialog = LibStub("AceConfigDialog-3.0")
-
-AceConfig:RegisterOptionsTable("Arcana", aceoptions)
-
-function ArcanaOptions_PopulateOptionsPanelOld(container)
-    if container._aceOpened then
-        return
-    end
-    container._aceOpened = true
-
-    if container.status then
-        container.status:Hide()
-    end
-
-    AceConfigDialog:Open("Arcana", container)
-end
-
-function Arcana:RegisterOptions(data, _, modules)
+function ArcanaOptions:RegisterOptions(data, _, modules)
     db = data
-    aceoptions.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
-    AceCfgDlg:SetDefaultSize("Arcana", 700, 600)
+    aceoptions.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(Arcana.db)
+    AceConfigDialog:SetDefaultSize("Arcana", 700, 600)
 
-    AceCfgDlg:SelectGroup("Arcana", "newsAndPlugins", "plugins")
-    AceCfgDlg:SelectGroup("Arcana", "newsAndPlugins", "news")
+    AceConfigDialog:SelectGroup("Arcana", "newsAndObjects", "objects")
+    AceConfigDialog:SelectGroup("Arcana", "newsAndObjects", "news")
 
     for name, module in pairs(modules) do
-        --self:AddModuleOptions(name, module.options)
+        --Arcana:AddModuleOptions(name, module.options)
         moduleOptions[name] = module.options
         if module.OnOpenOptions then module:OnOpenOptions() end
     end
 end
 
-function Arcana:OpenOptions(objName)
+function ArcanaOptions:OpenOptions(objName)
     if objName then
-        AceCfgDlg:SelectGroup("Arcana", "newsAndPlugins", "plugins", objName)
+        AceConfigDialog:SelectGroup("Arcana", "newsAndObjects", "objects", objName)
     end
 
     if InCombatLockdown() then
         Arcana:Info("|cff88ccffArcana|r", L["combat.openoption"])
-        AceCfgDlg:Open("Arcana")
+        AceConfigDialog:Open("Arcana")
     else
-        Settings.OpenToCategory(self.BlizzardOptionsCategoryID)
+        Settings.OpenToCategory(Arcana.BlizzardOptionsCategoryID)
     end
 end
 
-function Arcana:BuildArcanaOptions()
+function ArcanaOptions:BuildArcanaOptions()
     return aceoptions
 end
 
-function Arcana:AddBarOptions(name)
+function ArcanaOptions:AddBarOptions(name)
     barOptions[name] = {
         name = GetBarName,
         desc = name,
@@ -1812,26 +1814,26 @@ function Arcana:AddBarOptions(name)
     }
 end
 
-function Arcana:RemoveBarOptions(name)
+function ArcanaOptions:RemoveBarOptions(name)
     barOptions[name] = nil
 end
 
-function Arcana:RemovePluginOptions(cleanName)
-    pluginOptions[cleanName] = nil
+function ArcanaOptions:RemoveobjectOptions(cleanName)
+    objectOptions[cleanName] = nil
 end
 
 local alignments         = { left = L["Left"], center = L["Center"], right = L["Right"] }
 local widthBehaviorTypes = { free = L["Free"], fixed = L["Fixed"], max = L["Max"] }
 
-function Arcana:AddObjectOptions(name, obj)
+function ArcanaOptions:AddObjectOptions(name, obj)
     if not obj or not obj.type or (obj.type ~= "data source" and obj.type ~= "launcher") then
-        Arcana:Log("Not adding plugin object: ", name, " type: ", obj.type)
+        Arcana:Log("Not adding arcna object: ", name, " type: ", obj.type)
         return
     end
 
     local cleanName = Arcana:GetCleanName(name)
-    --use cleanName of name because aceconfig does not like some characters in the plugin names
-    pluginOptions[cleanName] = {
+    --use cleanName of name because aceconfig does not like some characters in the object names
+    objectOptions[cleanName] = {
         name = GetStyledIdentifier,
         desc = name,
         desc2 = name,
@@ -1841,7 +1843,7 @@ function Arcana:AddObjectOptions(name, obj)
         iconCoords = GetIconCoords,
         type = "group",
         args = {
-            pluginSettings = {
+            objectsSettings = {
                 inline = true,
                 name = GetHeaderName,
                 type = "group",
@@ -1853,12 +1855,12 @@ function Arcana:AddObjectOptions(name, obj)
                         name = GetType,
                         --image = GetHeaderImage,
                     },
-                    showPluginOnBar = {
+                    showArcanaPiceOnBar = {
                         type = 'execute',
                         order = 3,
                         name = L["Highlight"],
-                        desc = L["Temporarily highlights the position of the plugin on the bar."],
-                        func = ShowPluginOnBar,
+                        desc = L["Temporarily highlights the position of the arcana pice on the bar."],
+                        func = ShowArcanaPiceOnBar,
                         disabled = GetDisabled,
                     },
                     enabled = {
@@ -1912,7 +1914,7 @@ function Arcana:AddObjectOptions(name, obj)
                         order = 7,
                         values = widthBehaviorTypes,
                         name = L["Width Behavior"],
-                        desc = L["How should the plugin width adapt to the text?"],
+                        desc = L["How should the arcana pice width adapt to the text?"],
                         get = GetWidthBehavior,
                         set = SetWidthBehavior,
                     },
@@ -1932,7 +1934,7 @@ function Arcana:AddObjectOptions(name, obj)
                         type = 'input',
                         order = 2,
                         name = L["Custom Label"],
-                        desc = L["Change the label of this plugin."],
+                        desc = L["Change the label of this arcana pice."],
                         width = "full",
                         get = GetCustomLabel,
                         set = SetCustomLabel,
@@ -1941,7 +1943,7 @@ function Arcana:AddObjectOptions(name, obj)
                         type = 'toggle',
                         order = 2,
                         name = L["Disable Tooltip"],
-                        desc = L["Only show tooltip of this plugin when a modifier (shift, alt, ctrl) is held."],
+                        desc = L["Only show tooltip of this arcana pice when a modifier (shift, alt, ctrl) is held."],
                         width = "full",
                         get = GetDisableTooltip,
                         set = SetDisableTooltip,
@@ -2008,37 +2010,36 @@ function Arcana:AddObjectOptions(name, obj)
             },
         },
     }
-    addPlaceholderOption(cleanName)
 end
 
-function Arcana:AddCustomPluginOptions(pluginName, customOptions)
-    for cleanName, _ in pairs(pluginOptions) do
-        if cleanName == pluginName then
-            table.insert(pluginOptions[cleanName].args, customOptions)
+function ArcanaOptions:AddCustomobjectOptions(objectName, customOptions)
+    for cleanName, _ in pairs(objectOptions) do
+        if cleanName == objectName then
+            table.insert(objectOptions[cleanName].args, customOptions)
         end
     end
 end
 
 -- remove a bar and disalbe all arcana pices in it
-function Arcana:RemoveBar(name)
-    local bar = self:GetBar(name)
+function ArcanaOptions:RemoveBar(name)
+    local bar = Arcana:GetBar(name)
     Drag:UnregisterFrame(bar)
     if bar then
         Arcana:RemoveBarOptions(name)
         bar:Disable()
         for objName, _ in pairs(bar.arcanaPices) do
-            self:DisableDataObject(objName)
+            Arcana:DisableDataObject(objName)
         end
-        self:GetBars()[name] = nil
+        Arcana:GetBars()[name] = nil
         db.barSettings[name] = nil
-        self:AnchorBars()
+        Arcana:AnchorBars()
     end
 end
 
 -- call when general bar options change
 -- updatekey: the key of the update function
-function Arcana:UpdateBarOptions(updatekey)
-    for _, bar in pairs(self:GetBars()) do
+function ArcanaOptions:UpdateBarOptions(updatekey)
+    for _, bar in pairs(Arcana:GetBars()) do
         local func = bar[updatekey]
         if func then
             func(bar, db)
@@ -2046,11 +2047,11 @@ function Arcana:UpdateBarOptions(updatekey)
     end
 end
 
-function Arcana:OptionsOnProfileChanged(_, database)
+function ArcanaOptions:OptionsOnProfileChanged(_, database)
     local arcanalabelColor = db.labelColor
 
     db = database.profile
-    self:UpdateDB(db)
+    Arcana:UpdateDB(db)
 
     -- itaret modules list and call each enable fuction
     for name, _ in pairs(Arcana.modules) do
@@ -2061,7 +2062,7 @@ function Arcana:OptionsOnProfileChanged(_, database)
         end
     end
 
-    for k, v in pairs(self:GetBars()) do
+    for k, v in pairs(Arcana:GetBars()) do
         Arcana:RemoveBarOptions(k)
         v:Hide()
         Drag:UnregisterFrame(v)
@@ -2071,33 +2072,34 @@ function Arcana:OptionsOnProfileChanged(_, database)
     local barSettings = db.barSettings
     for k, v in pairs(barSettings) do
         local name = v.barName
-        self:AddBar(k, v, true) --force no anchor update
+        Arcana:AddBar(k, v, true) --force no anchor update
         self:AddBarOptions(name)
     end
-    self:AnchorBars()
 
+    Arcana:AnchorBars()
     self:UpdateBarOptions()
-    for name, obj in broker:DataObjectIterator() do
+
+    for name, obj in LibDataBroker:DataObjectIterator() do
         local t = obj.type
         if t == "data source" or t == "launcher" then
             --for name, obj in pairs(dataObjects) do
             if db.objSettings[name].enabled then
-                local plugin = self:GetArcanaPice(name)
-                if plugin then
-                    plugin.settings = db.objSettings[name]
+                local object = Arcana:GetArcanaPice(name)
+                if object then
+                    object.settings = db.objSettings[name]
                 end
-                self:DisableDataObject(name)
-                self:EnableDataObject(name, obj, true) --no bar update
+                Arcana:DisableDataObject(name)
+                Arcana:EnableDataObject(name, obj, true) --no bar update
             else
-                self:DisableDataObject(name)
+                Arcana:DisableDataObject(name)
             end
         end
     end
-    self:UpdateBars(true) --update arcanaBars here
-    self:UpdateArcanaPieces("updateSettings")
-    self:UpdateArcanaPieces("resizeFrame")
+    Arcana:UpdateBars(true) --update arcanaBars here
+    Arcana:UpdateArcanaPieces("updateSettings")
+    Arcana:UpdateArcanaPieces("resizeFrame")
 
     --Arcana:AttributeChanged(nil, name, "updateSettings", value)
-    moreArcana = broker:GetDataObjectByName("MoreArcana")
+    moreArcana = LibDataBroker:GetDataObjectByName("MoreArcana")
     if moreArcana then moreArcana:SetBar(db) end
 end

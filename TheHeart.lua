@@ -221,9 +221,11 @@ function Arcana:Initialize()
             local success, reason = LoadAddOn("Arcana-Options")
             if not success then
                 print("|cff88ccffArcana|r Failed to load Arcana-Options: " .. reason)
+                return {}
             end
         end
-        return Arcana:BuildArcanaOptions()
+        local ArcanaOptions = LibStub("AceAddon-3.0"):GetAddon("Arcana-Options")
+        return ArcanaOptions:BuildArcanaOptions()
     end)
 
     local _, categoryID = AceConfigDialog:AddToBlizOptions("Arcana", "Arcana")
@@ -262,19 +264,23 @@ function Arcana:EnableModules()
 end
 
 function Arcana:EnableModule(name)
-    Arcana.modules[name]:EnableModule()
+    self.modules[name]:EnableModule()
     -- in case the module was enabled in this seesion before but was disabled we need to enable it again
     local obj = broker:GetDataObjectByName(name)
     if obj then
-        Arcana:EnableDataObject(name, obj)
+        self:EnableDataObject(name, obj)
     end
 end
 
 function Arcana:DisableModule(name)
-    Arcana.modules[name]:DisableModule()
-    Arcana:DisableDataObject(name)
-    local subModuleOptions = Arcana:GetAceOptions().args.moduleOptions.args[name].args
-    subModuleOptions.Options = {}
+    self.modules[name]:DisableModule()
+    self:DisableDataObject(name)
+
+    ArcanaOptions = LibStub("AceAddon-3.0"):GetAddon("Arcana-Options")
+    if ArcanaOptions then
+        local subModuleOptions = ArcanaOptions:GetAceOptions().args.moduleOptions.args[name].args
+        subModuleOptions.Options = {}
+    end
 end
 
 function Arcana:GetModule(name)
@@ -704,12 +710,12 @@ end
 
 function Arcana:NewPlaceholder(name)
     local obj = broker:GetDataObjectByName(name) or broker:NewDataObject(name, {
-        type    = "data source",
-        label   = name,
-        text    = "",
-        OnClick = onRightClick,
+        type        = "data source",
+        label       = name,
+        text        = "",
+        OnClick     = onRightClick,
+        placeholder = true
     })
-
     return obj
 end
 
@@ -744,12 +750,14 @@ function Arcana:LoadOptions(pluginName, input)
     if not IsAddOnLoaded("Arcana-Options") then
         local success, reason = LoadAddOn("Arcana-Options")
         if success then
-            Arcana:OpenOptions(pluginName)
+            ArcanaOptions = LibStub("AceAddon-3.0"):GetAddon("Arcana-Options")
+            ArcanaOptions:OpenOptions(pluginName)
         else
             Arcana:Log("Failed to load Arcana-Options: " .. reason)
         end
     else
-        Arcana:OpenOptions(pluginName)
+        ArcanaOptions = LibStub("AceAddon-3.0"):GetAddon("Arcana-Options")
+        ArcanaOptions:OpenOptions(pluginName)
     end
 end
 
