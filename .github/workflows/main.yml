@@ -3,6 +3,7 @@ name: CI
 on:
   release:
     types: [published]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -20,5 +21,5 @@ jobs:
         uses: BigWigsMods/packager@v2
         env:
           GITHUB_OAUTH: ${{ secrets.WORKFLOW_OAUTH }}
-          CF_API_KEY: ${{ secrets.CF_API_KEY }}
-          WOWI_API_TOKEN: ${{ secrets.WOWI_API_TOKEN }}
+          CF_API_KEY: ${{ github.event_name == 'release' && secrets.CF_API_KEY || '' }}
+          WOWI_API_TOKEN: ${{ github.event_name == 'release' && secrets.WOWI_API_TOKEN || '' }}
