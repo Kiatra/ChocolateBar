@@ -4,7 +4,7 @@ local L = LibStub("AceLocale-3.0"):GetLocale("CB_PlayedTime")
 --local Module = LibStub:GetLibrary("LibDataBroker-1.1",true):GetDataObjectByName(addonName)
 local Module = LibStub("AceAddon-3.0"):GetAddon("Arcana"):GetModule(moduleName)
 local db
-local tobedeleted
+local addedBlizzOptions = false
 
 local aceoptions = {
     name = moduleName,
@@ -79,7 +79,10 @@ function Module:RegisterOptions(data)
 
 
     LibStub("AceConfig-3.0"):RegisterOptionsTable(moduleName, aceoptions)
-    LibStub("AceConfigDialog-3.0"):AddToBlizOptions(moduleName, moduleName)
+    if not addedBlizzOptions then
+        LibStub("AceConfigDialog-3.0"):AddToBlizOptions(moduleName, moduleName)
+        addedBlizzOptions = true
+    end
 end
 
 function Module:OpenOptions()

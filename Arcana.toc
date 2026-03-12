@@ -24,20 +24,20 @@
 ## Category-zhTW: 資料管理
 
 #@no-lib-strip@
-libs\libs.xml
+Libs\Libs.xml
 #@end-no-lib-strip@
 
-libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
+Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
 
-localization\enUS.lua
-localization\deDE.lua
-localization\esES.lua
-localization\frFr.lua
-localization\koKR.lua
-localization\zhCN.lua
-localization\zhTW.lua
-localization\ptBR.lua
-localization\ruRU.lua
+Localization\enUS.lua
+Localization\deDE.lua
+Localization\esES.lua
+Localization\frFr.lua
+Localization\koKR.lua
+Localization\zhCN.lua
+Localization\zhTW.lua
+Localization\ptBR.lua
+Localization\ruRU.lua
 
 TheHeart.lua
 JostleMainline.lua
@@ -45,24 +45,20 @@ DragAndDrop.lua
 ArcanaPiece.lua
 Bar.lua
 DropPoints.lua
-modules\Placeholder.lua
-modules\MoreArcana.lua
 
+Modules\Placeholder\Placeholder.lua
+Modules\MoreArcana\MoreArcana.lua
+
+Modules\PlayedTime\PlayedTime_Loc.lua
+Modules\PlayedTime\PlayedTime.lua
+Modules\PlayedTime\PlayedTime_Options.lua
+
+Modules\PlayerCoordinates\PlayerCoordinates.lua
+Modules\Volume\MasterVolume.lua
+Modules\Volume\SoundVolume.lua
+Modules\Volume\MusicVolume.lua
 
 #@debug@
-modules\ItemLevel.lua
-modules\Lauchers_LibQTip.lua
-modules\BrokerDamage.lua
+Modules\ItemLevel\ItemLevel.lua
+Modules\DamageMeter\DamageMeter.lua
 #@end-debug@
-
-modules\PlayedTime_Loc.lua
-modules\PlayedTime.lua
-modules\PlayedTime_Options.lua
-
-modules\PlayerCoordinates\PlayerCoordinates.lua
-
-modules\MasterVolume\MasterVolume.lua
-modules\MusicVolume\MusicVolume.lua
-modules\SoundVolume\SoundVolume.lua
-
-Options.lua
