@@ -93,9 +93,14 @@ end
 
 function module:NewPlaceholder(name)
     local placeholder = LibStub("LibDataBroker-1.1"):NewDataObject(name, {
-        type  = "data source",
-        label = name,
-        text  = "",
+        type    = "data source",
+        label   = name,
+        text    = "",
+        OnClick = function(button)
+            if button == "RightButton" then
+                Arcana:LoadOptions()
+            end
+        end
     })
     return placeholder
 end

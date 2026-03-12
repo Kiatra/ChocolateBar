@@ -6,7 +6,11 @@ if not L then return end
 -- News
 -- -- ✧─────────────────────────────────────-----─────────✧
 L["news.7.header"] = "2026 March 12"
-L["news.7.text"] = "Options are now load on demand\nAdded pull requst from clicketz to add font outline options."
+L["news.7.text"] = [[
+Options are now load on demand.
+Added pull requst from clicketz to add font outline options.
+Added two new textures that only have a top or bottom line and are otherwise transparent.
+]]
 L["news.6.header"] = "2026 March 10"
 L["news.6.text"] = "Profile migration module is now load on demand and no longer required."
 

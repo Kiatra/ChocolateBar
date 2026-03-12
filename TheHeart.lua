@@ -177,6 +177,8 @@ function Arcana:Initialize()
 
     LSM:Register("statusbar", "Arcana Gold", "Interface\\AddOns\\Arcana\\Media\\ArcanaBar")
     LSM:Register("statusbar", "Arcana Gray", "Interface\\AddOns\\Arcana\\Meida\\ArcanaBarGray")
+    LSM:Register("statusbar", "Arcana Top", "Interface\\AddOns\\Arcana\\Media\\ArcanaTop")
+    LSM:Register("statusbar", "Arcana Bottom", "Interface\\AddOns\\Arcana\\Media\\ArcanaBottom")
     LSM:Register("statusbar", "Tooltip", "Interface\\Tooltips\\UI-Tooltip-Background")
     LSM:Register("statusbar", "Solid", "Interface\\Buttons\\WHITE8X8")
     LSM:Register("statusbar", "Gloss", "Interface\\AddOns\\Arcana\\Media\\Gloss")
@@ -742,12 +744,13 @@ function Arcana:LoadOptions(pluginName, input)
     if not IsAddOnLoaded("Arcana-Options") then
         local success, reason = LoadAddOn("Arcana-Options")
         if success then
-            Arcana:Log("Loading Options")
+            Arcana:OpenOptions(pluginName)
         else
             Arcana:Log("Failed to load Arcana-Options: " .. reason)
         end
+    else
+        Arcana:OpenOptions(pluginName)
     end
-    Arcana:OpenOptions(pluginName)
 end
 
 function Arcana:UpdateDB(data)
