@@ -39,7 +39,7 @@ local function migrateBarNames(db)
     end
 end
 
-local function migratePluginSettings(db)
+local function migrateArcanaPicesSettings(db)
     local settings = db.objSettings
     local barName = settings.barName
     if barName and barNameIsDeprecated(barName) then
@@ -99,7 +99,7 @@ function ArcanaMigrate:MigareDB()
 
     for _, profile in pairs(ChocolateBarDB.profiles) do
         migrateBarNames(profile)
-        migratePluginSettings(profile)
+        migrateArcanaPicesSettings(profile)
         migrateTexturePaths(profile)
     end
 

@@ -102,6 +102,7 @@ local function SettingsUpdater(self, value)
     self.text:SetPoint("RIGHT", self, 0, 0)
 
     if self.icon then
+        Arcana:Debug("SettingsUpdater icon showIcon:", settings.showIcon)
         if settings.showIcon then
             local iconSize = settings.iconSize or db.iconSize
             self.icon:SetWidth(db.height * iconSize)
@@ -178,7 +179,7 @@ local updaters = {
     end,
     updateSettings = SettingsUpdater,
     -- tooltiptext is no longer in the data spec, but
-    -- I'll continue to support it, as some plugins seem to use it
+    -- I'll continue to support it, as some data objects seem to use it
     tooltiptext    = function(frame, value, name)
         local object = frame.obj
         if not tooltipDisabled(object) then
@@ -314,7 +315,7 @@ local function OnDragStart(frame)
         Arcana.dragging = true
 
         if Arcana.db.profile.colorizedDragging then
-            Arcana:ExecuteforAllPlugins(function(frame)
+            Arcana:ExecuteforAllArcanaPices(function(frame)
                 frame:highlight(math.random(), math.random(), math.random(), .8)
             end)
         end
@@ -339,7 +340,7 @@ end
 local function OnDragStop(frame)
     if Arcana.dragging then
         --frame:highlight(0)
-        Arcana:ExecuteforAllPlugins(function(f) f:highlight(0, 0, 0, 0) end)
+        Arcana:ExecuteforAllArcanaPices(function(f) f:highlight(0, 0, 0, 0) end)
         frame:StopMovingOrSizing()
         frame.isMoving = false
         Drag:Stop(frame)
@@ -372,61 +373,61 @@ function ArcanaPiece:New(name, obj, settings, database)
     db = database
 
     local icon = obj.icon
-    local plugin = CreateFrame("Button", "Arcana" .. name, _G.UIParent,
+    local arcanaPiece = CreateFrame("Button", "Arcana" .. name, _G.UIParent,
         BackdropTemplateMixin and "BackdropTemplate")
     ---@diagnostic disable-next-line: inject-field
-    plugin.highlight = highlightBackground
+    arcanaPiece.highlight = highlightBackground
 
     --set update function
     ---@diagnostic disable-next-line: inject-field
-    plugin.Update = Update
+    arcanaPiece.Update = Update
     ---@diagnostic disable-next-line: inject-field
-    plugin.obj = obj
+    arcanaPiece.obj = obj
 
     ---@diagnostic disable-next-line: param-type-mismatch
-    plugin:EnableMouse(true)
-    plugin:RegisterForDrag("LeftButton")
+    arcanaPiece:EnableMouse(true)
+    arcanaPiece:RegisterForDrag("LeftButton")
 
     local fontPath = db.fontPath == " " and LSM:GetDefault("font") or db.fontPath
 
     ---@diagnostic disable-next-line: inject-field, param-type-mismatch
-    plugin.text = plugin:CreateFontString(nil, nil, "GameFontHighlight")
+    arcanaPiece.text = arcanaPiece:CreateFontString(nil, nil, "GameFontHighlight")
     ---@diagnostic disable-next-line: missing-parameter
-    plugin.text:SetFont(db.fontPath, db.fontSize)
-    plugin.text:SetJustifyH("LEFT")
+    arcanaPiece.text:SetFont(db.fontPath, db.fontSize)
+    arcanaPiece.text:SetJustifyH("LEFT")
 
     if isLauncherAndHasNoText(obj) then
         obj.text = obj.label and obj.label or name
     end
 
     if icon then
-        CreateIcon(plugin, icon)
+        CreateIcon(arcanaPiece, icon)
     end
 
-    plugin:SetScript("OnEnter", OnEnter)
-    plugin:SetScript("OnLeave", OnLeave)
-    plugin:RegisterForClicks("AnyUp")
-    plugin:SetScript("OnClick", OnClick)
-    plugin:SetScript("OnMouseWheel", OnMouseWheel)
+    arcanaPiece:SetScript("OnEnter", OnEnter)
+    arcanaPiece:SetScript("OnLeave", OnLeave)
+    arcanaPiece:RegisterForClicks("AnyUp")
+    arcanaPiece:SetScript("OnClick", OnClick)
+    arcanaPiece:SetScript("OnMouseWheel", OnMouseWheel)
 
-    plugin:Show()
+    arcanaPiece:Show()
     ---@diagnostic disable-next-line: inject-field
-    plugin.settings = settings
+    arcanaPiece.settings = settings
 
     if not obj.label then
         obj.label = name
     end
 
     ---@diagnostic disable-next-line: inject-field
-    plugin.name = name
+    arcanaPiece.name = name
     ---@diagnostic disable-next-line: param-type-mismatch
-    plugin:SetMovable(true)
-    plugin:SetScript("OnDragStart", OnDragStart)
-    plugin:SetScript("OnDragStop", OnDragStop)
-    SettingsUpdater(plugin, settings.showText)
-    LabelUpdater(plugin, obj.label)
+    arcanaPiece:SetMovable(true)
+    arcanaPiece:SetScript("OnDragStart", OnDragStart)
+    arcanaPiece:SetScript("OnDragStop", OnDragStop)
+    SettingsUpdater(arcanaPiece, settings.showText)
+    LabelUpdater(arcanaPiece, obj.label)
 
-    return plugin
+    return arcanaPiece
 end
 
 function ArcanaPiece:UpdateDB(database)

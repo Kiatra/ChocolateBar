@@ -10,7 +10,7 @@ local GetAverageItemLevel = GetAverageItemLevel or
 local dataobj = LibStub("LibDataBroker-1.1"):NewDataObject(addonName, {
     type        = "data source",
     description = "A broker plugin to show the characters item level",
-    label       = "Item Level",
+    label       = "iLvl",
     text        = "iLevel: ---",
     enabled     = false,
     --options = options,
@@ -23,7 +23,7 @@ end
 
 local function unitInventoryChange()
     local overall, equipped = GetAverageItemLevel()
-    dataobj.text = string.format("iLvl: %.1f (-%.1f)", overall, overall - equipped)
+    dataobj.text = string.format("%.1f (-%.1f)", overall, overall - equipped)
 end
 
 local frame = CreateFrame("Frame")
