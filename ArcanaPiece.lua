@@ -102,7 +102,6 @@ local function SettingsUpdater(self, value)
     self.text:SetPoint("RIGHT", self, 0, 0)
 
     if self.icon then
-        Arcana:Debug("SettingsUpdater icon showIcon:", settings.showIcon)
         if settings.showIcon then
             local iconSize = settings.iconSize or db.iconSize
             self.icon:SetWidth(db.height * iconSize)

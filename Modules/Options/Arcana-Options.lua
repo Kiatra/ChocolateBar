@@ -9,6 +9,7 @@
 -- ✧───────────────────────────────────────--------───────✧
 local libStub = LibStub
 local Arcana = libStub("AceAddon-3.0"):GetAddon("Arcana")
+local ArcanaOptions = LibStub("AceAddon-3.0"):NewAddon("Arcana-Options")
 local AceCfgDlg = LibStub("AceConfigDialog-3.0")
 local Drag = Arcana.Drag
 local broker = LibStub("LibDataBroker-1.1")
@@ -22,6 +23,22 @@ local GetAddOnMetadata = _G.GetAddOnMetadata or _G.C_AddOns.GetAddOnMetadata;
 local version = GetAddOnMetadata(addonName, "Version") or "unknown";
 local title = "|TInterface\\AddOns\\Arcana\\Media\\Icons\\ArcanaKnowledge.tga:" ..
     12 .. ":" .. 12 .. ":0:0|t " .. "Arcana - Quel'dorei Observatory"
+
+function ArcanaOptions:OnInitialize()
+    Arcana:RegisterOptions(Arcana.db.profile, _, Arcana.modules)
+    for name, obj in broker:DataObjectIterator() do
+        Arcana:AddObjectOptions(name, obj)
+    end
+
+    for name, _ in pairs(Arcana.modules) do
+        local subModuleOptions = Arcana:GetAceOptions().args.moduleOptions.args[name].args
+        subModuleOptions.Options = Arcana.modules[name].optionsExtended
+    end
+
+    for name, _ in pairs(Arcana.arcanaBars) do
+        Arcana:AddBarOptions(name)
+    end
+end
 
 local function GetStats()
     local total = 0
@@ -1269,7 +1286,6 @@ end
 -- plugin option functions
 -----
 local function GetStyledIdentifier(info)
-    --Arcana:Debug("GetSyledIdentifier", info.option.cleanName)
     local cleanName = info[#info]
     local name = pluginOptions[cleanName].desc
     --local icon = pluginOptions[cleanName].icon
@@ -1612,42 +1628,8 @@ function ArcanaOptions_PopulateOptionsPanelOld(container)
     AceConfigDialog:Open("Arcana", container)
 end
 
-local AceGUI = LibStub("AceGUI-3.0")
-local AceConfig = LibStub("AceConfig-3.0")
-local AceConfigDialog = LibStub("AceConfigDialog-3.0")
-
-function ArcanaOptions_PopulateOptionsPanel(parentFrame, arcanaBars, localdb, input, pluginName)
-    db = localdb
-
-    Arcana:Debug("PopulateOptionsPanel", parentFrame, arcanaBars, localdb, input, pluginName)
-    if parentFrame.aceContainer then
-        AceConfigDialog:Open("Arcana", parentFrame.aceContainer)
-        return
-    end
-
-    local container = AceGUI:Create("SimpleGroup")
-    container:SetFullWidth(true)
-    container:SetFullHeight(true)
-    container:SetLayout("Fill")
-
-    container.frame:SetParent(parentFrame)
-    container.frame:ClearAllPoints()
-    container.frame:SetPoint("TOPLEFT", parentFrame, "TOPLEFT", 10, -10)
-    container.frame:SetPoint("BOTTOMRIGHT", parentFrame, "BOTTOMRIGHT", -10, 10)
-    container.frame:Show()
-
-    parentFrame.aceContainer = container
-
-    aceoptions.args.profiles = LibStub("AceDBOptions-3.0"):GetOptionsTable(Arcana.db)
-    aceoptions.args.profiles.order = 100
-
-    AceConfigDialog:Open("Arcana", container)
-end
-
 function Arcana:RegisterOptions(data, _, modules)
     db = data
-    --Arcana:Debug("RegisterOptions")
-    --LibStub("AceConfig-3.0"):RegisterOptionsTable("Arcana", aceoptions)
     aceoptions.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
     AceCfgDlg:SetDefaultSize("Arcana", 700, 600)
 
@@ -1661,36 +1643,22 @@ function Arcana:RegisterOptions(data, _, modules)
     end
 end
 
-function Arcana:OpenOptions(objName, input)
+function Arcana:OpenOptions(objName)
     if objName then
-        Arcana:Debug("OpenOptions", objName)
         AceCfgDlg:SelectGroup("Arcana", "newsAndPlugins", "plugins", objName)
     end
 
     if InCombatLockdown() then
         Arcana:Info("|cff88ccffArcana|r", L["combat.openoption"])
-        Arcana:LoadOptions()
+        AceCfgDlg:Open("Arcana")
     else
         Settings.OpenToCategory(self.BlizzardOptionsCategoryID)
     end
-
-    --if blizzard then
-    --Settings.OpenToCategory(self.BlizzardOptionsCategoryID)
-    --elseif not input or input:trim() == "" then
-    --    AceCfgDlg:Open("Arcana")
-    --else
-    -- LibStub("AceConfigCmd-3.0").HandleCommand(Arcana, "Arcana", "Arcana", input)
-    --end
 end
 
 function Arcana:BuildArcanaOptions()
     return aceoptions
 end
-
---function Arcana:AddModuleOptions(name, options)
---Arcana:Debug("AddModuleOptions", name)
---moduleOptions[name] = options
---end
 
 function Arcana:AddBarOptions(name)
     barOptions[name] = {
@@ -1844,14 +1812,9 @@ function Arcana:AddObjectOptions(name, obj)
         return
     end
 
-    --Arcana:Debug("Adding object options for", obj, name)
-    --local curse = C_AddOns.GetAddOnMetadata(name,"X-Curse-Packaged-Version") or ""
-    --local version = C_AddOns.GetAddOnMetadata(name,"Version") or ""
-
     local cleanName = Arcana:GetCleanName(name)
     --use cleanName of name because aceconfig does not like some characters in the plugin names
     pluginOptions[cleanName] = {
-        --name = GetObjectText,
         name = GetStyledIdentifier,
         desc = name,
         desc2 = name,
